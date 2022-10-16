@@ -17,4 +17,6 @@ Point_2 p(0,0), q(1, 1), r(2, 2);
 std::cout << (CGAL::collinear(p,q,r) ? "collinear\n" : "not" "collinear\n"); 
 } 
 return 0;
+
+//test version 1.1
 }

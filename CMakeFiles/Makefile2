@@ -53,7 +53,7 @@ CMAKE_BINARY_DIR = "/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Proj
 # Directory level rules for the build root directory
 
 # The main recursive "all" target.
-all: CMakeFiles/trial.dir/all
+all: CMakeFiles/main.dir/all
 
 .PHONY : all
 
@@ -63,36 +63,36 @@ preinstall:
 .PHONY : preinstall
 
 # The main recursive "clean" target.
-clean: CMakeFiles/trial.dir/clean
+clean: CMakeFiles/main.dir/clean
 
 .PHONY : clean
 
 #=============================================================================
-# Target rules for target CMakeFiles/trial.dir
+# Target rules for target CMakeFiles/main.dir
 
 # All Build rule for target.
-CMakeFiles/trial.dir/all:
-	$(MAKE) -f CMakeFiles/trial.dir/build.make CMakeFiles/trial.dir/depend
-	$(MAKE) -f CMakeFiles/trial.dir/build.make CMakeFiles/trial.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir="/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/CMakeFiles" --progress-num=1,2 "Built target trial"
-.PHONY : CMakeFiles/trial.dir/all
+CMakeFiles/main.dir/all:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/depend
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir="/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/CMakeFiles" --progress-num=1,2 "Built target main"
+.PHONY : CMakeFiles/main.dir/all
 
 # Build rule for subdir invocation for target.
-CMakeFiles/trial.dir/rule: cmake_check_build_system
+CMakeFiles/main.dir/rule: cmake_check_build_system
 	$(CMAKE_COMMAND) -E cmake_progress_start "/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/CMakeFiles" 2
-	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/trial.dir/all
+	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/main.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start "/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/CMakeFiles" 0
-.PHONY : CMakeFiles/trial.dir/rule
+.PHONY : CMakeFiles/main.dir/rule
 
 # Convenience name for target.
-trial: CMakeFiles/trial.dir/rule
+main: CMakeFiles/main.dir/rule
 
-.PHONY : trial
+.PHONY : main
 
 # clean rule for target.
-CMakeFiles/trial.dir/clean:
-	$(MAKE) -f CMakeFiles/trial.dir/build.make CMakeFiles/trial.dir/clean
-.PHONY : CMakeFiles/trial.dir/clean
+CMakeFiles/main.dir/clean:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/clean
+.PHONY : CMakeFiles/main.dir/clean
 
 #=============================================================================
 # Special targets to cleanup operation of make.

@@ -6,3 +6,9 @@
 
 #IncludeRegexTransform: 
 
+/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/main.cpp
+iostream
+-
+CGAL/Simple_cartesian.h
+-
+

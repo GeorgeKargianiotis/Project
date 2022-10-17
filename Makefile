@@ -111,44 +111,44 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named trial
+# Target rules for targets named main
 
 # Build rule for target.
-trial: cmake_check_build_system
-	$(MAKE) -f CMakeFiles/Makefile2 trial
-.PHONY : trial
+main: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 main
+.PHONY : main
 
 # fast build rule for target.
-trial/fast:
-	$(MAKE) -f CMakeFiles/trial.dir/build.make CMakeFiles/trial.dir/build
-.PHONY : trial/fast
+main/fast:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/build
+.PHONY : main/fast
 
-trial.o: trial.cpp.o
+main.o: main.cpp.o
 
-.PHONY : trial.o
+.PHONY : main.o
 
 # target to build an object file
-trial.cpp.o:
-	$(MAKE) -f CMakeFiles/trial.dir/build.make CMakeFiles/trial.dir/trial.cpp.o
-.PHONY : trial.cpp.o
+main.cpp.o:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.o
+.PHONY : main.cpp.o
 
-trial.i: trial.cpp.i
+main.i: main.cpp.i
 
-.PHONY : trial.i
+.PHONY : main.i
 
 # target to preprocess a source file
-trial.cpp.i:
-	$(MAKE) -f CMakeFiles/trial.dir/build.make CMakeFiles/trial.dir/trial.cpp.i
-.PHONY : trial.cpp.i
+main.cpp.i:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.i
+.PHONY : main.cpp.i
 
-trial.s: trial.cpp.s
+main.s: main.cpp.s
 
-.PHONY : trial.s
+.PHONY : main.s
 
 # target to generate assembly for a file
-trial.cpp.s:
-	$(MAKE) -f CMakeFiles/trial.dir/build.make CMakeFiles/trial.dir/trial.cpp.s
-.PHONY : trial.cpp.s
+main.cpp.s:
+	$(MAKE) -f CMakeFiles/main.dir/build.make CMakeFiles/main.dir/main.cpp.s
+.PHONY : main.cpp.s
 
 # Help Target
 help:
@@ -158,10 +158,10 @@ help:
 	@echo "... depend"
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
-	@echo "... trial"
-	@echo "... trial.o"
-	@echo "... trial.i"
-	@echo "... trial.s"
+	@echo "... main"
+	@echo "... main.o"
+	@echo "... main.i"
+	@echo "... main.s"
 .PHONY : help
 
 

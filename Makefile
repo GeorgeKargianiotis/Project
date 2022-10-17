@@ -48,10 +48,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project"
+CMAKE_SOURCE_DIR = /mnt/c/Users/User/MYVSCODEPROJECTS/7TH
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project"
+CMAKE_BINARY_DIR = /mnt/c/Users/User/MYVSCODEPROJECTS/7TH
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -80,9 +80,9 @@ edit_cache/fast: edit_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/CMakeFiles" "/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/CMakeFiles/progress.marks"
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CMakeFiles /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CMakeFiles/progress.marks
 	$(MAKE) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

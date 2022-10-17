@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/main.cpp" "/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/CMakeFiles/main.dir/main.cpp.o"
+  "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/main.cpp" "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CMakeFiles/main.dir/main.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
 

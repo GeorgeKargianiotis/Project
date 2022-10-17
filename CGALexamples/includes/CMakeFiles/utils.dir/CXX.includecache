@@ -1,0 +1,18 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CGALexamples/includes/utils.cpp
+utils.hpp
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CGALexamples/includes/utils.hpp
+
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CGALexamples/includes/utils.hpp
+CGAL/Exact_predicates_inexact_constructions_kernel.h
+-
+CGAL/Polygon_2.h
+-
+

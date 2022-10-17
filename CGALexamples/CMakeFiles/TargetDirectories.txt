@@ -1,0 +1,6 @@
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CGALexamples/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CGALexamples/CMakeFiles/edit_cache.dir
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CGALexamples/CMakeFiles/polyg.dir
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CGALexamples/includes/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CGALexamples/includes/CMakeFiles/edit_cache.dir
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CGALexamples/includes/CMakeFiles/utils.dir

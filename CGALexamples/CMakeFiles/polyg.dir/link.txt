@@ -1,0 +1,1 @@
+/usr/bin/c++     CMakeFiles/polyg.dir/ex.cpp.o  -o polyg  includes/libutils.a /usr/lib/x86_64-linux-gnu/libgmpxx.so /usr/lib/x86_64-linux-gnu/libmpfr.so /usr/lib/x86_64-linux-gnu/libgmp.so -pthread 

@@ -1,0 +1,3 @@
+/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/CMakeFiles/edit_cache.dir
+/mnt/c/Users/vtsim/Google Drive/Algorithmika Provlimata/Project/CMakeFiles/trial.dir

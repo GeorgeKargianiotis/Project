@@ -3,7 +3,7 @@
 
 cmake_minimum_required(VERSION 3.1...3.23)
 
-project( trial )
+project( main )
 
 
 # CGAL and its components
@@ -33,13 +33,13 @@ endif()
 # include for local package
 
 
-# Creating entries for target: trial
+# Creating entries for target: main
 # ############################
 
-add_executable( trial  trial.cpp )
+add_executable( main  main.cpp )
 
-add_to_cached_list( CGAL_EXECUTABLE_TARGETS trial )
+add_to_cached_list( CGAL_EXECUTABLE_TARGETS main )
 
 # Link the executable to CGAL and third-party libraries
-target_link_libraries(trial PRIVATE CGAL::CGAL )
+target_link_libraries(main PRIVATE CGAL::CGAL )
 

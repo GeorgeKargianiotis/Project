@@ -7,6 +7,7 @@ char *inputFiles, *outputFile, *algorithm, *edgeSelection, *initialization;
 
 int main(int argc, char* argv[]){
 	readArguments(argc, argv);
+	std::cout << "Successfully read arguments" << std::endl;
 	return 0;
 }
 

@@ -1,3 +1,0 @@
-/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CMakeFiles/rebuild_cache.dir
-/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CMakeFiles/edit_cache.dir
-/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/CMakeFiles/polygonization.dir

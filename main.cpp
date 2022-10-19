@@ -13,11 +13,11 @@ typedef CGAL::Projection_traits_yz_3<K3> K;
 typedef K::Point_2 Point_2;
 
 
-int main() {
+// int main() {
 
-	std::istream_iterator< Point_2 >  input_begin( std::cin );
-  	std::istream_iterator< Point_2 >  input_end;
- 	std::ostream_iterator< Point_2 >  output( std::cout, "\n" );
-  	CGAL::convex_hull_2( input_begin, input_end, output, K() );
-	return 0;
-}
+// 	std::istream_iterator< Point_2 >  input_begin( std::cin );
+//   	std::istream_iterator< Point_2 >  input_end;
+//  	std::ostream_iterator< Point_2 >  output( std::cout, "\n" );
+//   	CGAL::convex_hull_2( input_begin, input_end, output, K() );
+// 	return 0;
+// }

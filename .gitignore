@@ -9,3 +9,5 @@ CMakeLists.txt
 polygonization
 Makefile
 euro-night--0000020.instance
+headers/*.a
+srouces/*.a

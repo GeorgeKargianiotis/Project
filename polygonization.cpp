@@ -1,5 +1,9 @@
 #include <iostream>
+#include <vector>
 #include <string>
+#include <fstream>
+
+#include "headers/utils.h"
 
 void readArguments(int &argc, char* argv[]);
 
@@ -7,7 +11,18 @@ char *inputFiles, *outputFile, *algorithm, *edgeSelection, *initialization;
 
 int main(int argc, char* argv[]){
 	readArguments(argc, argv);
-	std::cout << "Successfully read arguments" << std::endl;
+	std::ifstream file(inputFiles);
+	std::string test;
+
+	//ignore first two lines
+	std::getline(file, test);
+	std::getline(file, test);
+
+	while(std::getline(file, test)){
+		std::vector<std::string> split = utils::splitString(test, '\t'); 
+	}
+
+	file.close();
 	return 0;
 }
 

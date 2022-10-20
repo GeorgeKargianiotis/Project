@@ -123,32 +123,59 @@ polygonization/fast:
 	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/build
 .PHONY : polygonization/fast
 
-main.o: main.cpp.o
+functions.o: functions.cpp.o
 
-.PHONY : main.o
+.PHONY : functions.o
 
 # target to build an object file
-main.cpp.o:
-	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/main.cpp.o
-.PHONY : main.cpp.o
+functions.cpp.o:
+	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/functions.cpp.o
+.PHONY : functions.cpp.o
 
-main.i: main.cpp.i
+functions.i: functions.cpp.i
 
-.PHONY : main.i
+.PHONY : functions.i
 
 # target to preprocess a source file
-main.cpp.i:
-	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/main.cpp.i
-.PHONY : main.cpp.i
+functions.cpp.i:
+	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/functions.cpp.i
+.PHONY : functions.cpp.i
 
-main.s: main.cpp.s
+functions.s: functions.cpp.s
 
-.PHONY : main.s
+.PHONY : functions.s
 
 # target to generate assembly for a file
-main.cpp.s:
-	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/main.cpp.s
-.PHONY : main.cpp.s
+functions.cpp.s:
+	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/functions.cpp.s
+.PHONY : functions.cpp.s
+
+newFile.o: newFile.cpp.o
+
+.PHONY : newFile.o
+
+# target to build an object file
+newFile.cpp.o:
+	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/newFile.cpp.o
+.PHONY : newFile.cpp.o
+
+newFile.i: newFile.cpp.i
+
+.PHONY : newFile.i
+
+# target to preprocess a source file
+newFile.cpp.i:
+	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/newFile.cpp.i
+.PHONY : newFile.cpp.i
+
+newFile.s: newFile.cpp.s
+
+.PHONY : newFile.s
+
+# target to generate assembly for a file
+newFile.cpp.s:
+	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/newFile.cpp.s
+.PHONY : newFile.cpp.s
 
 polygonization.o: polygonization.cpp.o
 
@@ -186,9 +213,12 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... polygonization"
-	@echo "... main.o"
-	@echo "... main.i"
-	@echo "... main.s"
+	@echo "... functions.o"
+	@echo "... functions.i"
+	@echo "... functions.s"
+	@echo "... newFile.o"
+	@echo "... newFile.i"
+	@echo "... newFile.s"
 	@echo "... polygonization.o"
 	@echo "... polygonization.i"
 	@echo "... polygonization.s"

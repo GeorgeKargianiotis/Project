@@ -74,12 +74,12 @@ clean: CMakeFiles/polygonization.dir/clean
 CMakeFiles/polygonization.dir/all:
 	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/depend
 	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/build
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles --progress-num=1,2,3 "Built target polygonization"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --progress-dir=/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles --progress-num=1,2,3,4 "Built target polygonization"
 .PHONY : CMakeFiles/polygonization.dir/all
 
 # Build rule for subdir invocation for target.
 CMakeFiles/polygonization.dir/rule: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles 3
+	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles 4
 	$(MAKE) -f CMakeFiles/Makefile2 CMakeFiles/polygonization.dir/all
 	$(CMAKE_COMMAND) -E cmake_progress_start /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles 0
 .PHONY : CMakeFiles/polygonization.dir/rule

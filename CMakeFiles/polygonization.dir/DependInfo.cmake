@@ -4,7 +4,8 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/main.cpp" "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles/polygonization.dir/main.cpp.o"
+  "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/functions.cpp" "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles/polygonization.dir/functions.cpp.o"
+  "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/newFile.cpp" "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles/polygonization.dir/newFile.cpp.o"
   "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/polygonization.cpp" "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles/polygonization.dir/polygonization.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")

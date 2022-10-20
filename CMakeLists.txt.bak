@@ -36,7 +36,7 @@ endif()
 # Creating entries for target: polygonization
 # ############################
 
-add_executable( polygonization  functions.cpp newFile.cpp polygonization.cpp )
+add_executable( polygonization  main.cpp polygonization.cpp )
 
 add_to_cached_list( CGAL_EXECUTABLE_TARGETS polygonization )
 

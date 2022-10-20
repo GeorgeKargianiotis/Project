@@ -1,5 +1,6 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/polygonization.dir/main.cpp.o"
+  "CMakeFiles/polygonization.dir/functions.cpp.o"
+  "CMakeFiles/polygonization.dir/newFile.cpp.o"
   "CMakeFiles/polygonization.dir/polygonization.cpp.o"
   "polygonization"
   "polygonization.pdb"

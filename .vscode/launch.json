@@ -19,7 +19,7 @@
 				"-initialization",
 				"i",
 				"-i",
-				"euro-night-0000020.instance"
+				"euro-night-0000030.instance"
 			],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}",

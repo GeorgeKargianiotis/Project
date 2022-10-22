@@ -31,7 +31,7 @@ endif()
 # include for local directory
 add_subdirectory(sources)
 include_directories(headers)
-list(APPEND EXTRA_LIBS utils)
+list(APPEND EXTRA_LIBS utils incremental)
 # include for local package
 
 

@@ -3,18 +3,9 @@
 #include <string>
 #include <fstream>
 
-#include <CGAL/convex_hull_2.h>
-#include <CGAL/Convex_hull_traits_adapter_2.h>
-#include <CGAL/property_map.h>
-#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
-#include <CGAL/Polygon_2.h>
-
 #include "headers/utils.hpp"
-
-typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
-typedef CGAL::Polygon_2<K> Polygon_2;
-typedef K::Point_2 Point_2;
-typedef K::Segment_2 Segment_2;
+#include "headers/incremental.hpp"
+#include "headers/cgalConfig.hpp"
 
 void readArguments(int &argc, char* argv[]);
 
@@ -35,8 +26,8 @@ int main(int argc, char* argv[]){
 		Points2.push_back(Point_2(std::stod(split[1]), std::stod(split[2])));
 	}
 
-	for(auto point : Points2)
-		std::cout << point << std::endl;	
+	if(std::string(algorithm).compare("incremental") == 0)
+		incremental::incrementalAlgorithm(Points2);
 
 	file.close();
 	return 0;

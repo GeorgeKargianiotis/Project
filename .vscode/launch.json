@@ -13,7 +13,7 @@
 				"-o", 
 				"o",
 				"-algorithm",
-				"a",
+				"incremental",
 				"-edge_selection",
 				"s",
 				"-initialization",

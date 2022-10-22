@@ -1,9 +1,9 @@
 #include <vector>
 #include <string>
 
-#include "../headers/utils.h"
+#include "utils.hpp"
 
-std::vector<std::string> splitString(std::string str, char delimiter = ' '){
+std::vector<std::string> utils::splitString(std::string str, char delimiter = ' '){
 	std::vector<std::string> split;
 
 	int begin = 0;

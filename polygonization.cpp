@@ -3,7 +3,7 @@
 #include <string>
 #include <fstream>
 
-#include "headers/utils.h"
+#include "headers/utils.hpp"
 
 void readArguments(int &argc, char* argv[]);
 

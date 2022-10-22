@@ -8,6 +8,6 @@ CMakeCache.txt.bak
 #CMakeLists.txt
 polygonization
 Makefile
-euro-night--0000020.instance
+#euro-night-0000020.instance
 headers/*.a
 sources/*.a

@@ -3,7 +3,7 @@
 
 #include "../headers/utils.hpp"
 
-std::vector<std::string> utils::splitString(std::string str, char delimiter = ' '){
+std::vector<std::string> utils::splitString(std::string &str, char delimiter = ' '){
 	std::vector<std::string> split;
 
 	int begin = 0;

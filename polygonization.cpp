@@ -20,6 +20,7 @@ int main(int argc, char* argv[]){
 
 	while(std::getline(file, test)){
 		std::vector<std::string> split = utils::splitString(test, '\t'); 
+		split.erase(split.begin());
 	}
 
 	file.close();

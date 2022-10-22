@@ -11,3 +11,4 @@ Makefile
 #euro-night-0000020.instance
 headers/*.a
 sources/*.a
+updateMaster.sh

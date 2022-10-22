@@ -3,4 +3,3 @@ rm cmake_install.cmake
 rm CMakeCache.txt
 rm polygonization
 rm Makefile
-#rm CMakeLists.txt

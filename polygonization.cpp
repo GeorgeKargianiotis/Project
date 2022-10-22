@@ -32,7 +32,6 @@ int main(int argc, char* argv[]){
 
 	while(std::getline(file, line)){
 		std::vector<std::string> split = utils::splitString(line, '\t'); 
-		//convert string to Point_2
 		Points2.push_back(Point_2(std::stod(split[1]), std::stod(split[2])));
 	}
 

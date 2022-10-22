@@ -3,7 +3,18 @@
 #include <string>
 #include <fstream>
 
+#include <CGAL/convex_hull_2.h>
+#include <CGAL/Convex_hull_traits_adapter_2.h>
+#include <CGAL/property_map.h>
+#include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Polygon_2.h>
+
 #include "headers/utils.hpp"
+
+typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
+typedef CGAL::Polygon_2<K> Polygon_2;
+typedef K::Point_2 Point_2;
+typedef K::Segment_2 Segment_2;
 
 void readArguments(int &argc, char* argv[]);
 
@@ -12,17 +23,21 @@ char *inputFiles, *outputFile, *algorithm, *edgeSelection, *initialization;
 int main(int argc, char* argv[]){
 	readArguments(argc, argv);
 	std::ifstream file(inputFiles);
-	std::string test;
+	std::string line;
+	std::vector<Point_2> Points2;
 
 	//ignore first two lines
-	std::getline(file, test);
-	std::getline(file, test);
+	std::getline(file, line);
+	std::getline(file, line);
 
-	while(std::getline(file, test)){
-		std::vector<std::string> split = utils::splitString(test, '\t'); 
-		split.erase(split.begin());
+	while(std::getline(file, line)){
+		std::vector<std::string> split = utils::splitString(line, '\t'); 
 		//convert string to Point_2
+		Points2.push_back(Point_2(std::stod(split[1]), std::stod(split[2])));
 	}
+
+	for(auto point : Points2)
+		std::cout << point << std::endl;	
 
 	file.close();
 	return 0;

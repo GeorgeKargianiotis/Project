@@ -1,0 +1,42 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/headers/cgalConfig.hpp
+CGAL/convex_hull_2.h
+-
+CGAL/Convex_hull_traits_adapter_2.h
+-
+CGAL/property_map.h
+-
+CGAL/Exact_predicates_inexact_constructions_kernel.h
+-
+CGAL/Polygon_2.h
+-
+
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/headers/incremental.hpp
+../headers/cgalConfig.hpp
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/headers/cgalConfig.hpp
+
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/headers/utils.hpp
+
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/polygonization.cpp
+iostream
+-
+vector
+-
+string
+-
+fstream
+-
+headers/utils.hpp
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/headers/utils.hpp
+headers/incremental.hpp
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/headers/incremental.hpp
+headers/cgalConfig.hpp
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/headers/cgalConfig.hpp
+

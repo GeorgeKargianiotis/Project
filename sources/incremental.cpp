@@ -5,6 +5,9 @@
 #include "../headers/cgalConfig.hpp"
 #include "../headers/utils.hpp"
 
+#include <CGAL/draw_polygon_2.h>
+
+#define CGAL_USE_BASIC_VIEWER
 
 void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization){
 
@@ -21,8 +24,12 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	else if(std::string(initialization).compare(SORT_BY_Y_DESC) == 0)
 		std::sort(points.begin(), points.end(), utils::cmp2bPoint2);
 
-	std::cout << initialization << std::endl; 
-	for(auto point : points)
-		std::cout << point << std::endl;	
+	Polygon_2 polygon;			
+	
+	// initialize polygon with the 3 first points
+	polygon.push_back(points[0]);
+	polygon.push_back(points[1]);
+	polygon.push_back(points[2]);
 
+	CGAL::draw(polygon);
 }

@@ -5,6 +5,8 @@
 
 #include "headers/utils.hpp"
 #include "headers/incremental.hpp"
+#include "headers/onion.hpp"
+#include "headers/convex_hull.hpp"
 #include "headers/cgalConfig.hpp"
 
 void readArguments(int &argc, char* argv[]);

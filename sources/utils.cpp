@@ -18,3 +18,7 @@ std::vector<std::string> utils::splitString(std::string &str, char delimiter = '
 	
 	return split;
 }
+
+bool utils::cmpPoint2(Point_2 &point1, Point_2 &point2){
+	return point1.hx() < point2.hx();
+}

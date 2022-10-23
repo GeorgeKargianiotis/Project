@@ -1,3 +1,7 @@
 /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles/rebuild_cache.dir
 /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles/edit_cache.dir
 /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles/polygonization.dir
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/sources/CMakeFiles/rebuild_cache.dir
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/sources/CMakeFiles/edit_cache.dir
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/sources/CMakeFiles/incremental.dir
+/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/sources/CMakeFiles/utils.dir

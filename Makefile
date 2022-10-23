@@ -123,59 +123,31 @@ polygonization/fast:
 	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/build
 .PHONY : polygonization/fast
 
-functions.o: functions.cpp.o
+#=============================================================================
+# Target rules for targets named incremental
 
-.PHONY : functions.o
+# Build rule for target.
+incremental: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 incremental
+.PHONY : incremental
 
-# target to build an object file
-functions.cpp.o:
-	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/functions.cpp.o
-.PHONY : functions.cpp.o
+# fast build rule for target.
+incremental/fast:
+	$(MAKE) -f sources/CMakeFiles/incremental.dir/build.make sources/CMakeFiles/incremental.dir/build
+.PHONY : incremental/fast
 
-functions.i: functions.cpp.i
+#=============================================================================
+# Target rules for targets named utils
 
-.PHONY : functions.i
+# Build rule for target.
+utils: cmake_check_build_system
+	$(MAKE) -f CMakeFiles/Makefile2 utils
+.PHONY : utils
 
-# target to preprocess a source file
-functions.cpp.i:
-	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/functions.cpp.i
-.PHONY : functions.cpp.i
-
-functions.s: functions.cpp.s
-
-.PHONY : functions.s
-
-# target to generate assembly for a file
-functions.cpp.s:
-	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/functions.cpp.s
-.PHONY : functions.cpp.s
-
-newFile.o: newFile.cpp.o
-
-.PHONY : newFile.o
-
-# target to build an object file
-newFile.cpp.o:
-	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/newFile.cpp.o
-.PHONY : newFile.cpp.o
-
-newFile.i: newFile.cpp.i
-
-.PHONY : newFile.i
-
-# target to preprocess a source file
-newFile.cpp.i:
-	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/newFile.cpp.i
-.PHONY : newFile.cpp.i
-
-newFile.s: newFile.cpp.s
-
-.PHONY : newFile.s
-
-# target to generate assembly for a file
-newFile.cpp.s:
-	$(MAKE) -f CMakeFiles/polygonization.dir/build.make CMakeFiles/polygonization.dir/newFile.cpp.s
-.PHONY : newFile.cpp.s
+# fast build rule for target.
+utils/fast:
+	$(MAKE) -f sources/CMakeFiles/utils.dir/build.make sources/CMakeFiles/utils.dir/build
+.PHONY : utils/fast
 
 polygonization.o: polygonization.cpp.o
 
@@ -213,12 +185,8 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... polygonization"
-	@echo "... functions.o"
-	@echo "... functions.i"
-	@echo "... functions.s"
-	@echo "... newFile.o"
-	@echo "... newFile.i"
-	@echo "... newFile.s"
+	@echo "... incremental"
+	@echo "... utils"
 	@echo "... polygonization.o"
 	@echo "... polygonization.i"
 	@echo "... polygonization.s"

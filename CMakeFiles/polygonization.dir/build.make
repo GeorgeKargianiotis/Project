@@ -57,35 +57,9 @@ include CMakeFiles/polygonization.dir/progress.make
 # Include the compile flags for this target's objects.
 include CMakeFiles/polygonization.dir/flags.make
 
-CMakeFiles/polygonization.dir/functions.cpp.o: CMakeFiles/polygonization.dir/flags.make
-CMakeFiles/polygonization.dir/functions.cpp.o: functions.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/polygonization.dir/functions.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/polygonization.dir/functions.cpp.o -c /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/functions.cpp
-
-CMakeFiles/polygonization.dir/functions.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/polygonization.dir/functions.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/functions.cpp > CMakeFiles/polygonization.dir/functions.cpp.i
-
-CMakeFiles/polygonization.dir/functions.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/polygonization.dir/functions.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/functions.cpp -o CMakeFiles/polygonization.dir/functions.cpp.s
-
-CMakeFiles/polygonization.dir/newFile.cpp.o: CMakeFiles/polygonization.dir/flags.make
-CMakeFiles/polygonization.dir/newFile.cpp.o: newFile.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object CMakeFiles/polygonization.dir/newFile.cpp.o"
-	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/polygonization.dir/newFile.cpp.o -c /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/newFile.cpp
-
-CMakeFiles/polygonization.dir/newFile.cpp.i: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/polygonization.dir/newFile.cpp.i"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/newFile.cpp > CMakeFiles/polygonization.dir/newFile.cpp.i
-
-CMakeFiles/polygonization.dir/newFile.cpp.s: cmake_force
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/polygonization.dir/newFile.cpp.s"
-	/usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/newFile.cpp -o CMakeFiles/polygonization.dir/newFile.cpp.s
-
 CMakeFiles/polygonization.dir/polygonization.cpp.o: CMakeFiles/polygonization.dir/flags.make
 CMakeFiles/polygonization.dir/polygonization.cpp.o: polygonization.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object CMakeFiles/polygonization.dir/polygonization.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object CMakeFiles/polygonization.dir/polygonization.cpp.o"
 	/usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/polygonization.dir/polygonization.cpp.o -c /mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/polygonization.cpp
 
 CMakeFiles/polygonization.dir/polygonization.cpp.i: cmake_force
@@ -98,22 +72,20 @@ CMakeFiles/polygonization.dir/polygonization.cpp.s: cmake_force
 
 # Object files for target polygonization
 polygonization_OBJECTS = \
-"CMakeFiles/polygonization.dir/functions.cpp.o" \
-"CMakeFiles/polygonization.dir/newFile.cpp.o" \
 "CMakeFiles/polygonization.dir/polygonization.cpp.o"
 
 # External object files for target polygonization
 polygonization_EXTERNAL_OBJECTS =
 
-polygonization: CMakeFiles/polygonization.dir/functions.cpp.o
-polygonization: CMakeFiles/polygonization.dir/newFile.cpp.o
 polygonization: CMakeFiles/polygonization.dir/polygonization.cpp.o
 polygonization: CMakeFiles/polygonization.dir/build.make
+polygonization: sources/libutils.a
+polygonization: sources/libincremental.a
 polygonization: /usr/lib/x86_64-linux-gnu/libgmpxx.so
 polygonization: /usr/lib/x86_64-linux-gnu/libmpfr.so
 polygonization: /usr/lib/x86_64-linux-gnu/libgmp.so
 polygonization: CMakeFiles/polygonization.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Linking CXX executable polygonization"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Linking CXX executable polygonization"
 	$(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/polygonization.dir/link.txt --verbose=$(VERBOSE)
 
 # Rule to build all files generated by this target.

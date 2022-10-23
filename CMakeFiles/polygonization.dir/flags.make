@@ -6,5 +6,5 @@ CXX_FLAGS = -O3 -DNDEBUG   -frounding-math -pthread
 
 CXX_DEFINES = -DBOOST_ALL_NO_LIB -DCGAL_USE_GMPXX=1
 
-CXX_INCLUDES = 
+CXX_INCLUDES = -I/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/headers 
 

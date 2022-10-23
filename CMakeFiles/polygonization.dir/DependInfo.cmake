@@ -4,8 +4,6 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_CXX
-  "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/functions.cpp" "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles/polygonization.dir/functions.cpp.o"
-  "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/newFile.cpp" "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles/polygonization.dir/newFile.cpp.o"
   "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/polygonization.cpp" "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/CMakeFiles/polygonization.dir/polygonization.cpp.o"
   )
 set(CMAKE_CXX_COMPILER_ID "GNU")
@@ -18,10 +16,13 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
+  "headers"
   )
 
 # Targets to which this target links.
 set(CMAKE_TARGET_LINKED_INFO_FILES
+  "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/sources/CMakeFiles/utils.dir/DependInfo.cmake"
+  "/mnt/c/Users/User/MYVSCODEPROJECTS/7TH/Project/sources/CMakeFiles/incremental.dir/DependInfo.cmake"
   )
 
 # Fortran module output directory.

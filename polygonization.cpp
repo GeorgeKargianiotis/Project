@@ -1,5 +1,11 @@
 #include <iostream>
+#include <vector>
 #include <string>
+#include <fstream>
+
+#include "headers/utils.hpp"
+#include "headers/incremental.hpp"
+#include "headers/cgalConfig.hpp"
 
 void readArguments(int &argc, char* argv[]);
 
@@ -7,7 +13,23 @@ char *inputFiles, *outputFile, *algorithm, *edgeSelection, *initialization;
 
 int main(int argc, char* argv[]){
 	readArguments(argc, argv);
-	std::cout << "Successfully read arguments" << std::endl;
+	std::ifstream file(inputFiles);
+	std::string line;
+	std::vector<Point_2> Points2;
+
+	//ignore first two lines
+	std::getline(file, line);
+	std::getline(file, line);
+
+	while(std::getline(file, line)){
+		std::vector<std::string> split = utils::splitString(line, '\t'); 
+		Points2.push_back(Point_2(std::stod(split[1]), std::stod(split[2])));
+	}
+
+	if(std::string(algorithm).compare("incremental") == 0)
+		incremental::incrementalAlgorithm(Points2);
+
+	file.close();
 	return 0;
 }
 

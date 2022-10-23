@@ -10,6 +10,8 @@
 			"request": "launch",
 			"program": "${workspaceFolder}/polygonization",
 			"args": [
+				"-i",
+				"euro-night-0000030.instance",
 				"-o", 
 				"o",
 				"-algorithm",
@@ -17,9 +19,7 @@
 				"-edge_selection",
 				"s",
 				"-initialization",
-				"i",
-				"-i",
-				"euro-night-0000030.instance"
+				"1a"
 			],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}",

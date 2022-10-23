@@ -11,11 +11,11 @@
 
 void readArguments(int &argc, char* argv[]);
 
-char *inputFiles, *outputFile, *algorithm, *edgeSelection, *initialization;
+char *inputFile, *outputFile, *algorithm, *edgeSelection, *initialization;
 
 int main(int argc, char* argv[]){
 	readArguments(argc, argv);
-	std::ifstream file(inputFiles);
+	std::ifstream file(inputFile);
 	std::string line;
 	std::vector<Point_2> Points2;
 
@@ -28,17 +28,17 @@ int main(int argc, char* argv[]){
 		Points2.push_back(Point_2(std::stod(split[1]), std::stod(split[2])));
 	}
 
+	file.close();
+
 	if(std::string(algorithm).compare("incremental") == 0)
-		incremental::incrementalAlgorithm(Points2);
+		incremental::incrementalAlgorithm(Points2, initialization);
 
 	if(std::string(algorithm).compare("convex_hull") == 0)
-		convex_hull::Convex_HullAlgorithm(Points2);
+		convex_hull::convex_HullAlgorithm(Points2);
 
 	if(std::string(algorithm).compare("onion") == 0)
-		onion::OnionAlgorithm(Points2);	
+		onion::onionAlgorithm(Points2);	
 
-
-	file.close();
 	return 0;
 }
 
@@ -52,7 +52,7 @@ void readArguments(int &argc, char* argv[]){
 	for(int i = 1; i < argc; i += 2){
 
 		if(std::string(argv[i]).compare("-i") == 0){
-			inputFiles = argv[i+1];
+			inputFile = argv[i+1];
 			continue;
 		}
 
@@ -72,7 +72,7 @@ void readArguments(int &argc, char* argv[]){
 		}
 
 		if(std::string(argv[i]).compare("-initialization") == 0){
-			inputFiles = argv[i+1];
+			initialization = argv[i+1];
 			continue;
 		}
 	}

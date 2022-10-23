@@ -4,7 +4,7 @@
 #include "../headers/cgalConfig.hpp"
 
 namespace convex_hull {
-	void Convex_HullAlgorithm(std::vector<Point_2> &Points);	
+	void convex_HullAlgorithm(std::vector<Point_2> &Points);	
 } 
 
 #endif

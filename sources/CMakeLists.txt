@@ -1,3 +1,5 @@
 include_directories(../headers)
 add_library(utils utils.cpp)
 add_library(incremental incremental.cpp)
+add_library(convex_hull convex_hull.cpp)
+add_library(onion onion.cpp)

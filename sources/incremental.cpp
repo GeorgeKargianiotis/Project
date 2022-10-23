@@ -5,15 +5,20 @@
 #include "../headers/cgalConfig.hpp"
 #include "../headers/utils.hpp"
 
+
 void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization){
 
-	if(std::string(initialization).compare("1a") == 0)
+	//order by x ascending
+	if(std::string(initialization).compare(SORT_BY_X_ASC) == 0)
 		std::sort(points.begin(), points.end(), utils::cmp1aPoint2);
-	else if(std::string(initialization).compare("1b") == 0)
+	//order by x descending 
+	else if(std::string(initialization).compare(SORT_BY_X_DESC) == 0)
 		std::sort(points.begin(), points.end(), utils::cmp1bPoint2);
-	else if(std::string(initialization).compare("2a") == 0)
+	//order by y ascending
+	else if(std::string(initialization).compare(SORT_BY_Y_ASC) == 0)
 		std::sort(points.begin(), points.end(), utils::cmp2aPoint2);
-	else if(std::string(initialization).compare("2b") == 0)
+	//order by y descending 
+	else if(std::string(initialization).compare(SORT_BY_Y_DESC) == 0)
 		std::sort(points.begin(), points.end(), utils::cmp2bPoint2);
 
 	std::cout << initialization << std::endl; 

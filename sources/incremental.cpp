@@ -32,4 +32,5 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	//CGAL::draw(polygon);
 
 	utils::polygonToPythonArray(polygon);
+	utils::vectorToPythonArray(points);
 }

@@ -11,3 +11,4 @@ Makefile
 headers/*.a
 sources/*.a
 updateMaster.sh
+deleteQt5.sh

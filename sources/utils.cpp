@@ -19,6 +19,13 @@ std::vector<std::string> utils::splitString(std::string &str, char delimiter = '
 	return split;
 }
 
+
+void utils::polygonToPythonArray(Polygon_2 polygon){
+	for(Point_2 point : polygon)
+		std::cout << "[" << point.hx() << "," << point.hy() << "],";  
+	std::cout << std::endl;
+}
+
 bool utils::cmp1aPoint2(Point_2 &point1, Point_2 &point2){
 	return point1.hx() < point2.hx();
 }

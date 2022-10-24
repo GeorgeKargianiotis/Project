@@ -7,8 +7,6 @@
 
 #include <CGAL/draw_polygon_2.h>
 
-#define CGAL_USE_BASIC_VIEWER
-
 void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization){
 
 	//order by x ascending
@@ -26,10 +24,12 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 	Polygon_2 polygon;			
 	
-	// initialize polygon with the 3 first points
+	// initialize polygon with the 3 first sorted points
 	polygon.push_back(points[0]);
 	polygon.push_back(points[1]);
 	polygon.push_back(points[2]);
 
-	CGAL::draw(polygon);
+	//CGAL::draw(polygon);
+
+	utils::polygonToPythonArray(polygon);
 }

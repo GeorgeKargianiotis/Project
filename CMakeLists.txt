@@ -5,10 +5,8 @@ cmake_minimum_required(VERSION 3.1...3.23)
 
 project( polygonization )
 
-
 # CGAL and its components
 find_package( CGAL QUIET COMPONENTS  )
-#find_package(CGAL REQUIRED COMPONENTS Qt5 Core)
 
 if ( NOT CGAL_FOUND )
 
@@ -29,16 +27,11 @@ if ( NOT Boost_FOUND )
 
 endif()
 
-# if(CGAL_Qt5_FOUND)
-#   add_definitions(-DCGAL_USE_BASIC_VIEWER -DQT_NO_KEYWORDS)
-# endif()
-
 # include for local directory
 add_subdirectory(sources)
 include_directories(headers)
 list(APPEND EXTRA_LIBS utils incremental convex_hull onion)
 # include for local package
-
 
 # Creating entries for target: polygonization
 # ############################
@@ -49,4 +42,3 @@ add_to_cached_list( CGAL_EXECUTABLE_TARGETS polygonization )
 
 # Link the executable to CGAL and third-party libraries
 target_link_libraries(polygonization PRIVATE CGAL::CGAL ${EXTRA_LIBS})
-#target_link_libraries(polygonization PRIVATE CGAL::CGAL ${EXTRA_LIBS} CGAL::CGAL_Qt5 CGAL::CGAL_Core)

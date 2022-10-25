@@ -5,8 +5,6 @@
 #include "../headers/cgalConfig.hpp"
 #include "../headers/utils.hpp"
 
-#include <CGAL/draw_polygon_2.h>
-
 void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization){
 
 	//order by x ascending
@@ -28,8 +26,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	polygon.push_back(points[0]);
 	polygon.push_back(points[1]);
 	polygon.push_back(points[2]);
-
-	//CGAL::draw(polygon);
 
 	utils::polygonToPythonArray(polygon);
 	utils::vectorToPythonArray(points);

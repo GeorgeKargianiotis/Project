@@ -37,13 +37,33 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points){
 	for (auto vi = polygonchain.vertices_begin(); vi != polygonchain.vertices_end(); vi+=2)
 		myseg.push_back(Segment_2 (*vi, *(vi+1)));
 
-	// From each edge, find nearest visible point and add it to polygon	
+	// From each edge, find nearest visible point INSIDE THE CHAIN and add it to polygon	
+	// 3 ways: random, max and min area
 
- 	const bool simpl = mypolygon.is_simple();
+	// Random first, simply pick the first one that is visible
+	for (auto iter=myseg.begin(); iter!=myseg.end(); ++iter){
+		Segment_2 temp = *iter;
+		// Visible, Add it to the polygon
+		// FIX NEEDED, FIND THE CLOSEST POINT WITH SQUARED DISTANCE
+		if(CGAL::do_intersect(temp, Points[0])){
+			myseg.push_back(Segment_2 (temp.source(), Points[0]));
+			myseg.push_back(Segment_2 (Points[0], temp.target()));
+			//ADD TO RIGHT POLYGON
+		}
+	}
+
+	// 2ND WAY, MAX TRIANGLE AREA
+
+
+
+	// 3RD WAY, MIN TRIANGLE AREA
+
+	// Check final polygon, simplicity and polygon points = starting points
+ 	/*const bool simpl = mypolygon.is_simple();
  	if (simpl) 
  		std::cout << "Simple polygon" << std::endl;
  	else
- 		std::cout << "Not simple" << std::endl;
+ 		std::cout << "Not simple" << std::endl;*/
  
 	// CGAL::squared_distance() + arguments
 

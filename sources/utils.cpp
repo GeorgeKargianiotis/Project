@@ -2,6 +2,7 @@
 #include <string>
 
 #include "../headers/utils.hpp"
+#include "../headers/cgalConfig.hpp"
 
 std::vector<std::string> utils::splitString(std::string &str, char delimiter = ' '){
 	std::vector<std::string> split;

@@ -33,7 +33,7 @@
 				"ignoreFailures": true
 				}
 			],
-			"preLaunchTask": "Build polygonization",
+			"preLaunchTask": "Build polygonization for debug",
 			"miDebuggerPath": "/usr/bin/gdb"
 		}
 	]

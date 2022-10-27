@@ -5,7 +5,6 @@
 
 #include "headers/utils.hpp"
 #include "headers/incremental.hpp"
-#include "headers/onion.hpp"
 #include "headers/convex_hull.hpp"
 #include "headers/cgalConfig.hpp"
 
@@ -35,9 +34,6 @@ int main(int argc, char* argv[]){
 
 	if(std::string(algorithm).compare("convex_hull") == 0)
 		convex_hull::convex_HullAlgorithm(Points2);
-
-	if(std::string(algorithm).compare("onion") == 0)
-		onion::onionAlgorithm(Points2);	
 
 	return 0;
 }

@@ -30,7 +30,7 @@ endif()
 # include for local directory
 add_subdirectory(sources)
 include_directories(headers)
-list(APPEND EXTRA_LIBS utils incremental convex_hull onion)
+list(APPEND EXTRA_LIBS utils incremental convex_hull)
 # include for local package
 
 # Creating entries for target: polygonization

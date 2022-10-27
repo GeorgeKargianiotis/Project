@@ -56,8 +56,23 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		getConvexHullPolygonFromPoints(polygon.vertices(), convexHullPolygon);
 
 		//find the red edges of convex hull polygon
-		for(Polygon_2::Edge_const_iterator it = convexHullPolygon.edges().begin(); it != convexHullPolygon.edges().end(); it++){
-			std::cout << isRedEdge(it, points[lastPointExpandPolygonIndex], points[0]) << std::endl;			
+		for(Polygon_2::Edge_const_iterator convexPolygonEdge = convexHullPolygon.edges().begin(); convexPolygonEdge != convexHullPolygon.edges().end(); convexPolygonEdge++){
+
+			if(isRedEdge(convexPolygonEdge , points[lastPointExpandPolygonIndex], points[0])){
+				
+				for(Polygon_2::Vertex_iterator polygonVertex = polygon.vertices_begin(); polygonVertex  != polygon.vertices_end(); polygonVertex++){
+
+					if(convexPolygonEdge->start() == *polygonVertex){
+
+						//check if all polygon edges "behind" the red edge are visible to the newPoint
+						do{
+							
+							
+						}while(convexPolygonEdge->end() != *polygonVertex);
+
+					}
+				}
+			}
 		}
 
 	}

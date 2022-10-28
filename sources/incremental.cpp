@@ -7,7 +7,9 @@
 
 void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon_2 &convexHullPolygon);
 
-bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Point_2 &polygonPoint);
+bool isRedEdge(Polygon_2::Edge_const_iterator &edge, Point_2 &newPoint, Point_2 &polygonPoint);
+
+bool isEdgeVisible(Polygon_2 &polygon, Polygon_2::Edge_const_iterator &edge, Point_2 &newPoint);
 
 void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization){
 
@@ -67,14 +69,16 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 						//check if all polygon edges "behind" the red edge are visible to the newPoint
 						do{
 							
+							polygonVertex++;
 							
 						}while(convexPolygonEdge->end() != *polygonVertex);
 
+						std::cout << "Checked all edges" << std::endl;
+						break;
 					}
 				}
 			}
 		}
-
 	}
 }
 
@@ -86,8 +90,13 @@ void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon
 }
 
 //given an edge of the convex hull polygon it returns true if it is red 
-bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Point_2 &polygonPoint){
+bool isRedEdge(Polygon_2::Edge_const_iterator &edge, Point_2 &newPoint, Point_2 &polygonPoint){
 	double detA = CGAL::determinant(Vector_3(edge->start().hx(), edge->end().hw(), newPoint.hx()), Vector_3(edge->start().hy(), edge->end().hy(), newPoint.hy()), Vector_3(1, 1, 1));
 	double detB = CGAL::determinant(Vector_3(edge->start().hx(), edge->end().hw(), polygonPoint.hx()), Vector_3(edge->start().hy(), edge->end().hy(), polygonPoint.hy()), Vector_3(1, 1, 1));
 	return detA * detB < 0;
+}
+
+//checks if the given edge is visible from the newPoint
+bool isEdgeVisible(Polygon_2 &polygon, Polygon_2::Edge_const_iterator &edge, Point_2 &newPoint){
+	return true;
 }

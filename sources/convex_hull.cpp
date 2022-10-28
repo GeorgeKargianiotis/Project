@@ -14,6 +14,10 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 	double distance; // Needed for the point we are about to add
 	double mindistance = 9999999999.9999999;
 	Point_2 toadd;
+	Segment_2 random, minemb, maxemb;
+	double area;
+	double minarea = 99999999.999999999;
+	double maxarea = 0.0;
 
 	// Add all points to new vector
 	for (auto iter=Points.begin(); iter!=Points.end(); ++iter)
@@ -58,35 +62,96 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 					}
 				}
 				// FOUND POINT, CHECK VISIBILITY WITH EVERY EDGE(SEGMENT)
-				if(CGAL::do_intersect(temp, Points[0])){
-					myseg.push_back(Segment_2 (temp.source(), Points[0]));
-					myseg.push_back(Segment_2 (Points[0], temp.target()));
-					//ADD TO RIGHT POLYGON
+				for (auto iter2=myseg.begin(); iter2!=myseg.end(); ++iter2){
+					if(!CGAL::do_intersect(*iter2, toadd)){
+						std::cerr << "Visibility error" << std::endl;
+					}
 				}
+				// 1st case, random edge
+				random = myseg.at(rand() % myseg.size() + 1);
+				myseg.push_back(Segment_2 (random.source(), toadd));
+				myseg.push_back(Segment_2 (toadd, random.target()));
+				myseg.erase(std::remove(myseg.begin(), myseg.end(), random), myseg.end());
+				RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), toadd), RemainingPoints.end());
+				polygonchain.push_back(toadd);
+
 			}	
 		}
 		else if (edge == 2){
-			// 2ND WAY, MAX TRIANGLE AREA
+			// 2ND WAY, MIN TRIANGLE AREA
+			for (auto iter=myseg.begin(); iter!=myseg.end(); ++iter){
+				Segment_2 temp = *iter;
+				for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end();++it){
+					distance = CGAL::squared_distance(*iter, *it);
+
+					if (distance < mindistance){
+						mindistance = distance;
+						toadd = *it;
+					}
+				}
+				// FOUND POINT, CHECK VISIBILITY WITH EVERY EDGE(SEGMENT)
+				for (auto iter2=myseg.begin(); iter2!=myseg.end(); ++iter2){
+					if(!CGAL::do_intersect(*iter2, toadd)){
+						std::cerr << "Visibility error" << std::endl;
+					}
+					//
+					Segment_2 sgmt = *iter2;
+					area = CGAL::area(toadd, sgmt.source(), sgmt.target());
+
+					if (area < minarea){
+						minarea = area;
+						minemb = sgmt;
+					}
+				}
+				myseg.push_back(Segment_2 (minemb.source(), toadd));
+				myseg.push_back(Segment_2 (toadd, minemb.target()));
+				myseg.erase(std::remove(myseg.begin(), myseg.end(), minemb), myseg.end());
+				RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), toadd), RemainingPoints.end());
+				polygonchain.push_back(toadd);
+
+			}
 		}
 		
 		else{
-			// 3RD WAY, MIN TRIANGLE AREA
+			// 3RD WAY, MAX TRIANGLE AREA
+			for (auto iter=myseg.begin(); iter!=myseg.end(); ++iter){
+				Segment_2 temp = *iter;
+				for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end();++it){
+					distance = CGAL::squared_distance(*iter, *it);
+
+					if (distance < mindistance){
+						mindistance = distance;
+						toadd = *it;
+					}
+				}
+				// FOUND POINT, CHECK VISIBILITY WITH EVERY EDGE(SEGMENT)
+				for (auto iter2=myseg.begin(); iter2!=myseg.end(); ++iter2){
+					if(!CGAL::do_intersect(*iter2, toadd)){
+						std::cerr << "Visibility error" << std::endl;
+					}
+					//
+					Segment_2 sgmt = *iter2;
+					area = CGAL::area(toadd, sgmt.source(), sgmt.target());
+
+					if (area > maxarea){
+						maxarea = area;
+						maxemb = sgmt;
+					}
+				}
+				myseg.push_back(Segment_2 (maxemb.source(), toadd));
+				myseg.push_back(Segment_2 (toadd, maxemb.target()));
+				myseg.erase(std::remove(myseg.begin(), myseg.end(), minemb), myseg.end());
+				RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), toadd), RemainingPoints.end());
+				polygonchain.push_back(toadd);
+
+			}
 		}
 
 	
-	
-	// FOR BOTH WE NEED MAX/MIN AND SPECIFIC POINT
-	
 
 	// Check final polygon, simplicity and polygon points = starting points
- 	/*const bool simpl = mypolygon.is_simple();
- 	if (simpl) 
- 		std::cout << "Simple polygon" << std::endl;
- 	else
- 		std::cout << "Not simple" << std::endl;*/
- 
-	// CGAL::squared_distance() + arguments
-
-	// Need to use sqrt somewhere
-	}
+ 	const bool simpl = polygonchain.is_simple();
+ 	if (!simpl)
+		std::cerr << "Not Simple Polygon" << std::endl; 
+ 		
 }

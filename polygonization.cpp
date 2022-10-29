@@ -30,7 +30,7 @@ int main(int argc, char* argv[]){
 	file.close();
 
 	if(std::string(algorithm).compare("incremental") == 0)
-		incremental::incrementalAlgorithm(Points2, initialization);
+		incremental::incrementalAlgorithm(Points2, initialization, edgeSelection);
 
 	if(std::string(algorithm).compare("convex_hull") == 0)
 		convex_hull::convex_HullAlgorithm(Points2);

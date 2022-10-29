@@ -1,5 +1,6 @@
 #include <vector>
 #include <string>
+#include <functional>
 
 #include "../headers/incremental.hpp"
 #include "../headers/cgalConfig.hpp"
@@ -11,11 +12,19 @@ bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Point_2 &
 
 bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edge, const Point_2 &newPoint);
 
+int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
+
+int minAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
+
+int maxAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
+
 bool segment1BeforeSegment2AxisX(Segment_2 &seg1, Segment_2 &seg2);
 
 bool segment1BeforeSegment2AxisY(Segment_2 &seg1, Segment_2 &seg2);
 
-void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization){
+void test(int i ,int j, int k );
+
+void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, char *edgeSelection){
 
 	//order by x ascending
 	if(std::string(initialization).compare(SORT_BY_X_ASC) == 0)
@@ -29,6 +38,19 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	//order by y descending
 	else if(std::string(initialization).compare(SORT_BY_Y_DESC) == 0)
 		std::sort(points.begin(), points.end(), utils::cmp2bPoint2);
+
+	//void (*edgeSelectionFunction)(std::vector<Segment_2>, Polygon_2::Edge_const_iterator);
+	//std::function<Segment_2(std::vector<Segment_2>, Polygon_2::Edge_const_iterator)> edgeSelectionFunction = randomSelectEdge;	
+	// std::function<void(int, int,int)> func = test;
+	// std::function<void(const std::vector<Segment_2>&, const Polygon_2::Edge_const_iterator &)> edgeSelectionFunction = randomSelectEdge;
+
+	// if(std::string(edgeSelection).compare(RANDOM_EDGE_SELECTION) == 0)
+	// 	edgeSelectionFunction = &randomSelectEdge;
+	// 	//(*edgeSelectionFunction)(std::vector<Segment_2>, Polygon_2::Edge_const_iterator) = &randomSelectEdge;
+	// if(std::string(edgeSelection).compare(MIN_AREA_EDGE_SELECTION) == 0)
+	// 	(*edgeSelectionFunction)(std::vector<Segment_2>, Polygon_2::Edge_const_iterator) = &minAreaSelectEdge;
+	// if(std::string(edgeSelection).compare(MAX_AREA_EDGE_SELECTION) == 0)
+	// 	(*edgeSelectionFunction)(std::vector<Segment_2>, Polygon_2::Edge_const_iterator) = &maxAreaSelectEdge;
 
 	Polygon_2 polygon, convexHullPolygon;
 	Point_2 lastPointExpandPolygon; 	//to teleytaio shmeio poy mphke sthn polygwnikh grammh kai thn epektine
@@ -90,6 +112,17 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		}
 
 		//choose visible edge to replace
+		int index = 0;
+		if(std::string(edgeSelection).compare(RANDOM_EDGE_SELECTION) == 0)
+			index = randomSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
+		if(std::string(edgeSelection).compare(MIN_AREA_EDGE_SELECTION) == 0)
+			index = minAreaSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
+		if(std::string(edgeSelection).compare(MAX_AREA_EDGE_SELECTION) == 0)
+			index = maxAreaSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
+
+
+		//insert the new point to the right position in polygon
+		
 	}
 }
 
@@ -129,6 +162,32 @@ bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnderC
 	}
 
 	return true;
+}
+
+int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){
+	return 0;
+}
+
+int minAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){
+	double minArea = std::numeric_limits<double>::max();
+	int index = 0;
+
+	for(int i = 0; i < visibleEdges.size(); i++)
+		if(CGAL::area(visibleEdges[i].start(), visibleEdges[i].end(), newPoint) < minArea)	
+			index = 0;
+
+	return index;
+}
+
+int maxAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){
+	double maxArea = std::numeric_limits<double>::min();
+	int index = 0;
+
+	for(int i = 0; i < visibleEdges.size(); i++)
+		if(CGAL::area(visibleEdges[i].start(), visibleEdges[i].end(), newPoint) > maxArea)	
+			index = 0;
+
+	return index;
 }
 
 // Because points are in order, we check if a line is behind another one before we call intersect

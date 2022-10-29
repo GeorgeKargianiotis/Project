@@ -12,13 +12,19 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 	Segments myseg; // Edges stored here
 	std::vector<Point_2> RemainingPoints; // Used to store points not yet included in polygon, needs to be empty in the end
 	double distance; // Needed for the point we are about to add
+
+	// Initialising distances and areas, neede for edge selection
 	double mindistance = 9999999999.9999999;
-	Point_2 toadd;
-	Segment_2 random, minemb, maxemb;
-	double area;
 	double minarea = 99999999.999999999;
 	double maxarea = 0.0;
 
+	// Point selected to add to the chain
+	Point_2 toadd;
+
+	// Segments that provide the min and max area respectively
+	Segment_2 random, minemb, maxemb;
+	double area; // Area calculated each time
+	
 	// Add all points to new vector
 	for (auto iter=Points.begin(); iter!=Points.end(); ++iter)
 		RemainingPoints.push_back(*iter);
@@ -34,7 +40,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 	// Using all given points to create initial chain
 	CGAL::convex_hull_2(range.begin(), range.end(), std::back_inserter(result));
 
-	// After we get the convex hull, create the chain with the point chosen, and remove them from the point vector (they have now been used)
+	// After we get the convex hull, create the chain with the points chosen, and remove them from the point vector (they have now been used)
  	for (auto it = result.begin(); it!= result.end();++it){
  		polygonchain.push_back(*it);
 		RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), *it), RemainingPoints.end());
@@ -47,27 +53,30 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 	// From each edge, find nearest visible point INSIDE THE CHAIN and add it to polygon	
 	// 3 ways: random, max and min area
 
-	// TODO: REMOVE POINTS WHEN WE ADD TO POLYGON
+	// Process while we still have unused points
 	while (RemainingPoints.size() != 0){
-		// Random first, simply pick the first one that is visible
+		// Random edge selection
 		if (edge == 1){
+			// For each edge, find nearest point
 			for (auto iter=myseg.begin(); iter!=myseg.end(); ++iter){
 				Segment_2 temp = *iter;
 				for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end();++it){
 					distance = CGAL::squared_distance(*iter, *it);
 
+					// Keep the one closest to the edge
 					if (distance < mindistance){
 						mindistance = distance;
 						toadd = *it;
 					}
 				}
-				// FOUND POINT, CHECK VISIBILITY WITH EVERY EDGE(SEGMENT)
+				// After we find the closest point, make sure it's visible from every edge
 				for (auto iter2=myseg.begin(); iter2!=myseg.end(); ++iter2){
 					if(!CGAL::do_intersect(*iter2, toadd)){
 						std::cerr << "Visibility error" << std::endl;
 					}
 				}
-				// 1st case, random edge
+				
+				// Connect point with a random edge, create new edges and remove the point, old edge is also removed
 				random = myseg.at(rand() % myseg.size() + 1);
 				myseg.push_back(Segment_2 (random.source(), toadd));
 				myseg.push_back(Segment_2 (toadd, random.target()));
@@ -78,7 +87,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 			}	
 		}
 		else if (edge == 2){
-			// 2ND WAY, MIN TRIANGLE AREA
+			// Add the edge that offers the smallest triangle area, when connected to the point
 			for (auto iter=myseg.begin(); iter!=myseg.end(); ++iter){
 				Segment_2 temp = *iter;
 				for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end();++it){
@@ -89,7 +98,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 						toadd = *it;
 					}
 				}
-				// FOUND POINT, CHECK VISIBILITY WITH EVERY EDGE(SEGMENT)
+				// Same as above, visibility check
 				for (auto iter2=myseg.begin(); iter2!=myseg.end(); ++iter2){
 					if(!CGAL::do_intersect(*iter2, toadd)){
 						std::cerr << "Visibility error" << std::endl;
@@ -113,7 +122,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 		}
 		
 		else{
-			// 3RD WAY, MAX TRIANGLE AREA
+			// Biggest triangle area
 			for (auto iter=myseg.begin(); iter!=myseg.end(); ++iter){
 				Segment_2 temp = *iter;
 				for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end();++it){
@@ -149,9 +158,10 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 
 	
 
-	// Check final polygon, simplicity and polygon points = starting points
+	// After each new point entry, the polygon needs to remain simple
  	const bool simpl = polygonchain.is_simple();
  	if (!simpl)
 		std::cerr << "Not Simple Polygon" << std::endl; 
  		
+	}
 }

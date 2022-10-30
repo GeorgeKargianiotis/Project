@@ -21,14 +21,14 @@ std::vector<std::string> utils::splitString(std::string &str, char delimiter = '
 }
 
 // this function prints the polygon's points as a python array to plot the polygon with matplotlib.
-void utils::polygonToPythonArray(Polygon_2 polygon){
+void utils::polygonToPythonArray(Polygon_2 &polygon){
 	for(Point_2 point : polygon)
 		std::cout << "[" << point.hx() << "," << point.hy() << "],";  
 	std::cout << std::endl;
 }
 
 // this function prints the vector's points as a python array to plot the polygon with matplotlib.
-void utils::vectorToPythonArray(std::vector<Point_2> points){
+void utils::vectorToPythonArray(std::vector<Point_2> &points){
 	for(Point_2 point : points)
 		std::cout << "[" << point.hx() << "," << point.hy() << "],";  
 	std::cout << std::endl;

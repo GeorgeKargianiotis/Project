@@ -10,8 +10,7 @@
 
 void readArguments(int &argc, char* argv[]);
 
-char *inputFile, *outputFile, *algorithm, *initialization;
-int edgeSelection;
+char *inputFile, *outputFile, *algorithm, *initialization, *edgeSelection;
 
 int main(int argc, char* argv[]){
 	readArguments(argc, argv);
@@ -35,7 +34,7 @@ int main(int argc, char* argv[]){
 
 	// Need int for convex hull edges
 	if(std::string(algorithm).compare("convex_hull") == 0)
-		convex_hull::convex_HullAlgorithm(Points2, edgeSelection);
+		convex_hull::convex_HullAlgorithm(Points2, std::stoi(edgeSelection));
 
 	return 0;
 }
@@ -65,7 +64,7 @@ void readArguments(int &argc, char* argv[]){
 		}
 			
 		if(std::string(argv[i]).compare("-edge_selection") == 0){
-			edgeSelection = atoi(argv[i+1]);
+			edgeSelection = argv[i+1];
 			continue;
 		}
 

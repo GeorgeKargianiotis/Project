@@ -9,7 +9,7 @@ namespace utils{
 
 	void polygonToPythonArray(Polygon_2 &polygon);
 	void vectorToPythonArray(std::vector<Point_2> &points);
-
+	
 	bool cmp1aPoint2(Point_2 &point1, Point_2 &point2);
 	bool cmp1bPoint2(Point_2 &point1, Point_2 &point2);
 	bool cmp2aPoint2(Point_2 &point1, Point_2 &point2);

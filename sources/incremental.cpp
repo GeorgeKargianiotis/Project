@@ -152,6 +152,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		// 	}
 		// 	lastPointExpandPolygonIndex--;
 			std::cerr << "Polygon is no simple\n";
+			exit (EXIT_FAILURE);
 		 }
 	}
 }

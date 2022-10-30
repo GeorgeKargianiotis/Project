@@ -145,14 +145,14 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		std::cout << "New point " << newPoint << std::endl;
 		utils::polygonToPythonArray(polygon);
 
-		if(!polygon.is_simple()){
-			for(Polygon_2::Vertex_iterator p = polygon.begin(); p != polygon.end(); p++){
-				if(*p == newPoint)
-					polygon.erase(p);
-			}
-			lastPointExpandPolygonIndex--;
+		 if(!polygon.is_simple()){
+		// 	for(Polygon_2::Vertex_iterator p = polygon.begin(); p != polygon.end(); p++){
+		// 		if(*p == newPoint)
+		// 			polygon.erase(p);
+		// 	}
+		// 	lastPointExpandPolygonIndex--;
 			std::cerr << "Polygon is no simple\n";
-		}
+		 }
 	}
 }
 

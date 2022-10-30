@@ -15,9 +15,9 @@
 				"-o", 
 				"o",
 				"-algorithm",
-				"incremental",
+				"convex_hull",
 				"-edge_selection",
-				"s",
+				"1",
 				"-initialization",
 				"1a"
 			],

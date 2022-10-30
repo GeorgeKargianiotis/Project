@@ -1,1 +1,1 @@
-./polygonization -i euro-night-0000030.instance -o o -algorithm incremental -edge_selection s -initialization 1a 
+./polygonization -i euro-night-0000030.instance -o o -algorithm incremental -edge_selection 1 -initialization 1a 

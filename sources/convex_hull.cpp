@@ -8,6 +8,7 @@ typedef std::vector<Segment_2> Segments;
 
 void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){	
 
+	std::cout << "Reached Here" << std::endl;
 	Polygon_2 mypolygon, polygonchain; // Initial polygon to be used in convex_hull
 	Segments myseg; // Edges stored here
 	std::vector<Point_2> RemainingPoints; // Used to store points not yet included in polygon, needs to be empty in the end
@@ -28,17 +29,19 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 	// Add all points to new vector
 	for (auto iter=Points.begin(); iter!=Points.end(); ++iter)
 		RemainingPoints.push_back(*iter);
-
+		
 	// Same for polygon
 	for (auto iter=Points.begin(); iter!=Points.end(); ++iter)
 		mypolygon.push_back(*iter);
 
+	std::cout << "Reached Here Also" << std::endl;
 
 	const Polygon_2::Vertices& range = mypolygon.vertices();
  	std::vector<Point_2> result;
 
 	// Using all given points to create initial chain
 	CGAL::convex_hull_2(range.begin(), range.end(), std::back_inserter(result));
+	std::cout << "Convex Hull Done" << std::endl;
 
 	// After we get the convex hull, create the chain with the points chosen, and remove them from the point vector (they have now been used)
  	for (auto it = result.begin(); it!= result.end();++it){

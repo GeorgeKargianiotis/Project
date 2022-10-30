@@ -1,6 +1,8 @@
 #include <vector>
 #include <string>
 #include <functional>
+#include <cstdlib>
+#include <time.h>
 
 #include "../headers/incremental.hpp"
 #include "../headers/cgalConfig.hpp"
@@ -24,7 +26,9 @@ bool segment1BeforeSegment2AxisY(Segment_2 &seg1, Segment_2 &seg2);
 
 void test(int i ,int j, int k );
 
-void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, char *edgeSelection){
+void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection){
+
+	srand(time(0));
 
 	//order by x ascending
 	if(std::string(initialization).compare(SORT_BY_X_ASC) == 0)
@@ -78,20 +82,24 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	lastPointExpandPolygonIndex = i + 2;
 	lastPointExpandPolygon = points[lastPointExpandPolygonIndex];
 	polygonArea = CGAL::area(points[0], points[1], points[i+3]);
-	Point_2 polygonFirstEdgeMiddlePoint = Point_2((polygon.edge(0).point(0).hx() + polygon.edge(0).point(1).hx()) / 2.0, (polygon.edge(0).point(0).hy() + polygon.edge(0).point(1).hy()) / 2.0);
+	Point_2 polygonFirstEdgeMiddlePoint = Point_2((polygon.edge(0).point(0).x() + polygon.edge(0).point(1).x()) / 2.0, (polygon.edge(0).point(0).y() + polygon.edge(0).point(1).y()) / 2.0);
+	std::vector<Segment_2> visibleEdges;
 
 	while(lastPointExpandPolygonIndex != points.size() - 1){
 		lastPointExpandPolygonIndex++;
+		Point_2 newPoint = points[lastPointExpandPolygonIndex];
 		//find the convex hull polygon
 		convexHullPolygon.clear();
 		getConvexHullPolygonFromPoints(polygon.vertices(), convexHullPolygon);
-		std::vector<Segment_2> visibleEdges;
+		visibleEdges.clear();
 
 		//find the red edges of convex hull polygon
 		for(Polygon_2::Edge_const_iterator convexPolygonEdge = convexHullPolygon.edges().begin(); convexPolygonEdge != convexHullPolygon.edges().end(); convexPolygonEdge++){
 
-			//if(isRedEdge(convexPolygonEdge, points[lastPointExpandPolygonIndex], points[0])){
-			if(isRedEdge(convexPolygonEdge, points[lastPointExpandPolygonIndex], polygonFirstEdgeMiddlePoint)){
+			if(isRedEdge(convexPolygonEdge, newPoint, polygonFirstEdgeMiddlePoint)){
+
+				std::cout << convexPolygonEdge->start() << std::endl;
+				std::cout << convexPolygonEdge->end() << std::endl;
 
 				//find visible edges
 				for(Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++){
@@ -100,7 +108,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 						//check if all polygon edges "behind" the red edge are visible to the newPoint
 						do{
-							 if(isVisibleEdge(polygon, edge, points[lastPointExpandPolygonIndex]))
+							 if(isVisibleEdge(polygon, edge, newPoint))
 							 	visibleEdges.push_back(Segment_2(edge->start(), edge->end()));
 							edge++;
 						} while(convexPolygonEdge->end() != edge->start() && edge != polygon.edges().end());
@@ -113,16 +121,38 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 		//choose visible edge to replace
 		int index = 0;
-		if(std::string(edgeSelection).compare(RANDOM_EDGE_SELECTION) == 0)
+		//if(std::string(edgeSelection).compare(RANDOM_EDGE_SELECTION) == 0)
+		if(edgeSelection == RANDOM_EDGE_SELECTION)
 			index = randomSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
-		if(std::string(edgeSelection).compare(MIN_AREA_EDGE_SELECTION) == 0)
+		//if(std::string(edgeSelection).compare(MIN_AREA_EDGE_SELECTION) == 0)
+		else if(edgeSelection == MIN_AREA_EDGE_SELECTION)
 			index = minAreaSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
-		if(std::string(edgeSelection).compare(MAX_AREA_EDGE_SELECTION) == 0)
+		//if(std::string(edgeSelection).compare(MAX_AREA_EDGE_SELECTION) == 0)
+		else if(edgeSelection == MAX_AREA_EDGE_SELECTION)
 			index = maxAreaSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
 
+		Segment_2 edgeToBeReplaced = visibleEdges[index];
 
 		//insert the new point to the right position in polygon
-		
+		for(Polygon_2::Vertex_iterator endVertexOfEdgeToBeReplaced = polygon.begin(); endVertexOfEdgeToBeReplaced != polygon.end(); endVertexOfEdgeToBeReplaced++){
+			if(*endVertexOfEdgeToBeReplaced == edgeToBeReplaced.end()){
+				polygon.insert(endVertexOfEdgeToBeReplaced, newPoint); 
+				break;
+			}
+		}
+
+		std::cout << "Edge replaced " << edgeToBeReplaced << std::endl;
+		std::cout << "New point " << newPoint << std::endl;
+		utils::polygonToPythonArray(polygon);
+
+		if(!polygon.is_simple()){
+			for(Polygon_2::Vertex_iterator p = polygon.begin(); p != polygon.end(); p++){
+				if(*p == newPoint)
+					polygon.erase(p);
+			}
+			lastPointExpandPolygonIndex--;
+			std::cerr << "Polygon is no simple\n";
+		}
 	}
 }
 
@@ -135,10 +165,10 @@ void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon
 
 //given an edge of the convex hull polygon it returns true if it is red 
 bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Point_2 &polygonPoint){
-	//double detA = CGAL::determinant(Vector_3(edge->start().hx(), edge->end().hw(), newPoint.hx()), Vector_3(edge->start().hy(), edge->end().hy(), newPoint.hy()), Vector_3(1, 1, 1));
-	// double detB = CGAL::determinant(Vector_3(edge->start().hx(), edge->end().hw(), polygonPoint.hx()), Vector_3(edge->start().hy(), edge->end().hy(), polygonPoint.hy()), Vector_3(1, 1, 1));
-	double detA = CGAL::determinant(Vector_3(edge->start().hx(), edge->start().hy(), 1), Vector_3(edge->end().hx(), edge->end().hy(), 1), Vector_3(newPoint.hx(), newPoint.hy(), 1));
-	double detB = CGAL::determinant(Vector_3(edge->start().hx(), edge->start().hy(), 1), Vector_3(edge->end().hx(), edge->end().hy(), 1), Vector_3(polygonPoint.hx(), polygonPoint.hy(), 1));
+	//double detA = CGAL::determinant(Vector_3(edge->start().x(), edge->end().hw(), newPoint.x()), Vector_3(edge->start().y(), edge->end().y(), newPoint.y()), Vector_3(1, 1, 1));
+	// double detB = CGAL::determinant(Vector_3(edge->start().x(), edge->end().hw(), polygonPoint.()), Vector_3(edge->start().y(), edge->end().y(), polygonPoint.y()), Vector_3(1, 1, 1));
+	double detA = CGAL::determinant(Vector_3(edge->start().x(), edge->start().y(), 1), Vector_3(edge->end().x(), edge->end().y(), 1), Vector_3(newPoint.x(), newPoint.y(), 1));
+	double detB = CGAL::determinant(Vector_3(edge->start().x(), edge->start().y(), 1), Vector_3(edge->end().x(), edge->end().y(), 1), Vector_3(polygonPoint.x(), polygonPoint.y(), 1));
 	return detA * detB < 0;
 }
 
@@ -157,7 +187,7 @@ bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnderC
 		if(intersectLine.start() == line2.start() || intersectLine.end() == line2.start() || intersectLine.start() == line2.end() || intersectLine.end() == line2.end())
 			continue;
 
-		if(CGAL::intersection(intersectLine, line1) || CGAL::intersection(intersectLine, line2))
+		if(CGAL::do_intersect(intersectLine, line1) || CGAL::do_intersect(intersectLine, line2))
 			return false;	
 	}
 
@@ -165,7 +195,7 @@ bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnderC
 }
 
 int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){
-	return 0;
+	return rand() % visibleEdges.size();
 }
 
 int minAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){
@@ -192,10 +222,10 @@ int maxAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){
 
 // Because points are in order, we check if a line is behind another one before we call intersect
 bool segment1BeforeSegment2AxisX(Segment_2 &seg1, Segment_2 &seg2){
-	return seg1.start().hx() < seg2.start().hx() && seg1.start().hx() < seg2.end().hx() && seg1.end().hx() < seg2.start().hx() && seg1.end().hx() < seg2.end().hx();
+	return seg1.start().x() < seg2.start().x() && seg1.start().x() < seg2.end().x() && seg1.end().x() < seg2.start().x() && seg1.end().x() < seg2.end().x();
 }
 
 // Because points are in order, we check if a line is behind another one before we call intersect
 bool segment1BeforeSegment2AxisY(Segment_2 &seg1, Segment_2 &seg2){
-	return seg1.start().hy() < seg2.start().hy() && seg1.start().hy() < seg2.end().hy() && seg1.end().hy() < seg2.start().hy() && seg1.end().hy() < seg2.end().hy();
+	return seg1.start().y() < seg2.start().y() && seg1.start().y() < seg2.end().y() && seg1.end().y() < seg2.start().y() && seg1.end().y() < seg2.end().y();
 }

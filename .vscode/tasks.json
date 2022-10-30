@@ -8,7 +8,8 @@
                 {
                         "label": "Create Makefile",
                         "command": "cmake",
-                        "args": [ "-DCGAL_DIR=$HOME/CGAL-5.5.1/lib/CGAL -DCMAKE_BUILD_TYPE=Debug" ],
+                        "args": [ "-DCGAL_DIR=$HOME/CGAL-5.5.1/lib/CGAL", 
+                                  "-DCMAKE_BUILD_TYPE=Debug" ],
                         "options": { "cwd": "${workspaceFolder}" },
                         "problemMatcher": [ "$gcc" ],
                         "group": {

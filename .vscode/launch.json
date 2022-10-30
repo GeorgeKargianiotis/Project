@@ -17,7 +17,7 @@
 				"-algorithm",
 				"incremental",
 				"-edge_selection",
-				"s",
+				"1",
 				"-initialization",
 				"1a"
 			],

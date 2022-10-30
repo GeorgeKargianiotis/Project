@@ -17,7 +17,6 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points){
 
 	// Needed for points to add
 	int counter = 2;
-
 	
 
 	// Πολυγωνική Αλυσίδα:vector<Segment_2> 

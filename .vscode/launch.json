@@ -15,6 +15,7 @@
 				"-o", 
 				"o",
 				"-algorithm",
+				//"convex_hull",
 				"incremental",
 				"-edge_selection",
 				"1",

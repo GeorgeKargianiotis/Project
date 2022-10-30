@@ -34,11 +34,10 @@ int main(int argc, char* argv[]){
 
 	// Need int for convex hull edges
 	if(std::string(algorithm).compare("convex_hull") == 0)
-		convex_hull::convex_HullAlgorithm(Points2, (int)edgeSelection);
+		convex_hull::convex_HullAlgorithm(Points2, std::stoi(edgeSelection));
 
 	return 0;
 }
-
 
 void readArguments(int &argc, char* argv[]){
 	if(argc != 11){

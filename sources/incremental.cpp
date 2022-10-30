@@ -10,7 +10,7 @@
 
 void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon_2 &convexHullPolygon);
 
-bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Point_2 &polygonPoint);
+bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2 &polygon);
 
 bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edge, const Point_2 &newPoint);
 
@@ -43,19 +43,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	else if(std::string(initialization).compare(SORT_BY_Y_DESC) == 0)
 		std::sort(points.begin(), points.end(), utils::cmp2bPoint2);
 
-	//void (*edgeSelectionFunction)(std::vector<Segment_2>, Polygon_2::Edge_const_iterator);
-	//std::function<Segment_2(std::vector<Segment_2>, Polygon_2::Edge_const_iterator)> edgeSelectionFunction = randomSelectEdge;	
-	// std::function<void(int, int,int)> func = test;
-	// std::function<void(const std::vector<Segment_2>&, const Polygon_2::Edge_const_iterator &)> edgeSelectionFunction = randomSelectEdge;
-
-	// if(std::string(edgeSelection).compare(RANDOM_EDGE_SELECTION) == 0)
-	// 	edgeSelectionFunction = &randomSelectEdge;
-	// 	//(*edgeSelectionFunction)(std::vector<Segment_2>, Polygon_2::Edge_const_iterator) = &randomSelectEdge;
-	// if(std::string(edgeSelection).compare(MIN_AREA_EDGE_SELECTION) == 0)
-	// 	(*edgeSelectionFunction)(std::vector<Segment_2>, Polygon_2::Edge_const_iterator) = &minAreaSelectEdge;
-	// if(std::string(edgeSelection).compare(MAX_AREA_EDGE_SELECTION) == 0)
-	// 	(*edgeSelectionFunction)(std::vector<Segment_2>, Polygon_2::Edge_const_iterator) = &maxAreaSelectEdge;
-
 	Polygon_2 polygon, convexHullPolygon;
 	Point_2 lastPointExpandPolygon; 	//to teleytaio shmeio poy mphke sthn polygwnikh grammh kai thn epektine
 	int lastPointExpandPolygonIndex;
@@ -78,7 +65,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		}
 	}
 
-
 	lastPointExpandPolygonIndex = i + 2;
 	lastPointExpandPolygon = points[lastPointExpandPolygonIndex];
 	polygonArea = CGAL::area(points[0], points[1], points[i+3]);
@@ -92,14 +78,17 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		convexHullPolygon.clear();
 		getConvexHullPolygonFromPoints(polygon.vertices(), convexHullPolygon);
 		visibleEdges.clear();
+		std::vector<Segment_2> redEdges;
 
 		//find the red edges of convex hull polygon
 		for(Polygon_2::Edge_const_iterator convexPolygonEdge = convexHullPolygon.edges().begin(); convexPolygonEdge != convexHullPolygon.edges().end(); convexPolygonEdge++){
 
-			if(isRedEdge(convexPolygonEdge, newPoint, polygonFirstEdgeMiddlePoint)){
+			if(isRedEdge(convexPolygonEdge, newPoint, polygon)){
 
-				std::cout << convexPolygonEdge->start() << std::endl;
-				std::cout << convexPolygonEdge->end() << std::endl;
+				redEdges.push_back(*convexPolygonEdge);
+
+				// std::cout << convexPolygonEdge->start() << std::endl;
+				// std::cout << convexPolygonEdge->end() << std::endl;
 
 				//find visible edges
 				for(Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++){
@@ -118,6 +107,15 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 				}
 			}
 		}
+
+
+		std::cout << "Red edges: ";
+		for(auto edge : redEdges)
+			std::cout << "[" << edge.start().x() << "," << edge.start().y() << "], " << "[" << edge.end().x() << "," << edge.end().y() << "],";
+		std::cout << std::endl;
+
+		if(visibleEdges.empty())
+			exit(EXIT_FAILURE);
 
 		//choose visible edge to replace
 		int index = 0;
@@ -141,8 +139,9 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			}
 		}
 
-		std::cout << "Edge replaced " << edgeToBeReplaced << std::endl;
 		std::cout << "New point " << newPoint << std::endl;
+		std::cout << "Edge replaced " << edgeToBeReplaced << std::endl;
+		std::cout << "Polygon: ";
 		utils::polygonToPythonArray(polygon);
 
 		 if(!polygon.is_simple()){
@@ -153,7 +152,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		// 	lastPointExpandPolygonIndex--;
 			std::cerr << "Polygon is no simple\n";
 			exit (EXIT_FAILURE);
-		 }
+		}
 	}
 }
 
@@ -165,12 +164,16 @@ void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon
 }
 
 //given an edge of the convex hull polygon it returns true if it is red 
-bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Point_2 &polygonPoint){
-	//double detA = CGAL::determinant(Vector_3(edge->start().x(), edge->end().hw(), newPoint.x()), Vector_3(edge->start().y(), edge->end().y(), newPoint.y()), Vector_3(1, 1, 1));
-	// double detB = CGAL::determinant(Vector_3(edge->start().x(), edge->end().hw(), polygonPoint.()), Vector_3(edge->start().y(), edge->end().y(), polygonPoint.y()), Vector_3(1, 1, 1));
-	double detA = CGAL::determinant(Vector_3(edge->start().x(), edge->start().y(), 1), Vector_3(edge->end().x(), edge->end().y(), 1), Vector_3(newPoint.x(), newPoint.y(), 1));
-	double detB = CGAL::determinant(Vector_3(edge->start().x(), edge->start().y(), 1), Vector_3(edge->end().x(), edge->end().y(), 1), Vector_3(polygonPoint.x(), polygonPoint.y(), 1));
-	return detA * detB < 0;
+bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2 &polygon){
+	double detA;
+	double detB;
+	for(Polygon_2::Vertex_iterator point = polygon.vertices_begin(); point != polygon.vertices_end(); point++){
+		detA = CGAL::determinant(Vector_3(edge->start().x(), edge->start().y(), 1), Vector_3(edge->end().x(), edge->end().y(), 1), Vector_3(newPoint.x(), newPoint.y(), 1));
+		detB = CGAL::determinant(Vector_3(edge->start().x(), edge->start().y(), 1), Vector_3(edge->end().x(), edge->end().y(), 1), Vector_3(point->x(), point->y(), 1));
+		if(detA * detB > 0)
+			return false;
+	}
+	return true;
 }
 
 //checks if the given edge is visible from the newPoint

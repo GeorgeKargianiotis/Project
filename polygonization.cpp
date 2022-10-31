@@ -10,7 +10,7 @@
 
 void readArguments(int &argc, char* argv[]);
 
-char *inputFile, *outputFile, *algorithm, *edgeSelection, *initialization;
+char *inputFile, *outputFile, *algorithm, *initialization, *edgeSelection;
 
 int main(int argc, char* argv[]){
 	readArguments(argc, argv);

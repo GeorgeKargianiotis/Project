@@ -20,6 +20,25 @@ std::vector<std::string> utils::splitString(std::string &str, char delimiter = '
 	return split;
 }
 
+
+void utils::writeToOutputFile(std::ofstream &outFile, std::vector<Point_2> &points, Polygon_2 &polygon, Polygon_2 &convexHullPolygon, int edgeSelection, char* initialization, int polygonArea, const int64_t &executionTime){
+	//wirite polygon's points
+	for(Point_2 point : points)
+		outFile << point.x() << " " << point.y() << "\n"; 
+	
+	//write polygon's edges
+	for(Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++)
+		outFile << edge->start() << " " << edge->end() << "\n";
+
+	outFile << "Alogrithm: incremental edge_selection " << edgeSelection << " initilization " << *initialization << "\n";  
+
+	outFile << "area: " << polygonArea << "\n";
+
+	outFile << "ratio: " << polygonArea / convexHullPolygon.area() << "\n";
+
+	outFile << "construction time: " << executionTime << " ms\n";
+}
+
 // this function prints the polygon's points as a python array to plot the polygon with matplotlib.
 void utils::polygonToPythonArray(Polygon_2 &polygon, const std::string &name){
 	std::cout << name << " = [\n";

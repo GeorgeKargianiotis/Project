@@ -174,21 +174,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
 	//write output
-	//wirite polygon's points
-	for(Point_2 point : points)
-		outFile << point.x() << " " << point.y() << "\n"; 
-	
-	//write polygon's edges
-	for(Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++)
-		outFile << edge->start() << " " << edge->end() << "\n";
-
-	outFile << "Alogrithm: incremental edge_selection " << edgeSelection << " initilization " << *initialization << "\n";  
-
-	outFile << "area: " << polygonArea << "\n";
-
-	outFile << "ratio: " << polygonArea / convexHullPolygon.area() << "\n";
-
-	outFile << "construction time: " << executionTime.count() << " ms\n";
+	utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, initialization, polygonArea, executionTime.count());
 }
 
 //, int lastPointExpandPolygonIndex,

@@ -1,7 +1,8 @@
-#include <vector>
-#include <string>
-#include <functional>
+#include <chrono>
 #include <cstdlib>
+#include <functional>
+#include <string>
+#include <vector>
 #include <time.h>
 
 #include "../headers/incremental.hpp"
@@ -67,8 +68,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 	lastPointExpandPolygonIndex = i + 2;
 	lastPointExpandPolygon = points[lastPointExpandPolygonIndex];
-	polygonArea = CGAL::area(points[0], points[1], points[i+3]);
-	Point_2 polygonFirstEdgeMiddlePoint = Point_2((polygon.edge(0).point(0).x() + polygon.edge(0).point(1).x()) / 2.0, (polygon.edge(0).point(0).y() + polygon.edge(0).point(1).y()) / 2.0);
+	polygonArea = std::abs(CGAL::area(points[0], points[1], points[i+2]));
 	std::vector<Segment_2> visibleEdges;
 
 	while(lastPointExpandPolygonIndex != points.size() - 1){
@@ -110,17 +110,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			}
 		}
 
-
-		std::cout << "New point " << newPoint << std::endl;
-		std::cout << "Convex Hull: ";
-		utils::polygonToPythonArray(convexHullPolygon);
-		std::cout << "Red edges: ";
-		for(auto edge : redEdges)
-			std::cout << "[" << edge.start().x() << "," << edge.start().y() << "], " << "[" << edge.end().x() << "," << edge.end().y() << "],";
-		std::cout << std::endl;
-
 		if(visibleEdges.empty()){
-
 			for(auto point : points)
 				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
 			std::cout << "Empty visible Edges" << std::endl;
@@ -129,17 +119,16 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 		//choose visible edge to replace
 		int index = 0;
-		//if(std::string(edgeSelection).compare(RANDOM_EDGE_SELECTION) == 0)
 		if(edgeSelection == RANDOM_EDGE_SELECTION)
 			index = randomSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
-		//if(std::string(edgeSelection).compare(MIN_AREA_EDGE_SELECTION) == 0)
 		else if(edgeSelection == MIN_AREA_EDGE_SELECTION)
 			index = minAreaSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
-		//if(std::string(edgeSelection).compare(MAX_AREA_EDGE_SELECTION) == 0)
 		else if(edgeSelection == MAX_AREA_EDGE_SELECTION)
 			index = maxAreaSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
 
 		Segment_2 edgeToBeReplaced = visibleEdges[index];
+
+		polygonArea += std::abs(CGAL::area(edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint));
 
 		//insert the new point to the right position in polygon
 		for(Polygon_2::Vertex_iterator endVertexOfEdgeToBeReplaced = polygon.begin(); endVertexOfEdgeToBeReplaced != polygon.end(); endVertexOfEdgeToBeReplaced++){
@@ -149,18 +138,57 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			}
 		}
 
-		std::cout << "Edge replaced: " << "[" << edgeToBeReplaced.start().x() << "," << edgeToBeReplaced.start().y() << "], " << "[" << edgeToBeReplaced.end().x() << "," << edgeToBeReplaced.end().y() << "]\n";
-		std::cout << "Polygon: ";
-		utils::polygonToPythonArray(polygon);
-
-
+		
 		 if(!polygon.is_simple()){
+			std::cout << "points = [\n";
+			for(auto point : points)
+				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
+			std::cout << "\n]\n";
+			utils::polygonToPythonArray(convexHullPolygon, "convexHull");
+			std::cout << "redEdges = [\n";
+			for(auto edge : redEdges)
+				std::cout << "[" << edge.start().x() << "," << edge.start().y() << "], " << "[" << edge.end().x() << "," << edge.end().y() << "],";
+			std::cout << "]\n";
+			utils::polygonToPythonArray(polygon);
+			std::cout << "edgeToBeReplaced = [\n" << "[" << edgeToBeReplaced.start().x() << "," << edgeToBeReplaced.start().y() << "], " << "[" << edgeToBeReplaced.end().x() << "," << edgeToBeReplaced.end().y() << "]\n]\n";
 			std::cerr << "Polygon is no simple\n";
 			exit (EXIT_FAILURE);
 		}
 
-		std::cout << "\n\n";
+		if(lastPointExpandPolygonIndex + 1 == points.size()){
+			std::cout << "points = [\n";
+			for(auto point : points)
+				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
+			std::cout << "\n]\n";
+			utils::polygonToPythonArray(convexHullPolygon, "convexHull");
+			std::cout << "redEdges = [\n";
+			for(auto edge : redEdges)
+				std::cout << "[" << edge.start().x() << "," << edge.start().y() << "], " << "[" << edge.end().x() << "," << edge.end().y() << "],";
+			std::cout << "]\n";
+			utils::polygonToPythonArray(polygon);
+			std::cout << "edgeToBeReplaced = [\n" << "[" << edgeToBeReplaced.start().x() << "," << edgeToBeReplaced.start().y() << "], " << "[" << edgeToBeReplaced.end().x() << "," << edgeToBeReplaced.end().y() << "]\n]\n";
+		}
 	}
+
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+
+	//write output
+	//wirite polygon's points
+	for(Point_2 point : points)
+		outFile << point.x() << " " << point.y() << "\n"; 
+	
+	//write polygon's edges
+	for(Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++)
+		outFile << edge->start() << " " << edge->end() << "\n";
+
+	outFile << "Alogrithm: incremental edge_selection " << edgeSelection << " initilization " << *initialization << "\n";  
+
+	outFile << "area: " << polygonArea << "\n";
+
+	outFile << "ratio: " << polygonArea / convexHullPolygon.area() << "\n";
+
+	outFile << "construction time: " << executionTime.count() << " ms\n";
 }
 
 //, int lastPointExpandPolygonIndex,
@@ -225,22 +253,32 @@ int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){
 
 int minAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){
 	double minArea = std::numeric_limits<double>::max();
+	double tempArea;
 	int index = 0;
 
-	for(int i = 0; i < visibleEdges.size(); i++)
-		if(CGAL::area(visibleEdges[i].start(), visibleEdges[i].end(), newPoint) < minArea)	
-			index = 0;
+	for(int i = 0; i < visibleEdges.size(); i++){
+		tempArea = std::abs(CGAL::area(visibleEdges[i].start(), visibleEdges[i].end(), newPoint));
+		if( tempArea < minArea){
+			minArea = tempArea;
+			index = i;
+		}
+	}
 
 	return index;
 }
 
 int maxAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){
-	double maxArea = std::numeric_limits<double>::min();
+	double maxArea = 0;
+	double tempArea;
 	int index = 0;
 
-	for(int i = 0; i < visibleEdges.size(); i++)
-		if(CGAL::area(visibleEdges[i].start(), visibleEdges[i].end(), newPoint) > maxArea)	
-			index = 0;
+	for(int i = 0; i < visibleEdges.size(); i++){
+		tempArea = std::abs(CGAL::area(visibleEdges[i].start(), visibleEdges[i].end(), newPoint));
+		if( tempArea > maxArea){
+			maxArea = tempArea;
+			index = i;
+		}
+	}
 
 	return index;
 }

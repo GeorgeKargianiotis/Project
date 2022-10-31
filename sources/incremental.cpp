@@ -95,6 +95,11 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 					if(convexPolygonEdge->start() == edge->start()){
 
+						if(convexPolygonEdge->end() == edge->end()){
+							visibleEdges.push_back(Segment_2(edge->start(), edge->end()));
+							break;
+						}
+
 						//check if all polygon edges "behind" the red edge are visible to the newPoint
 						do{
 							 if(isVisibleEdge(polygon, edge, newPoint))
@@ -109,13 +114,18 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		}
 
 
+		std::cout << "New point " << newPoint << std::endl;
+		std::cout << "Convex Hull: ";
+		utils::polygonToPythonArray(convexHullPolygon);
 		std::cout << "Red edges: ";
 		for(auto edge : redEdges)
 			std::cout << "[" << edge.start().x() << "," << edge.start().y() << "], " << "[" << edge.end().x() << "," << edge.end().y() << "],";
 		std::cout << std::endl;
 
-		if(visibleEdges.empty())
+		if(visibleEdges.empty()){
+			std::cout << "Empty visible Edges" << std::endl;
 			exit(EXIT_FAILURE);
+		}
 
 		//choose visible edge to replace
 		int index = 0;
@@ -139,10 +149,10 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			}
 		}
 
-		std::cout << "New point " << newPoint << std::endl;
-		std::cout << "Edge replaced " << edgeToBeReplaced << std::endl;
+		std::cout << "Edge replaced: " << "[" << edgeToBeReplaced.start().x() << "," << edgeToBeReplaced.start().y() << "], " << "[" << edgeToBeReplaced.end().x() << "," << edgeToBeReplaced.end().y() << "]\n";
 		std::cout << "Polygon: ";
 		utils::polygonToPythonArray(polygon);
+
 
 		 if(!polygon.is_simple()){
 		// 	for(Polygon_2::Vertex_iterator p = polygon.begin(); p != polygon.end(); p++){
@@ -153,13 +163,16 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			std::cerr << "Polygon is no simple\n";
 			exit (EXIT_FAILURE);
 		}
+
+		std::cout << "\n\n";
 	}
 }
 
-void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon_2 &convexHullPolygon){
+//, int lastPointExpandPolygonIndex,
+void getConvexHullPolygonFromPoints(const std::vector<Point_2> &vertices, Polygon_2 &convexHullPolygon){
 	std::vector<Point_2> points;
 	CGAL::convex_hull_2(vertices.begin(), vertices.end(), std::back_inserter(points));
-	for(auto it = vertices.begin(); it != vertices.end(); it++)
+	for(auto it = points.begin(); it != points.end(); it++)
 		convexHullPolygon.push_back(*it);
 }
 
@@ -185,13 +198,26 @@ bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnderC
 	for(int i = 0; i < polygon.edges().size(); i++){
 		Segment_2 intersectLine = Segment_2(polygon.edge(i).start(), polygon.edge(i).end());
 
-		//if the two lines are neighbors or are the same line
-		if(intersectLine.start() == line1.start() || intersectLine.end() == line1.start() || intersectLine.start() == line1.end() || intersectLine.end() == line1.end())
-			continue;
-		if(intersectLine.start() == line2.start() || intersectLine.end() == line2.start() || intersectLine.start() == line2.end() || intersectLine.end() == line2.end())
-			continue;
+		bool firstLineIsNeighbor = intersectLine.start() == line1.start() || intersectLine.end() == line1.start() || intersectLine.start() == line1.end() || intersectLine.end() == line1.end();
+		bool secondLineIsNeighbor =  intersectLine.start() == line2.start() || intersectLine.end() == line2.start() || intersectLine.start() == line2.end() || intersectLine.end() == line2.end();
 
-		if(CGAL::do_intersect(intersectLine, line1) || CGAL::do_intersect(intersectLine, line2))
+		//if the two lines are neighbors or are the same line
+		if(firstLineIsNeighbor && secondLineIsNeighbor)
+			continue;
+		if(firstLineIsNeighbor){
+			if(CGAL::intersection(intersectLine, line2))
+				return false;
+			else
+				continue;
+		}
+		if(secondLineIsNeighbor){
+			if(CGAL::intersection(intersectLine, line1))
+				return false;
+			else
+				continue;
+		}
+
+		if(CGAL::intersection(intersectLine, line1) || CGAL::intersection(intersectLine, line2))
 			return false;	
 	}
 

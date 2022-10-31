@@ -120,6 +120,9 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		std::cout << std::endl;
 
 		if(visibleEdges.empty()){
+
+			for(auto point : points)
+				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
 			std::cout << "Empty visible Edges" << std::endl;
 			exit(EXIT_FAILURE);
 		}

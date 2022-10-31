@@ -87,9 +87,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 				redEdges.push_back(*convexPolygonEdge);
 
-				// std::cout << convexPolygonEdge->start() << std::endl;
-				// std::cout << convexPolygonEdge->end() << std::endl;
-
 				//find visible edges
 				for(Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++){
 
@@ -155,11 +152,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 
 		 if(!polygon.is_simple()){
-		// 	for(Polygon_2::Vertex_iterator p = polygon.begin(); p != polygon.end(); p++){
-		// 		if(*p == newPoint)
-		// 			polygon.erase(p);
-		// 	}
-		// 	lastPointExpandPolygonIndex--;
 			std::cerr << "Polygon is no simple\n";
 			exit (EXIT_FAILURE);
 		}

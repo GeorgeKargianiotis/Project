@@ -14,31 +14,33 @@ char *inputFile, *outputFile, *algorithm, *initialization, *edgeSelection;
 
 int main(int argc, char* argv[]){
 	readArguments(argc, argv);
-	std::ifstream file(inputFile);
+	std::ifstream inFile(inputFile);
+	std::ofstream outFile(outputFile);
 	std::string line;
 	std::vector<Point_2> Points2;
 
 	//ignore first two lines
-	std::getline(file, line);
-	std::getline(file, line);
+	std::getline(inFile, line);
+	std::getline(inFile, line);
 
-	while(std::getline(file, line)){
+	while(std::getline(inFile, line)){
 		std::vector<std::string> split = utils::splitString(line, '\t'); 
 		Points2.push_back(Point_2(std::stod(split[1]), std::stod(split[2])));
 	}
 
-	file.close();
+	inFile.close();
 
 	if(std::string(algorithm).compare("incremental") == 0)
-		incremental::incrementalAlgorithm(Points2, initialization, std::stoi(edgeSelection));
+		incremental::incrementalAlgorithm(Points2, initialization, std::stoi(edgeSelection), outFile);
 
 	// Need int for convex hull edges
 	if(std::string(algorithm).compare("convex_hull") == 0)
 		convex_hull::convex_HullAlgorithm(Points2, std::stoi(edgeSelection));
 
+	outFile.close();
+
 	return 0;
 }
-
 
 void readArguments(int &argc, char* argv[]){
 	if(argc != 11){

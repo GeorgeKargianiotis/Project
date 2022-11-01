@@ -27,7 +27,7 @@ void test(int i ,int j, int k );
 
 bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edge, const Point_2 &newPoint);
 
-void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection){
+void incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile){
 
 	srand(time(0));
 
@@ -170,7 +170,8 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		}
 	}
 
-	auto stop = std::chrono::high_resolution_clock::now();
+	auto stop = std::chrono::high_resolution_clock::now();	
+	auto start = std::chrono::high_resolution_clock::now();
 	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
 	//write output
@@ -279,24 +280,3 @@ bool segment1BeforeSegment2AxisY(Segment_2 &seg1, Segment_2 &seg2){
 	return seg1.start().y() < seg2.start().y() && seg1.start().y() < seg2.end().y() && seg1.end().y() < seg2.start().y() && seg1.end().y() < seg2.end().y();
 }
 
-//checks if the given edge is visible from the newPoint
-bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnderCheck, const Point_2 &newPoint){
-
-	Segment_2 line1 = Segment_2(edgeUnderCheck->start(), newPoint);
-	Segment_2 line2 = Segment_2(edgeUnderCheck->end(), newPoint);
-
-	for(int i = 0; i < polygon.edges().size(); i++){
-		Segment_2 intersectLine = Segment_2(polygon.edge(i).start(), polygon.edge(i).end());
-
-		//if the two lines are neighbors or are the same line
-		if(intersectLine.start() == line1.start() || intersectLine.end() == line1.start() || intersectLine.start() == line1.end() || intersectLine.end() == line1.end())
-			continue;
-		if(intersectLine.start() == line2.start() || intersectLine.end() == line2.start() || intersectLine.start() == line2.end() || intersectLine.end() == line2.end())
-			continue;
-
-		if(CGAL::do_intersect(intersectLine, line1) || CGAL::do_intersect(intersectLine, line2))
-			return false;	
-	}
-
-	return true;
-}

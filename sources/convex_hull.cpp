@@ -13,8 +13,6 @@ typedef std::vector<Segment_2> Segments;
 
 bool isVisibleEdgeCH(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edge, const Point_2 &newPoint);
 
-// bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edge, const Point_2 &newPoint);
-
 void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){	
 
 	
@@ -124,17 +122,16 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 					}
 				}
 				// Same as above, visibility check
-				for (auto iter2=myseg.begin(); iter2!=myseg.end(); ++iter2){
-					if(!CGAL::do_intersect(*iter2, toadd)){
+				for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
+					if(!isVisibleEdgeCH(polygonchain, edge, toadd)){
 						std::cerr << "Visibility error" << std::endl;
 					}
-					//
-					Segment_2 sgmt = *iter2;
-					area = CGAL::area(toadd, sgmt.source(), sgmt.target());
+					
+					area = CGAL::area(toadd, edge->source(), edge->target());
 
 					if (area < minarea){
 						minarea = area;
-						minemb = sgmt;
+						minemb = *edge;
 					}
 				}
 				myseg.push_back(Segment_2 (minemb.source(), toadd));
@@ -159,17 +156,15 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 					}
 				}
 				// FOUND POINT, CHECK VISIBILITY WITH EVERY EDGE(SEGMENT)
-				for (auto iter2=myseg.begin(); iter2!=myseg.end(); ++iter2){
-					if(!CGAL::do_intersect(*iter2, toadd)){
+				for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
+					if(!isVisibleEdgeCH(polygonchain, edge, toadd)){
 						std::cerr << "Visibility error" << std::endl;
 					}
-					//
-					Segment_2 sgmt = *iter2;
-					area = CGAL::area(toadd, sgmt.source(), sgmt.target());
+					area = CGAL::area(toadd, edge->source(), edge->target());
 
 					if (area > maxarea){
 						maxarea = area;
-						maxemb = sgmt;
+						maxemb = *edge;
 					}
 				}
 				myseg.push_back(Segment_2 (maxemb.source(), toadd));
@@ -200,13 +195,26 @@ bool isVisibleEdgeCH(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnde
 	for(int i = 0; i < polygon.edges().size(); i++){
 		Segment_2 intersectLine = Segment_2(polygon.edge(i).start(), polygon.edge(i).end());
 
-		//if the two lines are neighbors or are the same line
-		if(intersectLine.start() == line1.start() || intersectLine.end() == line1.start() || intersectLine.start() == line1.end() || intersectLine.end() == line1.end())
-			continue;
-		if(intersectLine.start() == line2.start() || intersectLine.end() == line2.start() || intersectLine.start() == line2.end() || intersectLine.end() == line2.end())
-			continue;
+		bool firstLineIsNeighbor = intersectLine.start() == line1.start() || intersectLine.end() == line1.start() || intersectLine.start() == line1.end() || intersectLine.end() == line1.end();
+		bool secondLineIsNeighbor =  intersectLine.start() == line2.start() || intersectLine.end() == line2.start() || intersectLine.start() == line2.end() || intersectLine.end() == line2.end();
 
-		if(CGAL::do_intersect(intersectLine, line1) || CGAL::do_intersect(intersectLine, line2))
+		//if the two lines are neighbors or are the same line
+		if(firstLineIsNeighbor && secondLineIsNeighbor)
+			continue;
+		if(firstLineIsNeighbor){
+			if(CGAL::intersection(intersectLine, line2))
+				return false;
+			else
+				continue;
+		}
+		if(secondLineIsNeighbor){
+			if(CGAL::intersection(intersectLine, line1))
+				return false;
+			else
+				continue;
+		}
+
+		if(CGAL::intersection(intersectLine, line1) || CGAL::intersection(intersectLine, line2))
 			return false;	
 	}
 

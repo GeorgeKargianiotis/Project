@@ -44,7 +44,8 @@ void utils::polygonToPythonArray(Polygon_2 &polygon, const std::string &name){
 	std::cout << name << " = [\n";
 	for(Point_2 point : polygon)
 		std::cout << "[" << point.hx() << "," << point.hy() << "],";  
-	std::cout << "]\n";
+	std::cout << "\b \b";
+	std::cout << "\n]\n";
 }
 
 // this function prints the vector's points as a python array to plot the polygon with matplotlib.
@@ -55,17 +56,53 @@ void utils::vectorToPythonArray(std::vector<Point_2> &points){
 }
 
 bool utils::cmp1aPoint2(Point_2 &point1, Point_2 &point2){
-	return point1.hx() < point2.hx();
+	if(point1.x() < point2.x())
+		return true;
+	else if(point1.x() > point2.x())
+		return false;
+	else{
+		if(point1.y() < point2.y())
+		return true;
+	else
+		return false;
+	}
 }
 
 bool utils::cmp1bPoint2(Point_2 &point1, Point_2 &point2){
-	return point1.hx() > point2.hx();
+	if(point1.x() > point2.x())
+		return true;
+	else if(point1.x() < point2.x())
+		return false;
+	else{
+		if(point1.y() < point2.y())
+		return true;
+	else
+		return false;
+	}
 }
 
 bool utils::cmp2aPoint2(Point_2 &point1, Point_2 &point2){
-	return point1.hy() < point2.hy();
+	if(point1.y() < point2.y())
+		return true;
+	else if(point1.y() > point2.y())
+		return false;
+	else{
+		if(point1.x() < point2.x())
+		return true;
+	else
+		return false;
+	}
 }
 
 bool utils::cmp2bPoint2(Point_2 &point1, Point_2 &point2){
-	return point1.hy() > point2.hy();
+	if(point1.y() > point2.y())
+		return true;
+	else if(point1.y() < point2.y())
+		return false;
+	else{
+		if(point1.x() < point2.x())
+		return true;
+	else
+		return false;
+	}
 }

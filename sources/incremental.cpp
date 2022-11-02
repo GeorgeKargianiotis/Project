@@ -15,6 +15,8 @@ bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2
 
 bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edge, const Point_2 &newPoint);
 
+bool pointIsCollinearAndBetweenPreviousPoints(char* initialization, std::vector<Point_2> &points, int n);
+
 int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
 
 int minAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
@@ -72,9 +74,20 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	lastPointExpandPolygon = points[lastPointExpandPolygonIndex];
 	polygonArea = std::abs(CGAL::area(points[0], points[1], points[i+2]));
 	std::vector<Segment_2> visibleEdges;
+	
+	int x = 0;
 
 	while(lastPointExpandPolygonIndex != points.size() - 1){
 		lastPointExpandPolygonIndex++;
+
+		if(points[lastPointExpandPolygonIndex].x() == points[lastPointExpandPolygonIndex + 1].x()){
+			//std::cout << "Points with same x: " << lastPointExpandPolygonIndex << std::endl;
+			x++;
+		}
+
+		if(points[lastPointExpandPolygonIndex].x() == points[lastPointExpandPolygonIndex + 1].x() && points[lastPointExpandPolygonIndex].y() == points[lastPointExpandPolygonIndex + 1].y())
+			std::cout << "Dual points\n" << lastPointExpandPolygonIndex << std::endl;
+
 		Point_2 newPoint = points[lastPointExpandPolygonIndex];
 		//find the convex hull polygon
 		convexHullPolygon.clear();
@@ -82,6 +95,29 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		visibleEdges.clear();
 		std::vector<Segment_2> redEdges;
 
+		/*
+			if point n have the same x coordinate (if points are order by x) with point n-1 and n+1 
+			or point n have the same y coordinate (if points are order by y) with point n-1 and n+1
+			and it is in between n-1 and n+1 
+			just add it in the polygon between them
+		*/
+		if(pointIsCollinearAndBetweenPreviousPoints(initialization, points, lastPointExpandPolygonIndex)){
+			//insert the new point to the right position in polygon
+			for(Polygon_2::Vertex_iterator endVertexOfEdgeToBeReplaced = polygon.begin(); endVertexOfEdgeToBeReplaced != polygon.end(); endVertexOfEdgeToBeReplaced++){
+				if(*endVertexOfEdgeToBeReplaced == points[lastPointExpandPolygonIndex+1]){
+					polygon.insert(endVertexOfEdgeToBeReplaced, newPoint); 
+					break;
+				}
+			}
+
+			 if(!polygon.is_simple()){
+				std::cout << "NOT SIMPLE!" << std::endl;
+				exit (EXIT_FAILURE);
+			 }
+			continue;
+		}
+
+		//else{
 		//find the red edges of convex hull polygon
 		for(Polygon_2::Edge_const_iterator convexPolygonEdge = convexHullPolygon.edges().begin(); convexPolygonEdge != convexHullPolygon.edges().end(); convexPolygonEdge++){
 
@@ -101,8 +137,8 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 						//check if all polygon edges "behind" the red edge are visible to the newPoint
 						do{
-							 if(isVisibleEdge(polygon, edge, newPoint))
-							 	visibleEdges.push_back(Segment_2(edge->start(), edge->end()));
+							if(isVisibleEdge(polygon, edge, newPoint))
+								visibleEdges.push_back(Segment_2(edge->start(), edge->end()));
 							edge++;
 						} while(convexPolygonEdge->end() != edge->start() && edge != polygon.edges().end());
 
@@ -112,11 +148,24 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			}
 		}
 
+		//}
+
 		if(visibleEdges.empty()){
-			std::cout << "Points:\n";
-			for(auto point : points)
-				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
-			std::cout << "Empty visible Edges" << std::endl;
+			 std::cout << "Points:\n";
+			 for(auto point : points)
+			 	std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
+			std::cout << "\b \b";
+			// utils::polygonToPythonArray(convexHullPolygon, "convexHull");
+			// std::cout << "redEdges = [\n";
+			// for(auto edge : redEdges)
+			// 	std::cout << "[" << edge.start().x() << "," << edge.start().y() << "], " << "[" << edge.end().x() << "," << edge.end().y() << "],";
+			// std::cout << "\b \b";
+			// std::cout << "]\n";
+			// utils::polygonToPythonArray(polygon);
+			std::cout << "\n redEdges: " << redEdges.size() << std::endl;
+			std::cout << polygon.size() << std::endl;
+			std::cout << lastPointExpandPolygonIndex << std::endl;
+			std::cout << "\nEmpty visible Edges\n";
 			exit(EXIT_FAILURE);
 		}
 
@@ -143,26 +192,31 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 		
 		 if(!polygon.is_simple()){
-			std::cout << "points = [\n";
-			for(auto point : points)
-				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
-			std::cout << "\n]\n";
+			// std::cout << "points = [\n";
+			// for(auto point : points)
+			// 	std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
+			// std::cout << "\b \b";
+			// std::cout << "\n]\n";
 			utils::polygonToPythonArray(convexHullPolygon, "convexHull");
 			std::cout << "redEdges = [\n";
 			for(auto edge : redEdges)
 				std::cout << "[" << edge.start().x() << "," << edge.start().y() << "], " << "[" << edge.end().x() << "," << edge.end().y() << "],";
+			std::cout << "\b \b";
 			std::cout << "]\n";
 			utils::polygonToPythonArray(polygon);
 			std::cout << "edgeToBeReplaced = [\n" << "[" << edgeToBeReplaced.start().x() << "," << edgeToBeReplaced.start().y() << "], " << "[" << edgeToBeReplaced.end().x() << "," << edgeToBeReplaced.end().y() << "]\n]\n";
 			std::cerr << "Polygon is no simple\n";
+			std::cout << polygon.size() << std::endl;
+			std::cout << "dual points " << x << std::endl;
+			std::cout << lastPointExpandPolygonIndex << std::endl;
 			exit (EXIT_FAILURE);
 		}
 
 		if(lastPointExpandPolygonIndex + 1 == points.size()){
-			std::cout << "points = [\n";
-			for(auto point : points)
-				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
-			std::cout << "\n]\n";
+			// std::cout << "points = [\n";
+			// for(auto point : points)
+			// 	std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
+			// std::cout << "\n]\n";
 			utils::polygonToPythonArray(convexHullPolygon, "convexHull");
 			std::cout << "redEdges = [\n";
 			for(auto edge : redEdges)
@@ -217,23 +271,43 @@ bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnderC
 		if(firstLineIsNeighbor && secondLineIsNeighbor)
 			continue;
 		if(firstLineIsNeighbor){
-			if(CGAL::intersection(intersectLine, line2))
+			if(CGAL::do_intersect(intersectLine, line2))
 				return false;
 			else
 				continue;
 		}
 		if(secondLineIsNeighbor){
-			if(CGAL::intersection(intersectLine, line1))
+			if(CGAL::do_intersect(intersectLine, line1))
 				return false;
 			else
 				continue;
 		}
 
-		if(CGAL::intersection(intersectLine, line1) || CGAL::intersection(intersectLine, line2))
+		if(CGAL::do_intersect(intersectLine, line1) || CGAL::do_intersect(intersectLine, line2))
 			return false;	
 	}
 
 	return true;
+}
+
+void insertCollinearlyPoint(Polygon_2 &polygon, Point_2 &newPoint){
+
+}
+
+bool pointIsCollinearAndBetweenPreviousPoints(char* initialization, std::vector<Point_2> &points, int n){
+	std::string init = std::string(initialization);
+
+	if(init.compare(SORT_BY_X_ASC) == 0 || init.compare(SORT_BY_X_DESC))
+		if(points[n-1].x() == points[n].x() && points[n].x() == points[n+1].x())
+			if( !(points[n].y() > points[n-1].y() && points[n].y() > points[n+1].y()) && !(points[n].y() < points[n-1].y() && points[n].y() < points[n+1].y()) )
+				return true;
+	return false;
+
+	if(init.compare(SORT_BY_Y_ASC) == 0 || init.compare(SORT_BY_Y_DESC))
+		if(points[n-1].y() == points[n].y() && points[n].y() == points[n+1].y())
+			if( !(points[n].x() > points[n-1].x() && points[n].x() > points[n+1].x()) && !(points[n].x() < points[n-1].x() && points[n].x() < points[n+1].x()) )
+				return true;
+	return false;
 }
 
 int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){

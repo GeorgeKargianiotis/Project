@@ -1,3 +1,5 @@
+
+
 #include <chrono>
 #include <cstdlib>
 #include <functional>
@@ -13,6 +15,8 @@ void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon
 
 bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2 &polygon);
 
+bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edge, const Point_2 &newPoint);
+
 int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
 
 int minAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
@@ -25,9 +29,9 @@ bool segment1BeforeSegment2AxisY(Segment_2 &seg1, Segment_2 &seg2);
 
 void test(int i ,int j, int k );
 
-bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edge, const Point_2 &newPoint);
+void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile){
 
-void incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile){
+	auto start = std::chrono::high_resolution_clock::now();
 
 	srand(time(0));
 
@@ -111,6 +115,7 @@ void incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, in
 		}
 
 		if(visibleEdges.empty()){
+			std::cout << "Points:\n";
 			for(auto point : points)
 				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
 			std::cout << "Empty visible Edges" << std::endl;
@@ -170,8 +175,7 @@ void incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, in
 		}
 	}
 
-	auto stop = std::chrono::high_resolution_clock::now();	
-	auto start = std::chrono::high_resolution_clock::now();
+	auto stop = std::chrono::high_resolution_clock::now();
 	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
 	//write output
@@ -279,4 +283,3 @@ bool segment1BeforeSegment2AxisX(Segment_2 &seg1, Segment_2 &seg2){
 bool segment1BeforeSegment2AxisY(Segment_2 &seg1, Segment_2 &seg2){
 	return seg1.start().y() < seg2.start().y() && seg1.start().y() < seg2.end().y() && seg1.end().y() < seg2.start().y() && seg1.end().y() < seg2.end().y();
 }
-

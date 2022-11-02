@@ -13,9 +13,12 @@ typedef std::vector<Segment_2> Segments;
 
 bool isVisibleEdgeCH(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edge, const Point_2 &newPoint);
 
-void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){	
+void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, std::ofstream &outFile){	
 
-	
+	auto start = std::chrono::high_resolution_clock::now();
+
+	srand(time(0));
+
 	Polygon_2 mypolygon, polygonchain; // Initial polygon to be used in convex_hull
 	Segments myseg; // Edges stored here
 	Segment_2 chosen;
@@ -87,7 +90,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 
 					
 			// Connect point with a random edge, create new edges and remove the point, old edge is also removed
-			random = rand() % myseg.size();
+			random = rand() % ClosestPoints.size();
 			chosen = myseg.at(random);
 			newp = ClosestPoints.at(random);
 
@@ -104,10 +107,15 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 				}
 			}
 			ClosestPoints.clear();
+			// ΤΟ DO, VISIBILITY BEFORE INSERTION
+			// CHANGE INTERSECTION WITH DO_INTERSECT
+			// CLOCKWISE VS COUNTERCLOCKWISE ROTATION OF CONVEX HULL
+			// FOR OUTSIDE POINTS: DO_INERSECT POINT LEFT OUT WITH 2 NEW EDGES AND OLD ONE
 			for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
 				if(!isVisibleEdgeCH(polygonchain, edge, newp))
 					std::cerr << "Visibility error" << std::endl;
 			}
+			std::cout << "Conveeeex" << std::endl;
 
 		}
 		else if (edge == 2){
@@ -203,12 +211,37 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge){
 
 	
 
-	// After each new point entry, the polygon needs to remain simple
- 	const bool simpl = polygonchain.is_simple();
- 	if (!simpl)
-		std::cerr << "Not Simple Polygon" << std::endl; 
- 		
+		// After each new point entry, the polygon needs to remain simple
+		const bool simpl = polygonchain.is_simple();
+		if (!simpl){
+			std::cout << "points = [\n";
+			for(auto point : Points)
+				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
+			std::cout << "\n]\n";
+			utils::polygonToPythonArray(mypolygon, "convexHull");
+			utils::polygonToPythonArray(polygonchain);
+			std::cerr << "Polygon is no simple\n";
+			exit (EXIT_FAILURE); 
+		}
+		else{
+			std::cout << "points = [\n";
+			for(auto point : Points)
+				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
+			std::cout << "\n]\n";
+			utils::polygonToPythonArray(mypolygon, "convexHull");
+			utils::polygonToPythonArray(polygonchain);
+			std::cerr << "Polygon is no simple\n";
+
+		}
 	}
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+	std::cout << "Made It" << std::endl;
+
+	//write output
+	utils::writeToOutputFile(outFile, Points, polygonchain, mypolygon, edge, "none", std::abs(mypolygon.area()), executionTime.count());
+	std::cout << "Made It" << std::endl;
+	utils::polygonToPythonArray(polygonchain);
 }
 
 //checks if the given edge is visible from the newPoint

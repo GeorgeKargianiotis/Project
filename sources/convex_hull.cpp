@@ -3,6 +3,7 @@
 #include <functional>
 #include <cstdlib>
 #include <time.h>
+#include <chrono>
 
 #include "../headers/convex_hull.hpp"
 #include "../headers/cgalConfig.hpp"
@@ -12,6 +13,8 @@ typedef std::vector<Point_2>::iterator pveciterator;
 typedef std::vector<Segment_2> Segments; 
 
 bool isVisibleEdgeCH(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edge, const Point_2 &newPoint);
+
+// int check_inside(Point_2 pt, Point_2 start, Point_2 end, K traits);
 
 void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, std::ofstream &outFile){	
 
@@ -36,7 +39,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 
 	// Segments that provide the min and max area respectively
 	Segment_2 minemb, maxemb;
-	int random, index;
+	int random, index, outside;
 	double area; // Area calculated each time
 	
 	// Add all points to new vector
@@ -50,6 +53,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 	const Polygon_2::Vertices& range = mypolygon.vertices();
  	std::vector<Point_2> result;
 
+	polygonchain.clear();
 	// Using all given points to create initial chain
 	CGAL::convex_hull_2(range.begin(), range.end(), std::back_inserter(result));
 
@@ -59,6 +63,9 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 		
 		RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), *it), RemainingPoints.end());
 	}	
+
+	if(polygonchain.is_clockwise_oriented() != mypolygon.is_clockwise_oriented())
+			polygonchain.reverse_orientation();
 
 	// Make edges from polygon chain, add them to vector
 	for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++)
@@ -94,28 +101,51 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			chosen = myseg.at(random);
 			newp = ClosestPoints.at(random);
 
+			for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
+				if(!isVisibleEdgeCH(polygonchain, edge, newp))
+					std::cerr << "Visibility error" << std::endl;
+			}
+
+			for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
+				if(*vertex == chosen.start()){
+					vertex++; 
+					if(*vertex == chosen.end()){
+						polygonchain.insert(vertex, newp);
+						break;
+					}
+
+					vertex--;
+					if(vertex != polygonchain.begin())
+						vertex--;
+					if(*vertex == chosen.end()){
+						polygonchain.insert(vertex, newp);
+						break;
+					}
+
+					if(*polygonchain.begin() == chosen.end()){
+						polygonchain.insert(polygonchain.begin(), newp);
+						break;
+					}
+					
+					std::cout << "Problem inserting point " << std::endl;
+					exit (EXIT_FAILURE);
+
+				}
+			}
+
 			myseg.push_back(Segment_2 (chosen.source(), newp));
 			myseg.push_back(Segment_2 (newp, chosen.target()));
 			myseg.erase(std::remove(myseg.begin(), myseg.end(), chosen), myseg.end());
 			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
 			
-
-			for(Polygon_2::Vertex_iterator EdgeToBeReplaced = polygonchain.begin(); EdgeToBeReplaced != polygonchain.end(); EdgeToBeReplaced++){
-				if(*EdgeToBeReplaced == chosen.end()){
-					polygonchain.insert(EdgeToBeReplaced, newp); 
-					break;
-				}
-			}
 			ClosestPoints.clear();
-			// ΤΟ DO, VISIBILITY BEFORE INSERTION
-			// CHANGE INTERSECTION WITH DO_INTERSECT
-			// CLOCKWISE VS COUNTERCLOCKWISE ROTATION OF CONVEX HULL
-			// FOR OUTSIDE POINTS: DO_INERSECT POINT LEFT OUT WITH 2 NEW EDGES AND OLD ONE
-			for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
-				if(!isVisibleEdgeCH(polygonchain, edge, newp))
-					std::cerr << "Visibility error" << std::endl;
-			}
-			std::cout << "Conveeeex" << std::endl;
+
+			/*outside = check_inside(*polygonchain.begin(), *polygonchain.end(), newp, K());
+			
+			if(outside == 0){
+				std::cout << "Point Left Out" << std::endl;
+				exit(EXIT_FAILURE);
+			}*/
 
 		}
 		else if (edge == 2){
@@ -141,31 +171,62 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 
 					if (area < minarea){
 						minarea = area;
-						index = 1;
+						index = i;
 					}
 				}
 
-				myseg.push_back(Segment_2 (myseg.at(index).source(), RemainingPoints.at(index)));
-				myseg.push_back(Segment_2 (RemainingPoints.at(index), myseg.at(index).target()));
-				myseg.erase(std::remove(myseg.begin(), myseg.end(), myseg.at(index)), myseg.end());
-				RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), RemainingPoints.at(index)), RemainingPoints.end());
-				
-				for(Polygon_2::Vertex_iterator EdgeToBeReplaced = polygonchain.begin(); EdgeToBeReplaced != polygonchain.end(); EdgeToBeReplaced++){
-					if(*EdgeToBeReplaced == chosen.end()){
-						polygonchain.insert(EdgeToBeReplaced, newp); 
-						break;
-					}
-				}
-				ClosestPoints.clear();
 				for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
-					if(!isVisibleEdgeCH(polygonchain, edge, newp))
+					if(!isVisibleEdgeCH(polygonchain, edge, ClosestPoints.at(index)))
 						std::cerr << "Visibility error" << std::endl;
 				}
+
+				for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
+					if(*vertex == chosen.start()){
+						vertex++; 
+						if(*vertex == chosen.end()){
+							polygonchain.insert(vertex, newp);
+							break;
+						}
+
+						vertex--;
+						if(vertex != polygonchain.begin())
+							vertex--;
+						if(*vertex == chosen.end()){
+							polygonchain.insert(vertex, newp);
+							break;
+						}
+
+						if(*polygonchain.begin() == chosen.end()){
+							polygonchain.insert(polygonchain.begin(), newp);
+							break;
+						}
+						
+						std::cout << "Problem inserting point " << std::endl;
+						exit (EXIT_FAILURE);
+
+					}
+				}
+
+			myseg.push_back(Segment_2 (myseg.at(index).source(), RemainingPoints.at(index)));
+			myseg.push_back(Segment_2 (RemainingPoints.at(index), myseg.at(index).target()));
+			myseg.erase(std::remove(myseg.begin(), myseg.end(), myseg.at(index)), myseg.end());
+			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), RemainingPoints.at(index)), RemainingPoints.end());
+				
+		
+			ClosestPoints.clear();
+
+			/*outside = check_inside(*polygonchain.begin(), *polygonchain.end(), newp, K());
+			
+			if(outside == 0){
+				std::cout << "Point Left Out" << std::endl;
+				exit(EXIT_FAILURE);
+			}*/
+				
 		}
 		
 		
 		else{
-			// Add the edge that offers the largest triangle area, when connected to the point
+			// Add the edge that offers the smallest triangle area, when connected to the point
 			for (auto iter=myseg.begin(); iter!=myseg.end(); ++iter){
 				Segment_2 temp = *iter;
 				for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end();++it){
@@ -180,33 +241,63 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				ClosestPoints.push_back(toadd);	
 			}
 
-				// Myseg and closest points have the same size, find area for each pair
+			// Myseg and closest points have the same size, find area for each pair
 
-				for (int i = 0; i != myseg.size(); i++){
-					area = CGAL::area(ClosestPoints.at(i), myseg.at(i).source(), myseg.at(i).target());
+			for (int i = 0; i != myseg.size(); i++){
+				area = CGAL::area(ClosestPoints.at(i), myseg.at(i).source(), myseg.at(i).target());
 
-					if (area > maxarea){
-						maxarea = area;
-						index = 1;
-					}
+				if (area > maxarea){
+					maxarea = area;
+					index = i;
 				}
+			}
 
-				myseg.push_back(Segment_2 (myseg.at(index).source(), RemainingPoints.at(index)));
-				myseg.push_back(Segment_2 (RemainingPoints.at(index), myseg.at(index).target()));
-				myseg.erase(std::remove(myseg.begin(), myseg.end(), myseg.at(index)), myseg.end());
-				RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), RemainingPoints.at(index)), RemainingPoints.end());
-				
-				for(Polygon_2::Vertex_iterator EdgeToBeReplaced = polygonchain.begin(); EdgeToBeReplaced != polygonchain.end(); EdgeToBeReplaced++){
-					if(*EdgeToBeReplaced == chosen.end()){
-						polygonchain.insert(EdgeToBeReplaced, newp); 
+			for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
+				if(!isVisibleEdgeCH(polygonchain, edge, ClosestPoints.at(index)))
+					std::cerr << "Visibility error" << std::endl;
+			}
+
+			for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
+				if(*vertex == chosen.start()){
+					vertex++; 
+					if(*vertex == chosen.end()){
+						polygonchain.insert(vertex, newp);
 						break;
 					}
+
+					vertex--;
+					if(vertex != polygonchain.begin())
+						vertex--;
+					if(*vertex == chosen.end()){
+						polygonchain.insert(vertex, newp);
+						break;
+					}
+
+					if(*polygonchain.begin() == chosen.end()){
+						polygonchain.insert(polygonchain.begin(), newp);
+						break;
+					}
+					
+					std::cout << "Problem inserting point " << std::endl;
+					exit (EXIT_FAILURE);
+
 				}
-				ClosestPoints.clear();
-				for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
-					if(!isVisibleEdgeCH(polygonchain, edge, newp))
-						std::cerr << "Visibility error" << std::endl;
-				}
+			}
+
+			myseg.push_back(Segment_2 (myseg.at(index).source(), RemainingPoints.at(index)));
+			myseg.push_back(Segment_2 (RemainingPoints.at(index), myseg.at(index).target()));
+			myseg.erase(std::remove(myseg.begin(), myseg.end(), myseg.at(index)), myseg.end());
+			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), RemainingPoints.at(index)), RemainingPoints.end());
+				
+		
+			ClosestPoints.clear();
+
+			/*outside = check_inside(*polygonchain.begin(), *polygonchain.end(), newp, K());
+			
+			if(outside == 0){
+				std::cout << "Point Left Out" << std::endl;
+				exit(EXIT_FAILURE);
+			}*/
 		}
 
 	
@@ -236,11 +327,9 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 	}
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-	std::cout << "Made It" << std::endl;
 
 	//write output
 	utils::writeToOutputFile(outFile, Points, polygonchain, mypolygon, edge, "none", std::abs(mypolygon.area()), executionTime.count());
-	std::cout << "Made It" << std::endl;
 	utils::polygonToPythonArray(polygonchain);
 }
 
@@ -260,21 +349,38 @@ bool isVisibleEdgeCH(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnde
 		if(firstLineIsNeighbor && secondLineIsNeighbor)
 			continue;
 		if(firstLineIsNeighbor){
-			if(CGAL::intersection(intersectLine, line2))
+			if(CGAL::do_intersect(intersectLine, line2))
 				return false;
 			else
 				continue;
 		}
 		if(secondLineIsNeighbor){
-			if(CGAL::intersection(intersectLine, line1))
+			if(CGAL::do_intersect(intersectLine, line1))
 				return false;
 			else
 				continue;
 		}
 
-		if(CGAL::intersection(intersectLine, line1) || CGAL::intersection(intersectLine, line2))
+		if(CGAL::do_intersect(intersectLine, line1) || CGAL::do_intersect(intersectLine, line2))
 			return false;	
 	}
 
 	return true;
 }
+
+/*int check_inside(Point_2 pt, Point_2 start, Point_2 end, K traits){
+
+  std::cout << "The point " << pt;
+  switch(CGAL::bounded_side_2(start, end, pt, traits)) {
+    case CGAL::ON_BOUNDED_SIDE :
+      std::cout << " is inside the polygon.\n";
+      return 1;
+    case CGAL::ON_BOUNDARY:
+      std::cout << " is on the polygon boundary.\n";
+	  return -1;
+    case CGAL::ON_UNBOUNDED_SIDE:
+      std::cout << " is outside the polygon.\n";
+	  return 0;
+  }
+  return 1;
+}*/

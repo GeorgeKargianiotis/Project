@@ -5,6 +5,7 @@
 #include <CGAL/Convex_hull_traits_adapter_2.h>
 #include <CGAL/property_map.h>
 #include <CGAL/Exact_predicates_inexact_constructions_kernel.h>
+#include <CGAL/Polygon_2_algorithms.h>
 #include <CGAL/Polygon_2.h>
 #include <CGAL/Vector_3.h>
 #include <CGAL/determinant.h>

@@ -140,6 +140,11 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			
 			ClosestPoints.clear();
 
+			if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), newp, K()) == CGAL::ON_UNBOUNDED_SIDE){
+				std::cout << "Point Left Out" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+
 			/*outside = check_inside(*polygonchain.begin(), *polygonchain.end(), newp, K());
 			
 			if(outside == 0){
@@ -221,6 +226,11 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				std::cout << "Point Left Out" << std::endl;
 				exit(EXIT_FAILURE);
 			}*/
+
+			if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), newp, K()) == CGAL::ON_UNBOUNDED_SIDE){
+				std::cout << "Point Left Out" << std::endl;
+				exit(EXIT_FAILURE);
+			}
 				
 		}
 		
@@ -298,6 +308,12 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				std::cout << "Point Left Out" << std::endl;
 				exit(EXIT_FAILURE);
 			}*/
+
+			if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), newp, K()) == CGAL::ON_UNBOUNDED_SIDE){
+				std::cout << "Point Left Out" << std::endl;
+				exit(EXIT_FAILURE);
+			}
+			std::cout << "Test" << std::endl;
 		}
 
 	
@@ -371,16 +387,19 @@ bool isVisibleEdgeCH(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnde
 /*int check_inside(Point_2 pt, Point_2 start, Point_2 end, K traits){
 
   std::cout << "The point " << pt;
-  switch(CGAL::bounded_side_2(start, end, pt, traits)) {
+  switch(CGAL::bounded_side_2(&start, &end, &pt, traits)) {
     case CGAL::ON_BOUNDED_SIDE :
       std::cout << " is inside the polygon.\n";
       return 1;
+	  break;
     case CGAL::ON_BOUNDARY:
       std::cout << " is on the polygon boundary.\n";
 	  return -1;
+	  break;
     case CGAL::ON_UNBOUNDED_SIDE:
       std::cout << " is outside the polygon.\n";
 	  return 0;
+	  break;
   }
   return 1;
 }*/

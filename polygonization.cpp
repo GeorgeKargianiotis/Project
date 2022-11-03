@@ -38,6 +38,7 @@ int main(int argc, char* argv[]){
 		convex_hull::convex_HullAlgorithm(Points2, std::stoi(edgeSelection), outFile);
 
 	outFile.close();
+	// test
 
 	return 0;
 }

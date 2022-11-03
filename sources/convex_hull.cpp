@@ -24,9 +24,9 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 
 	Polygon_2 mypolygon, polygonchain; // Initial polygon to be used in convex_hull
 	Segments myseg; // Edges stored here
-	Segment_2 chosen;
+	Segment_2 chosen, current;
 	// Used to store points not yet included in polygon, needs to be empty in the end, closest is the closest point to each edge (according to myseg)
-	std::vector<Point_2> RemainingPoints, ClosestPoints; 
+	std::vector<Point_2> RemainingPoints, ClosestPoints, DefectivePoints; 
 	double distance; // Needed for the point we are about to add
 
 	// Initialising distances and areas, neede for edge selection
@@ -79,79 +79,88 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 	while (RemainingPoints.size() != 0){
 		// Random edge selection
 		if (edge == 1){
-			// For each edge, find nearest point
-			for (auto iter=myseg.begin(); iter!=myseg.end(); iter++){
-				Segment_2 temp = *iter;
-				for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end(); it++){
-					distance = CGAL::squared_distance(*iter, *it);
+			while(true){
+				// For each edge, find nearest point
+				for (auto iter=myseg.begin(); iter!=myseg.end(); iter++){
+					Segment_2 temp = *iter;
+					for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end(); it++){
+						distance = CGAL::squared_distance(*iter, *it);
 
-					// Keep the one closest to the edge
-					if (distance < mindistance){
-						mindistance = distance;
-						toadd = *it;
+						// Keep the one closest to the edge
+						if (distance < mindistance){
+							mindistance = distance;
+							toadd = *it;
+						}
 					}
+					// Make the entry: Each edge in myseg now has a matching closest point in this vector
+					ClosestPoints.push_back(toadd);	
 				}
-				// Make the entry: Each edge in myseg now has a matching closest point in this vector
-				ClosestPoints.push_back(toadd);	
-			}
 
-					
-			// Connect point with a random edge, create new edges and remove the point, old edge is also removed
-			random = rand() % ClosestPoints.size();
-			chosen = myseg.at(random);
-			newp = ClosestPoints.at(random);
+						
+				// Connect point with a random edge, create new edges and remove the point, old edge is also removed
+				random = rand() % ClosestPoints.size();
+				chosen = myseg.at(random);
+				newp = ClosestPoints.at(random);
 
-			for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
-				if(!isVisibleEdgeCH(polygonchain, edge, newp))
-					std::cerr << "Visibility error" << std::endl;
-			}
+				for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
+					if(!isVisibleEdgeCH(polygonchain, edge, newp))
+						std::cerr << "Visibility error" << std::endl;
+				}
 
-			for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
-				if(*vertex == chosen.start()){
-					vertex++; 
-					if(*vertex == chosen.end()){
-						polygonchain.insert(vertex, newp);
-						break;
-					}
+				for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
+					if(*vertex == chosen.start()){
+						vertex++; 
+						if(*vertex == chosen.end()){
+							polygonchain.insert(vertex, newp);
+							break;
+						}
 
-					vertex--;
-					if(vertex != polygonchain.begin())
 						vertex--;
-					if(*vertex == chosen.end()){
-						polygonchain.insert(vertex, newp);
-						break;
-					}
+						if(vertex != polygonchain.begin())
+							vertex--;
+						if(*vertex == chosen.end()){
+							polygonchain.insert(vertex, newp);
+							break;
+						}
 
-					if(*polygonchain.begin() == chosen.end()){
-						polygonchain.insert(polygonchain.begin(), newp);
-						break;
-					}
-					
-					std::cout << "Problem inserting point " << std::endl;
-					exit (EXIT_FAILURE);
+						if(*polygonchain.begin() == chosen.end()){
+							polygonchain.insert(polygonchain.begin(), newp);
+							break;
+						}
+						
+						std::cout << "Problem inserting point " << std::endl;
+						exit (EXIT_FAILURE);
 
+					}
 				}
+				current = chosen;
+				Segment_2 new1 (chosen.source(), newp);
+				Segment_2 new2 (newp, chosen.target());
+				myseg.push_back(new1);
+				myseg.push_back(new2);
+				myseg.erase(std::remove(myseg.begin(), myseg.end(), chosen), myseg.end());
+				RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
+				
+				ClosestPoints.clear();
+
+				for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
+					if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), *it, K()) == CGAL::ON_UNBOUNDED_SIDE){
+						std::cout << "Point Left Out" << std::endl;
+						exit(EXIT_FAILURE);
+						//DefectivePoints.push_back(newp);
+						//myseg.erase(std::remove(myseg.begin(), myseg.end(), new1), myseg.end());
+						//myseg.erase(std::remove(myseg.begin(), myseg.end(), new2), myseg.end());
+						//erase point from polygon
+						
+					}
+				}
+				/*outside = check_inside(*polygonchain.begin(), *polygonchain.end(), newp, K());
+				
+				if(outside == 0){
+					std::cout << "Point Left Out" << std::endl;
+					exit(EXIT_FAILURE);
+				}*/
 			}
-
-			myseg.push_back(Segment_2 (chosen.source(), newp));
-			myseg.push_back(Segment_2 (newp, chosen.target()));
-			myseg.erase(std::remove(myseg.begin(), myseg.end(), chosen), myseg.end());
-			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
-			
-			ClosestPoints.clear();
-
-			if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), newp, K()) == CGAL::ON_UNBOUNDED_SIDE){
-				std::cout << "Point Left Out" << std::endl;
-				exit(EXIT_FAILURE);
-			}
-
-			/*outside = check_inside(*polygonchain.begin(), *polygonchain.end(), newp, K());
-			
-			if(outside == 0){
-				std::cout << "Point Left Out" << std::endl;
-				exit(EXIT_FAILURE);
-			}*/
-
 		}
 		else if (edge == 2){
 			// Add the edge that offers the smallest triangle area, when connected to the point
@@ -226,12 +235,13 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				std::cout << "Point Left Out" << std::endl;
 				exit(EXIT_FAILURE);
 			}*/
-
-			if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), newp, K()) == CGAL::ON_UNBOUNDED_SIDE){
-				std::cout << "Point Left Out" << std::endl;
-				exit(EXIT_FAILURE);
-			}
-				
+			for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
+				if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), newp, K()) == CGAL::ON_UNBOUNDED_SIDE){
+					std::cout << "Point Left Out" << std::endl;
+					exit(EXIT_FAILURE);
+				}
+			}	
+			break;	
 		}
 		
 		
@@ -309,11 +319,13 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				exit(EXIT_FAILURE);
 			}*/
 
-			if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), newp, K()) == CGAL::ON_UNBOUNDED_SIDE){
-				std::cout << "Point Left Out" << std::endl;
-				exit(EXIT_FAILURE);
-			}
-			std::cout << "Test" << std::endl;
+			for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
+				if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), newp, K()) == CGAL::ON_UNBOUNDED_SIDE){
+					std::cout << "Point Left Out" << std::endl;
+					exit(EXIT_FAILURE);
+				}
+			}	
+			break;	
 		}
 
 	

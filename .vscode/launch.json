@@ -11,7 +11,7 @@
 			"program": "${workspaceFolder}/polygonization",
 			"args": [
 				"-i",
-				"../images/euro-night-0000030.instance",
+				"../images/euro-night-0000100.instance",
 				"-o", 
 				"o",
 				"-algorithm",

@@ -12,3 +12,4 @@ headers/*.a
 sources/*.a
 updateMaster.sh
 output.*
+o

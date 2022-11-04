@@ -39,7 +39,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 
 	// Segments that provide the min and max area respectively
 	Segment_2 minemb, maxemb;
-	int random, index, outside;
+	int random, index, outside, defect = 0;
 	double area; // Area calculated each time
 	
 	// Add all points to new vector
@@ -64,8 +64,8 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 		RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), *it), RemainingPoints.end());
 	}	
 
-	if(polygonchain.is_clockwise_oriented() != mypolygon.is_clockwise_oriented())
-			polygonchain.reverse_orientation();
+	//if(polygonchain.is_clockwise_oriented() != mypolygon.is_clockwise_oriented())
+			//polygonchain.reverse_orientation();
 
 	// Make edges from polygon chain, add them to vector
 	for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++)
@@ -84,6 +84,14 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				for (auto iter=myseg.begin(); iter!=myseg.end(); iter++){
 					Segment_2 temp = *iter;
 					for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end(); it++){
+						if (DefectivePoints.size() != 0){
+							for (auto it2 = DefectivePoints.begin(); it2!= DefectivePoints.end(); it2++){
+								if (*it == *it2){
+									break;
+								}	
+							}
+						continue;	
+						}
 						distance = CGAL::squared_distance(*iter, *it);
 
 						// Keep the one closest to the edge
@@ -152,166 +160,227 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				// Check if any of the remaining points is now external due to the new polygon
 				for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
 					if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), *it, K()) == CGAL::ON_UNBOUNDED_SIDE){
+						defect = 1;
 						std::cout << "Point Left Out" << std::endl;
-						exit(EXIT_FAILURE);
-						//DefectivePoints.push_back(newp);
-						//myseg.erase(std::remove(myseg.begin(), myseg.end(), new1), myseg.end());
-						//myseg.erase(std::remove(myseg.begin(), myseg.end(), new2), myseg.end());
-						//erase point from polygon
+						DefectivePoints.push_back(newp);
+						myseg.erase(std::remove(myseg.begin(), myseg.end(), new1), myseg.end());
+						myseg.erase(std::remove(myseg.begin(), myseg.end(), new2), myseg.end());
+						for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
+							if (*vertex == newp){
+								polygonchain.erase(vertex);
+							}
+						}
+						break;	
 					}
+				}
+				if (defect == 0){
+					break;
 				}
 			}
 		}
 		else if (edge == 2){
-			// Add the edge that offers the smallest triangle area, when connected to the point
-			for (auto iter=myseg.begin(); iter!=myseg.end(); ++iter){
-				Segment_2 temp = *iter;
-				for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end();++it){
-					distance = CGAL::squared_distance(*iter, *it);
+			while(true){
+				// Add the edge that offers the smallest triangle area, when connected to the point
+				for (auto iter=myseg.begin(); iter!=myseg.end(); ++iter){
+					Segment_2 temp = *iter;
+					for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end();++it){
 
-					if (distance < mindistance){
-						mindistance = distance;
-						toadd = *it;
-					}
-				}
-				
-				ClosestPoints.push_back(toadd);	
-			}
-				// Myseg and closest points have the same size, find area for each pair
-
-				for (int i = 0; i != myseg.size(); i++){
-					area = CGAL::area(ClosestPoints.at(i), myseg.at(i).source(), myseg.at(i).target());
-					if (area < minarea){
-						minarea = area;
-						index = i;
-					}
-				}
-
-				// Same as above, visibility and insertion
-				for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
-					if(!isVisibleEdgeCH(polygonchain, edge, ClosestPoints.at(index)))
-						std::cerr << "Visibility error" << std::endl;
-				}
-
-				for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
-					if(*vertex == chosen.start()){
-						vertex++; 
-						if(*vertex == chosen.end()){
-							polygonchain.insert(vertex, newp);
-							break;
+						if (DefectivePoints.size() != 0){
+							for (auto it2 = DefectivePoints.begin(); it2!= DefectivePoints.end(); it2++){
+								if (*it == *it2){
+									break;
+								}	
+							}
+							continue;	
 						}
+						distance = CGAL::squared_distance(*iter, *it);
 
-						vertex--;
-						if(vertex != polygonchain.begin())
+						if (distance < mindistance){
+							mindistance = distance;
+							toadd = *it;
+						}
+					}
+					
+					ClosestPoints.push_back(toadd);	
+				}
+					// Myseg and closest points have the same size, find area for each pair
+
+					for (int i = 0; i != myseg.size(); i++){
+						area = CGAL::area(ClosestPoints.at(i), myseg.at(i).source(), myseg.at(i).target());
+						if (area < minarea){
+							minarea = area;
+							index = i;
+						}
+					}
+
+					// Same as above, visibility and insertion
+					for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
+						if(!isVisibleEdgeCH(polygonchain, edge, ClosestPoints.at(index)))
+							std::cerr << "Visibility error" << std::endl;
+					}
+
+					for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
+						if(*vertex == chosen.start()){
+							vertex++; 
+							if(*vertex == chosen.end()){
+								polygonchain.insert(vertex, newp);
+								break;
+							}
+
 							vertex--;
-						if(*vertex == chosen.end()){
-							polygonchain.insert(vertex, newp);
-							break;
-						}
+							if(vertex != polygonchain.begin())
+								vertex--;
+							if(*vertex == chosen.end()){
+								polygonchain.insert(vertex, newp);
+								break;
+							}
 
-						if(*polygonchain.begin() == chosen.end()){
-							polygonchain.insert(polygonchain.begin(), newp);
-							break;
-						}
-						
-						std::cout << "Problem inserting point " << std::endl;
-						exit (EXIT_FAILURE);
+							if(*polygonchain.begin() == chosen.end()){
+								polygonchain.insert(polygonchain.begin(), newp);
+								break;
+							}
+							
+							std::cout << "Problem inserting point " << std::endl;
+							exit (EXIT_FAILURE);
 
+						}
 					}
-				}
 
-			// Same process as 1st case, same for 3rd as well
-			myseg.push_back(Segment_2 (myseg.at(index).source(), RemainingPoints.at(index)));
-			myseg.push_back(Segment_2 (RemainingPoints.at(index), myseg.at(index).target()));
-			myseg.erase(std::remove(myseg.begin(), myseg.end(), myseg.at(index)), myseg.end());
-			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), RemainingPoints.at(index)), RemainingPoints.end());
+				// Same process as 1st case, same for 3rd as well
+				current = chosen;
+				Segment_2 new1 (chosen.source(), newp);
+				Segment_2 new2 (newp, chosen.target());
+
+				// Insert new edges, remove old one and "use" the point
+				myseg.push_back(new1);
+				myseg.push_back(new2);
+				myseg.erase(std::remove(myseg.begin(), myseg.end(), chosen), myseg.end());
+				RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
 				
-			ClosestPoints.clear();
+				ClosestPoints.clear();
 
-			for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
-				if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), newp, K()) == CGAL::ON_UNBOUNDED_SIDE){
-					std::cout << "Point Left Out" << std::endl;
-					exit(EXIT_FAILURE);
-				}
-			}	
-			break;	
+				for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
+						if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), *it, K()) == CGAL::ON_UNBOUNDED_SIDE){
+							defect = 1;
+							std::cout << "Point Left Out" << std::endl;
+							DefectivePoints.push_back(newp);
+							myseg.erase(std::remove(myseg.begin(), myseg.end(), new1), myseg.end());
+							myseg.erase(std::remove(myseg.begin(), myseg.end(), new2), myseg.end());
+							for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
+								if (*vertex == newp){
+									polygonchain.erase(vertex);
+								}
+							}
+							break;	
+						}
+					}
+					if (defect == 0){
+						break;
+					}
+			}		
 		}
 		
 		
 		else{
-			// Add the edge that offers the smallest triangle area, when connected to the point
-			for (auto iter=myseg.begin(); iter!=myseg.end(); ++iter){
-				Segment_2 temp = *iter;
-				for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end();++it){
-					distance = CGAL::squared_distance(*iter, *it);
+			while(true){
+				// Add the edge that offers the smallest triangle area, when connected to the point
+				for (auto iter=myseg.begin(); iter!=myseg.end(); ++iter){
+					Segment_2 temp = *iter;
+					for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end();++it){
 
-					if (distance < mindistance){
-						mindistance = distance;
-						toadd = *it;
-					}
-				}
-				
-				ClosestPoints.push_back(toadd);	
-			}
+						if (DefectivePoints.size() != 0){
+							for (auto it2 = DefectivePoints.begin(); it2!= DefectivePoints.end(); it2++){
+								if (*it == *it2){
+									break;
+								}	
+							}
+							continue;	
+						}
+						distance = CGAL::squared_distance(*iter, *it);
 
-			// Myseg and closest points have the same size, find area for each pair
-
-			for (int i = 0; i != myseg.size(); i++){
-				area = CGAL::area(ClosestPoints.at(i), myseg.at(i).source(), myseg.at(i).target());
-
-				if (area > maxarea){
-					maxarea = area;
-					index = i;
-				}
-			}
-
-			for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
-				if(!isVisibleEdgeCH(polygonchain, edge, ClosestPoints.at(index)))
-					std::cerr << "Visibility error" << std::endl;
-			}
-
-			for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
-				if(*vertex == chosen.start()){
-					vertex++; 
-					if(*vertex == chosen.end()){
-						polygonchain.insert(vertex, newp);
-						break;
-					}
-
-					vertex--;
-					if(vertex != polygonchain.begin())
-						vertex--;
-					if(*vertex == chosen.end()){
-						polygonchain.insert(vertex, newp);
-						break;
-					}
-
-					if(*polygonchain.begin() == chosen.end()){
-						polygonchain.insert(polygonchain.begin(), newp);
-						break;
+						if (distance < mindistance){
+							mindistance = distance;
+							toadd = *it;
+						}
 					}
 					
-					std::cout << "Problem inserting point " << std::endl;
-					exit (EXIT_FAILURE);
-
+					ClosestPoints.push_back(toadd);	
 				}
-			}
+					// Myseg and closest points have the same size, find area for each pair
 
-			myseg.push_back(Segment_2 (myseg.at(index).source(), RemainingPoints.at(index)));
-			myseg.push_back(Segment_2 (RemainingPoints.at(index), myseg.at(index).target()));
-			myseg.erase(std::remove(myseg.begin(), myseg.end(), myseg.at(index)), myseg.end());
-			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), RemainingPoints.at(index)), RemainingPoints.end());
+					for (int i = 0; i != myseg.size(); i++){
+						area = CGAL::area(ClosestPoints.at(i), myseg.at(i).source(), myseg.at(i).target());
+						if (area < minarea){
+							minarea = area;
+							index = i;
+						}
+					}
+
+					// Same as above, visibility and insertion
+					for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
+						if(!isVisibleEdgeCH(polygonchain, edge, ClosestPoints.at(index)))
+							std::cerr << "Visibility error" << std::endl;
+					}
+
+					for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
+						if(*vertex == chosen.start()){
+							vertex++; 
+							if(*vertex == chosen.end()){
+								polygonchain.insert(vertex, newp);
+								break;
+							}
+
+							vertex--;
+							if(vertex != polygonchain.begin())
+								vertex--;
+							if(*vertex == chosen.end()){
+								polygonchain.insert(vertex, newp);
+								break;
+							}
+
+							if(*polygonchain.begin() == chosen.end()){
+								polygonchain.insert(polygonchain.begin(), newp);
+								break;
+							}
+							
+							std::cout << "Problem inserting point " << std::endl;
+							exit (EXIT_FAILURE);
+
+						}
+					}
+
+				// Same process as 1st case, same for 3rd as well
+				current = chosen;
+				Segment_2 new1 (chosen.source(), newp);
+				Segment_2 new2 (newp, chosen.target());
+
+				// Insert new edges, remove old one and "use" the point
+				myseg.push_back(new1);
+				myseg.push_back(new2);
+				myseg.erase(std::remove(myseg.begin(), myseg.end(), chosen), myseg.end());
+				RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
 				
-		
-			ClosestPoints.clear();
+				ClosestPoints.clear();
 
-			for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
-				if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), newp, K()) == CGAL::ON_UNBOUNDED_SIDE){
-					std::cout << "Point Left Out" << std::endl;
-					exit(EXIT_FAILURE);
-				}
+				for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
+						if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), *it, K()) == CGAL::ON_UNBOUNDED_SIDE){
+							defect = 1;
+							std::cout << "Point Left Out" << std::endl;
+							DefectivePoints.push_back(newp);
+							myseg.erase(std::remove(myseg.begin(), myseg.end(), new1), myseg.end());
+							myseg.erase(std::remove(myseg.begin(), myseg.end(), new2), myseg.end());
+							for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
+								if (*vertex == newp){
+									polygonchain.erase(vertex);
+								}
+							}
+							break;	
+						}
+					}
+					if (defect == 0){
+						break;
+					}
 			}	
-			break;	
 		}
 
 	
@@ -382,22 +451,3 @@ bool isVisibleEdgeCH(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnde
 	return true;
 }
 
-/*int check_inside(Point_2 pt, Point_2 start, Point_2 end, K traits){
-
-  std::cout << "The point " << pt;
-  switch(CGAL::bounded_side_2(&start, &end, &pt, traits)) {
-    case CGAL::ON_BOUNDED_SIDE :
-      std::cout << " is inside the polygon.\n";
-      return 1;
-	  break;
-    case CGAL::ON_BOUNDARY:
-      std::cout << " is on the polygon boundary.\n";
-	  return -1;
-	  break;
-    case CGAL::ON_UNBOUNDED_SIDE:
-      std::cout << " is outside the polygon.\n";
-	  return 0;
-	  break;
-  }
-  return 1;
-}*/

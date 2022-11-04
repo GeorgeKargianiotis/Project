@@ -22,13 +22,13 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 
 	srand(time(0));
 
-	Polygon_2 mypolygon, polygonchain; // Initial polygon to be used in convex_hull
+	Polygon_2 mypolygon, polygonchain; // Initial polygon to be used in convex_hull (polygon chain)
 	Segments myseg; // Edges stored here
-	Segment_2 chosen, current;
+	Segment_2 chosen, current; // Segments to be inserted or ketp in case we have visibility errors or an "external" point
 	// Used to store points not yet included in polygon, needs to be empty in the end, closest is the closest point to each edge (according to myseg)
-	std::vector<Point_2> RemainingPoints, ClosestPoints, DefectivePoints; 
-	double distance; // Needed for the point we are about to add
+	std::vector<Point_2> RemainingPoints, ClosestPoints, DefectivePoints; // Defective is to store points that cause an error
 
+	double distance; // Needed for the point we are about to add
 	// Initialising distances and areas, neede for edge selection
 	double mindistance = 9999999999.9999999;
 	double minarea = 99999999.999999999;
@@ -102,11 +102,13 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				chosen = myseg.at(random);
 				newp = ClosestPoints.at(random);
 
+				// Visibility check, point must be able to "see" every edge
 				for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
 					if(!isVisibleEdgeCH(polygonchain, edge, newp))
 						std::cerr << "Visibility error" << std::endl;
 				}
 
+				// Insert the new point
 				for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
 					if(*vertex == chosen.start()){
 						vertex++; 
@@ -133,9 +135,13 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 
 					}
 				}
+
+				// Keep the new and old edges, in case we have an xternal point and need to backtrack
 				current = chosen;
 				Segment_2 new1 (chosen.source(), newp);
 				Segment_2 new2 (newp, chosen.target());
+
+				// Insert new edges, remove old one and "use" the point
 				myseg.push_back(new1);
 				myseg.push_back(new2);
 				myseg.erase(std::remove(myseg.begin(), myseg.end(), chosen), myseg.end());
@@ -143,6 +149,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				
 				ClosestPoints.clear();
 
+				// Check if any of the remaining points is now external due to the new polygon
 				for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
 					if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), *it, K()) == CGAL::ON_UNBOUNDED_SIDE){
 						std::cout << "Point Left Out" << std::endl;
@@ -151,15 +158,8 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 						//myseg.erase(std::remove(myseg.begin(), myseg.end(), new1), myseg.end());
 						//myseg.erase(std::remove(myseg.begin(), myseg.end(), new2), myseg.end());
 						//erase point from polygon
-						
 					}
 				}
-				/*outside = check_inside(*polygonchain.begin(), *polygonchain.end(), newp, K());
-				
-				if(outside == 0){
-					std::cout << "Point Left Out" << std::endl;
-					exit(EXIT_FAILURE);
-				}*/
 			}
 		}
 		else if (edge == 2){
@@ -177,18 +177,17 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				
 				ClosestPoints.push_back(toadd);	
 			}
-
 				// Myseg and closest points have the same size, find area for each pair
 
 				for (int i = 0; i != myseg.size(); i++){
 					area = CGAL::area(ClosestPoints.at(i), myseg.at(i).source(), myseg.at(i).target());
-
 					if (area < minarea){
 						minarea = area;
 						index = i;
 					}
 				}
 
+				// Same as above, visibility and insertion
 				for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
 					if(!isVisibleEdgeCH(polygonchain, edge, ClosestPoints.at(index)))
 						std::cerr << "Visibility error" << std::endl;
@@ -221,20 +220,14 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 					}
 				}
 
+			// Same process as 1st case, same for 3rd as well
 			myseg.push_back(Segment_2 (myseg.at(index).source(), RemainingPoints.at(index)));
 			myseg.push_back(Segment_2 (RemainingPoints.at(index), myseg.at(index).target()));
 			myseg.erase(std::remove(myseg.begin(), myseg.end(), myseg.at(index)), myseg.end());
 			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), RemainingPoints.at(index)), RemainingPoints.end());
 				
-		
 			ClosestPoints.clear();
 
-			/*outside = check_inside(*polygonchain.begin(), *polygonchain.end(), newp, K());
-			
-			if(outside == 0){
-				std::cout << "Point Left Out" << std::endl;
-				exit(EXIT_FAILURE);
-			}*/
 			for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
 				if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), newp, K()) == CGAL::ON_UNBOUNDED_SIDE){
 					std::cout << "Point Left Out" << std::endl;
@@ -311,13 +304,6 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				
 		
 			ClosestPoints.clear();
-
-			/*outside = check_inside(*polygonchain.begin(), *polygonchain.end(), newp, K());
-			
-			if(outside == 0){
-				std::cout << "Point Left Out" << std::endl;
-				exit(EXIT_FAILURE);
-			}*/
 
 			for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
 				if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), newp, K()) == CGAL::ON_UNBOUNDED_SIDE){

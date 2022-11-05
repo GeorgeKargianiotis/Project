@@ -203,13 +203,15 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 					}
 					
 					ClosestPoints.push_back(toadd);	
+					std::cout << toadd << std::endl;
 				}
 					// Myseg and closest points have the same size, find area for each pair
 
 					for (int i = 0; i != myseg.size(); i++){
 						area = CGAL::area(ClosestPoints.at(i), myseg.at(i).source(), myseg.at(i).target());
-						if (area < minarea){
-							minarea = area;
+						std::cout << area << std::endl;
+						if (area > maxarea){
+							maxarea = area;
 							index = i;
 						}
 					}
@@ -221,6 +223,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 					}
 
 					for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
+						std::cout << "Insertion" << std::endl;
 						if(*vertex == chosen.start()){
 							vertex++; 
 							if(*vertex == chosen.end()){
@@ -402,6 +405,10 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			std::cerr << "Polygon is no simple\n";
 			exit (EXIT_FAILURE); 
 		}
+		mindistance = 9999999999.9999999;
+		minarea = 99999999.999999999;
+		maxarea = 0.0;
+
 	}
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);

@@ -30,7 +30,7 @@ void utils::writeToOutputFile(std::ofstream &outFile, std::vector<Point_2> &poin
 	for(Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++)
 		outFile << edge->start() << " " << edge->end() << "\n";
 
-	outFile << "Alogrithm: incremental edge_selection " << edgeSelection << " initilization " << *initialization << "\n";  
+	outFile << "Alogrithm: incremental edge_selection " << edgeSelection << " initilization " << initialization[0] << initialization[1] << "\n";  
 
 	outFile << "area: " << polygonArea << "\n";
 
@@ -58,7 +58,7 @@ void utils::vectorToPythonArray(std::vector<Point_2> &points){
 void utils::printOutput(Polygon_2 &polygon, std::vector<Point_2> &points, Polygon_2 &convexHullPolygon, std::vector<Segment_2> &redEdges, std::vector<Segment_2> &visibleEdges, Point_2 &newPoint){
 	std::cout << "points = [\n";
 	for(auto point : points)
-		std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
+		std::cout << "[" << point.x() << "," << point.y() << "],";
 	std::cout << "\b \b";
 	std::cout << "\n]\n";
 	utils::polygonToPythonArray(convexHullPolygon, "convexHull");

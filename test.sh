@@ -1,2 +1,2 @@
-./polygonization -i ../images/euro-night-0000030.instance -o output.txt -algorithm incremental -edge_selection 3 -initialization 1b
-#./polygonization -i ../images/euro-night-0000070.instance -o o -algorithm incremental -edge_selection 2 -initialization 2b 
+./polygonization -i ../images/euro-night-0001000.instance -o output.txt -algorithm incremental -edge_selection 1 -initialization 1b
+#./polygonization -i ../images/euro-night-0000100.instance -o o -algorithm incremental -edge_selection 2 -initialization 2a

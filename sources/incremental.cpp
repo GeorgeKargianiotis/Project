@@ -72,9 +72,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	polygonArea = std::abs(CGAL::area(points[0], points[1], points[i+2]));
 	std::vector<Segment_2> visibleEdges;
 
-	int x = 0;
-	int inserted = 0;
-
 	while(lastPointExpandPolygonIndex != points.size() - 1){
 		lastPointExpandPolygonIndex++;
 
@@ -97,46 +94,16 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		visibleEdges.clear();
 		std::vector<Segment_2> redEdges;
 
-		/*
-			if point n have the same x coordinate (if points are order by x) with point n-1 and n+1 
-			or point n have the same y coordinate (if points are order by y) with point n-1 and n+1
-			and it is in between n-1 and n+1 
-			just add it in the polygon between them
-		*/
-		// if(pointIsCollinearAndBetweenPreviousPoints(initialization, points, lastPointExpandPolygonIndex)){
-
-		// 	//insert the new point to the right position in polygon
-		// 	for(Polygon_2::Vertex_iterator endVertexOfEdgeToBeReplaced = polygon.begin(); endVertexOfEdgeToBeReplaced != polygon.end(); endVertexOfEdgeToBeReplaced++){
-		// 		if(*endVertexOfEdgeToBeReplaced == points[lastPointExpandPolygonIndex+1]){
-		// 			polygon.insert(endVertexOfEdgeToBeReplaced, newPoint); 
-		// 			break;
-		// 		}
-		// 	}
-
-		// 	 if(!polygon.is_simple()){
-		// 		std::cout << "NOT SIMPLE!" << std::endl;
-		// 		exit (EXIT_FAILURE);
-		// 	 }
-		// 	continue;
-		// }
-
-		bool firstRedEdgeFound = false;
-		bool redEdgeIsVisibleEdge = false;
 		bool pointPlaced = false;
 		//find the red edges of convex hull polygon
 
 		for(Polygon_2::Edge_const_iterator convexPolygonEdge = convexHullPolygon.edges().begin(); convexPolygonEdge != convexHullPolygon.edges().end(); convexPolygonEdge++){
-
-			if(newPoint.x() == 8070 && newPoint.y() == 3972)
-				std::cout << "Check red edge: " << convexPolygonEdge->start() << " " << convexPolygonEdge->end() << std::endl;
 
 			if(isRedEdge(convexPolygonEdge, newPoint, polygon)){
 
 				Polygon_2::Edge_const_iterator &redEdge = convexPolygonEdge;
 
 				redEdges.push_back(*redEdge);
-
-				firstRedEdgeFound = true;
 
 				//find visible edges
 				for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
@@ -153,14 +120,12 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 						//if red edge belongs to polygon
 						if(redEdge->end() == *vertex){
 							visibleEdges.push_back(Segment_2(startPoint, endPoint));
-							redEdgeIsVisibleEdge = true;
 							vertex--;
 							break;
 						}
 						vertex--;
 
 						//check if all polygon edges "behind" the red edge are visible to the newPoint
-						std::cout << "checked edges\n";
 						do{
 							Point_2 startPoint = *vertex;
 							vertex++;
@@ -169,8 +134,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 								endPoint = *polygon.begin();
 							else
 								endPoint = *vertex;
-
-							std::cout << "edge = [ [" << startPoint.x() << ", " << startPoint.y() << "], [" << endPoint.x() << ", " << endPoint.y() << "] ]\n";
 
 							if(isVisibleEdge(polygon, startPoint, endPoint, newPoint)){
 								visibleEdges.push_back(Segment_2(startPoint, endPoint));
@@ -199,78 +162,14 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			}
 
 			//if one red edge has been found and next is blue, it stops
-			if(firstRedEdgeFound)
-				break;
+			// if(firstRedEdgeFound)
+			// 	break;
 		}
 
 		if(pointPlaced) break;
 
-		// if(redEdgeIsVisibleEdge && visibleEdges.size() > 1){
-		// 	Segment_2 edgeToBeReplaced = visibleEdges[0];
-		// 	if(CGAL::collinear(edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint)){
-		// 		int a = 0;
-		// 		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
-		// 			if(*vertex == edgeToBeReplaced.start()){
-		// 				Segment_2 s = Segment_2(edgeToBeReplaced.end(), newPoint);
-		// 				if(s.has_on(edgeToBeReplaced.start())){
-		// 					polygon.insert(vertex, newPoint);
-		// 					a = 1;
-		// 					break;
-		// 				}
-		// 				else{
-		// 					vertex++;
-		// 					if(vertex == polygon.end()){
-		// 						polygon.insert(polygon.begin(), newPoint);
-		// 						break;
-		// 					}
-		// 					vertex++;
-		// 					polygon.insert(vertex, newPoint);
-		// 					a = 2;
-		// 					break;
-		// 				}
-		// 			}
-		// 			else if(*vertex == edgeToBeReplaced.end()){
-		// 				Segment_2 s = Segment_2(edgeToBeReplaced.start(), newPoint);
-		// 				if(s.has_on(edgeToBeReplaced.end())){
-		// 					polygon.insert(vertex, newPoint);
-		// 					a = 3;
-		// 					break;
-		// 				}
-		// 				else{
-		// 					vertex++;
-		// 					if(vertex == polygon.begin()){
-		// 						polygon.insert(polygon.end(), newPoint);
-		// 						break;
-		// 					}
-		// 					vertex++;
-		// 					polygon.insert(vertex, newPoint);
-		// 					a = 4;
-		// 					break;
-		// 				}
-		// 			}
-		// 		}
-
-		// 		if(polygon.is_simple()){
-		// 			std::cout << "succesull insertion from red" << std::endl;
-		// 			std::cout << "a " << a << std::endl;
-		// 			continue;
-		// 		}
-		// 		else{
-		// 			std::cout << "wrong insertion of new point in red edge" << std::endl;
-		// 			std::cout << "a " << a << std::endl;
-		// 			utils::printOutput(polygon, points, convexHullPolygon, redEdges, visibleEdges, newPoint);
-		// 			exit (EXIT_FAILURE);
-		// 		}
-		// 	}
-		// }
-
 		if(visibleEdges.empty()){
-			// std::cout << polygon.size() << std::endl;
-			// std::cout << "dual points " << x << std::endl;
-			// std::cout << lastPointExpandPolygonIndex << std::endl;
-			// std::cout << "inserted: " << inserted << std::endl;
 			utils::printOutput(polygon, points, convexHullPolygon, redEdges, visibleEdges, newPoint);
-			std::cerr << firstRedEdgeFound << std::endl;
 			std::cerr << "No visible edges\n";
 			exit(EXIT_FAILURE);
 		}
@@ -297,10 +196,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 				
 		 if(!polygon.is_simple()){
 			utils::printOutput(polygon, points, convexHullPolygon, redEdges, visibleEdges, newPoint);
-			std::cout << "dual points " << x << std::endl;
-			std::cout << lastPointExpandPolygonIndex << std::endl;
-			std::cout << "inserted: " << inserted << std::endl;
-			std::cout << "Last visible edge was a red edge " << redEdgeIsVisibleEdge << std::endl;
 			std::cerr << "Polygon is no simple\n";
 			exit (EXIT_FAILURE);
 		}
@@ -326,9 +221,6 @@ void getConvexHullPolygonFromPoints(const std::vector<Point_2> &vertices, Polygo
 bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2 &polygon){
 	double detA;
 	double detB;
-	if(newPoint.x() == 8070 && newPoint.y() == 3972)
-		std::cout << "Check red edge: " << edge->start() << " " << edge->end() << std::endl;
-
 	for(Polygon_2::Vertex_iterator point = polygon.vertices_begin(); point != polygon.vertices_end(); point++){
 		detA = CGAL::determinant(Vector_3(edge->start().x(), edge->start().y(), 1), Vector_3(edge->end().x(), edge->end().y(), 1), Vector_3(newPoint.x(), newPoint.y(), 1));
 		detB = CGAL::determinant(Vector_3(edge->start().x(), edge->start().y(), 1), Vector_3(edge->end().x(), edge->end().y(), 1), Vector_3(point->x(), point->y(), 1));
@@ -342,12 +234,6 @@ bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2
 bool isVisibleEdge(Polygon_2 &polygon, Point_2 &begin, Point_2 &end, const Point_2 &newPoint){
 	Segment_2 line1 = Segment_2(begin, newPoint);
 	Segment_2 line2 = Segment_2(end, newPoint);
-
-	if(begin.x() == 7070 and begin.y() == 2192 && end.x() == 2802 && end.y() == 624){
-		std::cout << "here\n";
-		 for(int i = 0; i < polygon.edges().size(); i++)
-		 	std::cout << "i: " << i << " --- " << polygon.edge(i).start() << " " << polygon.edge(i).end() << std::endl;
-	}
 
 	for(int i = 0; i < polygon.edges().size(); i++){
 		Segment_2 intersectLine = Segment_2(polygon.edge(i).start(), polygon.edge(i).end());

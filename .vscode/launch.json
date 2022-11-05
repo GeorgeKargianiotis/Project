@@ -13,14 +13,14 @@
 				"-i",
 				"../images/euro-night-0000030.instance",
 				"-o", 
-				"o",
+				"output.txt",
 				"-algorithm",
 				//"convex_hull",
 				"incremental",
 				"-edge_selection",
 				"3",
 				"-initialization",
-				"2a"
+				"1b"
 			],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}",

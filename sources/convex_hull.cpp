@@ -64,7 +64,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 		RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), *it), RemainingPoints.end());
 	}	
 
-	std::cout << polygonchain.orientation() << std::endl;
+	//std::cout << polygonchain.orientation() << std::endl;
 
 	// Make edges from polygon chain, add them to vector
 	for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++)
@@ -143,6 +143,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 					}
 				}
 
+
 				// Keep the new and old edges, in case we have an xternal point and need to backtrack
 				current = chosen;
 				Segment_2 new1 (chosen.source(), newp);
@@ -169,6 +170,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 								polygonchain.erase(vertex);
 							}
 						}
+						RemainingPoints.push_back(newp);
 						break;	
 					}
 				}
@@ -259,23 +261,24 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				ClosestPoints.clear();
 
 				for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
-						if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), *it, K()) == CGAL::ON_UNBOUNDED_SIDE){
-							defect = 1;
-							std::cout << "Point Left Out" << std::endl;
-							DefectivePoints.push_back(newp);
-							myseg.erase(std::remove(myseg.begin(), myseg.end(), new1), myseg.end());
-							myseg.erase(std::remove(myseg.begin(), myseg.end(), new2), myseg.end());
-							for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
-								if (*vertex == newp){
-									polygonchain.erase(vertex);
-								}
+					if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), *it, K()) == CGAL::ON_UNBOUNDED_SIDE){
+						defect = 1;
+						std::cout << "Point Left Out" << std::endl;
+						DefectivePoints.push_back(newp);
+						myseg.erase(std::remove(myseg.begin(), myseg.end(), new1), myseg.end());
+						myseg.erase(std::remove(myseg.begin(), myseg.end(), new2), myseg.end());
+						for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
+							if (*vertex == newp){
+								polygonchain.erase(vertex);
 							}
-							break;	
 						}
+						RemainingPoints.push_back(newp);
+						break;	
 					}
-					if (defect == 0){
-						break;
-					}
+				}
+				if (defect == 0){
+					break;
+				}
 			}		
 		}
 		
@@ -304,6 +307,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 					}
 					
 					ClosestPoints.push_back(toadd);	
+					DefectivePoints.clear();
 				}
 					// Myseg and closest points have the same size, find area for each pair
 
@@ -358,27 +362,29 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				myseg.push_back(new2);
 				myseg.erase(std::remove(myseg.begin(), myseg.end(), chosen), myseg.end());
 				RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
+				std::cout << "Made Addition" << std::endl; 
 				
 				ClosestPoints.clear();
 
 				for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
-						if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), *it, K()) == CGAL::ON_UNBOUNDED_SIDE){
-							defect = 1;
-							std::cout << "Point Left Out" << std::endl;
-							DefectivePoints.push_back(newp);
-							myseg.erase(std::remove(myseg.begin(), myseg.end(), new1), myseg.end());
-							myseg.erase(std::remove(myseg.begin(), myseg.end(), new2), myseg.end());
-							for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
-								if (*vertex == newp){
-									polygonchain.erase(vertex);
-								}
+					if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), *it, K()) == CGAL::ON_UNBOUNDED_SIDE){
+						defect = 1;
+						std::cout << "Point Left Out" << std::endl;
+						DefectivePoints.push_back(newp);
+						myseg.erase(std::remove(myseg.begin(), myseg.end(), new1), myseg.end());
+						myseg.erase(std::remove(myseg.begin(), myseg.end(), new2), myseg.end());
+						for(Polygon_2::Vertex_iterator vertex = polygonchain.begin(); vertex != polygonchain.end(); vertex++){
+							if (*vertex == newp){
+								polygonchain.erase(vertex);
 							}
-							break;	
 						}
+						RemainingPoints.push_back(newp);
+						break;	
 					}
-					if (defect == 0){
-						break;
-					}
+				}
+				if (defect == 0){
+					break;
+				}
 			}	
 		}
 
@@ -395,16 +401,6 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			utils::polygonToPythonArray(polygonchain);
 			std::cerr << "Polygon is no simple\n";
 			exit (EXIT_FAILURE); 
-		}
-		else{
-			std::cout << "points = [\n";
-			for(auto point : Points)
-				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
-			std::cout << "\n]\n";
-			utils::polygonToPythonArray(mypolygon, "convexHull");
-			utils::polygonToPythonArray(polygonchain);
-			std::cerr << "Polygon is no simple\n";
-
 		}
 	}
 	auto stop = std::chrono::high_resolution_clock::now();

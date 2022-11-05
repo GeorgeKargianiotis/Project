@@ -15,6 +15,8 @@ bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2
 
 bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnderCheck, const Point_2 &newPoint);
 
+void insertNewPointToPolygon(Polygon_2 &polygon, Segment_2 &edgeToBeReplaced, Point_2 newPoint);
+
 bool pointIsCollinearAndBetweenPreviousPoints(char* initialization, std::vector<Point_2> &points, int n);
 
 int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
@@ -68,7 +70,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	lastPointExpandPolygon = points[lastPointExpandPolygonIndex];
 	polygonArea = std::abs(CGAL::area(points[0], points[1], points[i+2]));
 	std::vector<Segment_2> visibleEdges;
-	
+
 	int x = 0;
 	int inserted = 0;
 
@@ -93,6 +95,8 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			just add it in the polygon between them
 		*/
 		if(pointIsCollinearAndBetweenPreviousPoints(initialization, points, lastPointExpandPolygonIndex)){
+
+			std::cout << "here" << std::endl;
 			//insert the new point to the right position in polygon
 			for(Polygon_2::Vertex_iterator endVertexOfEdgeToBeReplaced = polygon.begin(); endVertexOfEdgeToBeReplaced != polygon.end(); endVertexOfEdgeToBeReplaced++){
 				if(*endVertexOfEdgeToBeReplaced == points[lastPointExpandPolygonIndex+1]){
@@ -109,6 +113,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		}
 
 		bool firstRedEdgeFound = false;
+		bool redEdgeIsVisibleEdge = false;
 		//find the red edges of convex hull polygon
 		for(Polygon_2::Edge_const_iterator convexPolygonEdge = convexHullPolygon.edges().begin(); convexPolygonEdge != convexHullPolygon.edges().end(); convexPolygonEdge++){
 
@@ -125,6 +130,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 						if(convexPolygonEdge->end() == edge->end()){
 							visibleEdges.push_back(Segment_2(edge->start(), edge->end()));
+							redEdgeIsVisibleEdge = true;
 							break;
 						}
 
@@ -133,7 +139,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 							if(isVisibleEdge(polygon, edge, newPoint))
 								visibleEdges.push_back(Segment_2(edge->start(), edge->end()));
 							edge++;
-						} while(convexPolygonEdge->end() != edge->start() && edge != polygon.edges().end());
+						} while(convexPolygonEdge->end() != edge->start());//&& edge != polygon.edges().end());
 
 						break;
 					}
@@ -147,10 +153,87 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 				break;
 		}
 
+		if(redEdgeIsVisibleEdge){
+			Segment_2 edgeToBeReplaced = visibleEdges[0];
+			if(CGAL::collinear(edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint)){
+				int a = 0;
+				for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+					if(*vertex == edgeToBeReplaced.start()){
+						Segment_2 s = Segment_2(edgeToBeReplaced.end(), newPoint);
+						//if(s.collinear_has_on(edgeToBeReplaced.start())){
+						if(s.has_on(edgeToBeReplaced.start())){
+							polygon.insert(vertex, newPoint);
+							a = 1;
+							break;
+						}
+						else{
+							vertex++;
+							if(vertex == polygon.end()){
+								polygon.insert(polygon.begin(), newPoint);
+								break;
+							}
+							vertex++;
+							polygon.insert(vertex, newPoint);
+							a = 2;
+							break;
+						}
+					}
+					else if(*vertex == edgeToBeReplaced.end()){
+						Segment_2 s = Segment_2(edgeToBeReplaced.start(), newPoint);
+						//if(s.collinear_has_on(edgeToBeReplaced.end())){
+						if(s.has_on(edgeToBeReplaced.end())){
+							polygon.insert(vertex, newPoint);
+							a = 3;
+							break;
+						}
+						else{
+							vertex++;
+							if(vertex == polygon.begin()){
+								polygon.insert(polygon.end(), newPoint);
+								break;
+							}
+							vertex++;
+							polygon.insert(vertex, newPoint);
+							a = 4;
+							break;
+						}
+					}
+				}
+
+				if(polygon.is_simple()){
+					std::cout << "succesull insertion from red" << std::endl;
+					std::cout << "a " << a << std::endl;
+					continue;
+				}
+				else{
+					std::cout << "wrong insertion of new point in red edge" << std::endl;
+					std::cout << "a " << a << std::endl;
+					std::cout << "points = [\n";
+					for(auto point : points)
+						std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
+					std::cout << "]\n";
+					utils::polygonToPythonArray(convexHullPolygon, "convexHull");
+					std::cout << "redEdges = [\n";
+					for(auto edge : redEdges)
+						std::cout << "[" << edge.start().x() << "," << edge.start().y() << "], " << "[" << edge.end().x() << "," << edge.end().y() << "],";
+					std::cout << "\b \b";
+					std::cout << "]\n";
+					utils::polygonToPythonArray(polygon);
+					std::cout << "visibleEdges = [\n";
+					for(auto edge : visibleEdges)
+						std::cout << "[" << edge.start().x() << "," << edge.start().y() << "], " << "[" << edge.end().x() << "," << edge.end().y() << "],";
+					std::cout << "\b \b";
+					std::cout << "\n]\n";
+					exit (EXIT_FAILURE);
+				}
+			}
+		}
+
 		if(visibleEdges.empty()){
+			std::cout << "points = [\n";
 			for(auto point : points)
 				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
-			std::cout << "Empty visible Edges" << std::endl;
+			std::cout << "]\n";
 			utils::polygonToPythonArray(convexHullPolygon, "convexHull");
 			std::cout << "redEdges = [\n";
 			for(auto edge : redEdges)
@@ -158,14 +241,11 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			std::cout << "\b \b";
 			std::cout << "]\n";
 			utils::polygonToPythonArray(polygon);
-			std::cerr << "Polygon is no simple\n";
 			std::cout << polygon.size() << std::endl;
 			std::cout << "dual points " << x << std::endl;
 			std::cout << lastPointExpandPolygonIndex << std::endl;
 			std::cout << "inserted: " << inserted << std::endl;
-
-			std::cout << "Polygon is clockwise: " << polygon.is_clockwise_oriented() << std::endl;
-			std::cout << "ConvexHull is clockwise: " << convexHullPolygon.is_clockwise_oriented() << std::endl;
+			std::cerr << "No visible edges\n";
 			exit(EXIT_FAILURE);
 		}
 
@@ -183,34 +263,8 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		polygonArea += std::abs(CGAL::area(edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint));
 
 		//insert the new point to the right position in polygon
-		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
-			if(*vertex == edgeToBeReplaced.start()){
-				vertex++; 
-				if(*vertex == edgeToBeReplaced.end()){
-					polygon.insert(vertex, newPoint);
-					break;
-				}
-
-				vertex--;
-				if(vertex != polygon.begin())
-					vertex--;
-				if(*vertex == edgeToBeReplaced.end()){
-					polygon.insert(vertex, newPoint);
-					break;
-				}
-
-				if(*polygon.begin() == edgeToBeReplaced.end()){
-					polygon.insert(polygon.begin(), newPoint);
-					break;
-				}
+		insertNewPointToPolygon(polygon, edgeToBeReplaced, newPoint);
 				
-				std::cout << "Problem inserting point " << std::endl;
-				exit (EXIT_FAILURE);
-
-			}
-		}
-
-		
 		 if(!polygon.is_simple()){
 			std::cout << "points = [\n";
 			for(auto point : points)
@@ -225,13 +279,12 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			std::cout << "]\n";
 			utils::polygonToPythonArray(polygon);
 			std::cout << "edgeToBeReplaced = [\n" << "[" << edgeToBeReplaced.start().x() << "," << edgeToBeReplaced.start().y() << "], " << "[" << edgeToBeReplaced.end().x() << "," << edgeToBeReplaced.end().y() << "]\n]\n";
-			std::cerr << "Polygon is no simple\n";
 			std::cout << polygon.size() << std::endl;
 			std::cout << "dual points " << x << std::endl;
 			std::cout << lastPointExpandPolygonIndex << std::endl;
-			std::cout << "Polygon is clockwise: " << polygon.is_clockwise_oriented() << std::endl;
-			std::cout << "ConvexHull is clockwise: " << convexHullPolygon.is_clockwise_oriented() << std::endl;
 			std::cout << "inserted: " << inserted << std::endl;
+			std::cout << "Last visible edge was a red edge " << redEdgeIsVisibleEdge << std::endl;
+			std::cerr << "Polygon is no simple\n";
 			exit (EXIT_FAILURE);
 		}
 
@@ -314,6 +367,34 @@ bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnderC
 	return true;
 }
 
+void insertNewPointToPolygon(Polygon_2 &polygon, Segment_2 &edgeToBeReplaced, Point_2 newPoint){
+	for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+		if(*vertex == edgeToBeReplaced.start()){
+			vertex++; 
+			if(*vertex == edgeToBeReplaced.end()){
+				polygon.insert(vertex, newPoint);
+				break;
+			}
+
+			vertex--;
+			if(vertex != polygon.begin())
+				vertex--;
+			if(*vertex == edgeToBeReplaced.end()){
+				polygon.insert(vertex, newPoint);
+				break;
+			}
+
+			if(*polygon.begin() == edgeToBeReplaced.end()){
+				polygon.insert(polygon.begin(), newPoint);
+				break;
+			}
+			
+			std::cout << "Problem inserting point " << std::endl;
+			exit (EXIT_FAILURE);
+		}
+	}
+}
+
 bool pointIsCollinearAndBetweenPreviousPoints(char* initialization, std::vector<Point_2> &points, int n){
 	std::string init = std::string(initialization);
 
@@ -321,12 +402,12 @@ bool pointIsCollinearAndBetweenPreviousPoints(char* initialization, std::vector<
 		if(points[n-1].x() == points[n].x() && points[n].x() == points[n+1].x())
 			if( !(points[n].y() > points[n-1].y() && points[n].y() > points[n+1].y()) && !(points[n].y() < points[n-1].y() && points[n].y() < points[n+1].y()) )
 				return true;
-	return false;
 
 	if(init.compare(SORT_BY_Y_ASC) == 0 || init.compare(SORT_BY_Y_DESC))
 		if(points[n-1].y() == points[n].y() && points[n].y() == points[n+1].y())
 			if( !(points[n].x() > points[n-1].x() && points[n].x() > points[n+1].x()) && !(points[n].x() < points[n-1].x() && points[n].x() < points[n+1].x()) )
 				return true;
+
 	return false;
 }
 

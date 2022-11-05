@@ -11,16 +11,16 @@
 			"program": "${workspaceFolder}/polygonization",
 			"args": [
 				"-i",
-				"../images/euro-night-0000100.instance",
+				"../images/euro-night-0001000.instance",
 				"-o", 
 				"o",
 				"-algorithm",
 				//"convex_hull",
 				"incremental",
 				"-edge_selection",
-				"1",
+				"2",
 				"-initialization",
-				"1a"
+				"2a"
 			],
 			"stopAtEntry": false,
 			"cwd": "${workspaceFolder}",

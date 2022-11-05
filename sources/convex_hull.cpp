@@ -64,8 +64,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 		RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), *it), RemainingPoints.end());
 	}	
 
-	//if(polygonchain.is_clockwise_oriented() != mypolygon.is_clockwise_oriented())
-			//polygonchain.reverse_orientation();
+	std::cout << polygonchain.orientation() << std::endl;
 
 	// Make edges from polygon chain, add them to vector
 	for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++)

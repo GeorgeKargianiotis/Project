@@ -55,6 +55,31 @@ void utils::vectorToPythonArray(std::vector<Point_2> &points){
 	std::cout << std::endl;
 }
 
+void utils::printOutput(Polygon_2 &polygon, std::vector<Point_2> &points, Polygon_2 &convexHullPolygon, std::vector<Segment_2> &redEdges, std::vector<Segment_2> &visibleEdges, Point_2 &newPoint){
+	std::cout << "points = [\n";
+	for(auto point : points)
+		std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
+	std::cout << "\b \b";
+	std::cout << "\n]\n";
+	utils::polygonToPythonArray(convexHullPolygon, "convexHull");
+	std::cout << "redEdges = [\n";
+	for(auto edge : redEdges)
+		std::cout << "[" << edge.start().x() << "," << edge.start().y() << "], " << "[" << edge.end().x() << "," << edge.end().y() << "],";
+	std::cout << "\b \b";
+	std::cout << "]\n";
+	utils::polygonToPythonArray(polygon);
+	std::cout << "visibleEdges = [\n";
+	if(visibleEdges.size() != 0){
+	for(auto edge : visibleEdges)
+		std::cout << "[" << edge.start().x() << "," << edge.start().y() << "], " << "[" << edge.end().x() << "," << edge.end().y() << "],";
+	std::cout << "\b \b";
+	std::cout << "\n]\n";
+	}
+	else
+		std::cout << "[0, 0] ]\n";
+	std::cout << "newPoint = [[" << newPoint.x() << ", " << newPoint.y() << "]]" << "\n";
+}
+
 bool utils::cmp1aPoint2(Point_2 &point1, Point_2 &point2){
 	if(point1.x() < point2.x())
 		return true;
@@ -74,7 +99,7 @@ bool utils::cmp1bPoint2(Point_2 &point1, Point_2 &point2){
 	else if(point1.x() < point2.x())
 		return false;
 	else{
-		if(point1.y() < point2.y())
+		if(point1.y() > point2.y())
 			return true;
 		else
 			return false;
@@ -100,7 +125,7 @@ bool utils::cmp2bPoint2(Point_2 &point1, Point_2 &point2){
 	else if(point1.y() < point2.y())
 		return false;
 	else{
-		if(point1.x() < point2.x())
+		if(point1.x() > point2.x())
 			return true;
 		else
 			return false;

@@ -32,7 +32,7 @@ void utils::writeToOutputFile(std::ofstream &outFile, std::vector<Point_2> &poin
 
 	outFile << "Alogrithm: incremental edge_selection " << edgeSelection; 
 	if(initialization != nullptr)
-		std::cout << " initilization " << initialization[0] << initialization[1];  
+		outFile << " initilization " << initialization[0] << initialization[1];  
 
 	outFile << "\narea: " << polygonArea << "\n";
 

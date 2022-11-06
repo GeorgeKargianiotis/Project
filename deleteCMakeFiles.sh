@@ -1,4 +1,4 @@
-rm CMakeFiles -r
+rm CMakeFiles* -r
 rm cmake_install.cmake
 rm CMakeCache.txt
 rm polygonization

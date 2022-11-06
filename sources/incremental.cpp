@@ -15,10 +15,9 @@ bool isRedEdge(const Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Pol
 
 bool isVisibleEdge(Polygon_2 &polygon, Point_2 &begin, Point_2 &end, const Point_2 &newPoint);
 
-//void insertNewPointToPolygon(Polygon_2 &polygon, Segment_2 &edgeToBeReplaced, Point_2 newPoint);
-bool insertNewPointToPolygon(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint);
+void insertNewPointToPolygon(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint);
 
-bool pointIsCollinearAndBetweenPreviousPoints(char* initialization, std::vector<Point_2> &points, int n);
+//bool pointIsCollinearAndBetweenPreviousPoints(char* initialization, std::vector<Point_2> &points, int n);
 
 int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
 
@@ -173,10 +172,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		polygonArea += std::abs(CGAL::area(edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint));
 
 		//insert the new point to the right position in polygon
-		if(insertNewPointToPolygon(polygon, edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint)){
-			utils::printOutput(polygon, points, convexHullPolygon, redEdges, visibleEdges, newPoint);
-			exit (EXIT_FAILURE);
-		}
+		insertNewPointToPolygon(polygon, edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint);
 
 		if(!polygon.is_simple()){
 			// for debugging purpose
@@ -251,19 +247,18 @@ bool isVisibleEdge(Polygon_2 &polygon, Point_2 &begin, Point_2 &end, const Point
 	return true;
 }
 
-//void insertNewPointToPolygon(Polygon_2 &polygon, Segment_2 &edgeToBeReplaced, Point_2 newPoint){
-bool insertNewPointToPolygon(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint){
+void insertNewPointToPolygon(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint){
 
 	for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
 		if(*vertex == begin){
 			vertex++;
 			if(vertex == polygon.end()){
 				polygon.insert(polygon.begin(), newPoint);
-				return false;
+				return;
 			}
 			if(*vertex == end){
 				polygon.insert(vertex, newPoint);
-				return false;
+				return;
 			}
 			vertex--;
 		}
@@ -271,35 +266,34 @@ bool insertNewPointToPolygon(Polygon_2 &polygon, const Point_2 &begin, const Poi
 			vertex++;
 			if(vertex == polygon.end()){
 				polygon.insert(polygon.begin(), newPoint);
-				return false;
+				return;
 			}
 			if(*vertex == begin){
 				polygon.insert(--vertex, newPoint);
-				return false;
+				return;
 			}
 			vertex--;
 		 }
 	}
 
 	std::cout << "Problem inserting point " << std::endl;
-	return true;
 }
 
-bool pointIsCollinearAndBetweenPreviousPoints(char* initialization, std::vector<Point_2> &points, int n){
-	std::string init = std::string(initialization);
+// bool pointIsCollinearAndBetweenPreviousPoints(char* initialization, std::vector<Point_2> &points, int n){
+// 	std::string init = std::string(initialization);
 
-	if(init.compare(SORT_BY_X_ASC) == 0 || init.compare(SORT_BY_X_DESC))
-		if(points[n-1].x() == points[n].x() && points[n].x() == points[n+1].x())
-			if( !(points[n].y() > points[n-1].y() && points[n].y() > points[n+1].y()) && !(points[n].y() < points[n-1].y() && points[n].y() < points[n+1].y()) )
-				return true;
+// 	if(init.compare(SORT_BY_X_ASC) == 0 || init.compare(SORT_BY_X_DESC))
+// 		if(points[n-1].x() == points[n].x() && points[n].x() == points[n+1].x())
+// 			if( !(points[n].y() > points[n-1].y() && points[n].y() > points[n+1].y()) && !(points[n].y() < points[n-1].y() && points[n].y() < points[n+1].y()) )
+// 				return true;
 
-	if(init.compare(SORT_BY_Y_ASC) == 0 || init.compare(SORT_BY_Y_DESC))
-		if(points[n-1].y() == points[n].y() && points[n].y() == points[n+1].y())
-			if( !(points[n].x() > points[n-1].x() && points[n].x() > points[n+1].x()) && !(points[n].x() < points[n-1].x() && points[n].x() < points[n+1].x()) )
-				return true;
+// 	if(init.compare(SORT_BY_Y_ASC) == 0 || init.compare(SORT_BY_Y_DESC))
+// 		if(points[n-1].y() == points[n].y() && points[n].y() == points[n+1].y())
+// 			if( !(points[n].x() > points[n-1].x() && points[n].x() > points[n+1].x()) && !(points[n].x() < points[n-1].x() && points[n].x() < points[n+1].x()) )
+// 				return true;
 
-	return false;
-}
+// 	return false;
+// }
 
 int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){
 	return rand() % visibleEdges.size();

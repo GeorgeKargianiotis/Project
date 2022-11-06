@@ -116,7 +116,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 						//if red edge belongs to polygon
 						if(redEdge->end() == *vertex){
-							if(!CGAL::collinear(startPoint, endPoint, newPoint)){
+							if( !CGAL::collinear(startPoint, endPoint, newPoint) ){
 								visibleEdges.push_back(Segment_2(startPoint, endPoint));
 								break;
 							}
@@ -153,7 +153,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		}
 
 		if(visibleEdges.empty()){
-			utils::printOutput(polygon, points, convexHullPolygon, redEdges, visibleEdges, newPoint);
 			std::cerr << "No visible edges\n";
 			exit(EXIT_FAILURE);
 		}

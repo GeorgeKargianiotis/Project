@@ -11,7 +11,7 @@
 
 void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon_2 &convexHullPolygon);
 
-bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2 &polygon);
+bool isRedEdge(const Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2 &polygon);
 
 bool isVisibleEdge(Polygon_2 &polygon, Point_2 &begin, Point_2 &end, const Point_2 &newPoint);
 
@@ -94,15 +94,13 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		visibleEdges.clear();
 		std::vector<Segment_2> redEdges;
 
-		bool pointPlaced = false;
 		//find the red edges of convex hull polygon
 
-		for(Polygon_2::Edge_const_iterator convexPolygonEdge = convexHullPolygon.edges().begin(); convexPolygonEdge != convexHullPolygon.edges().end(); convexPolygonEdge++){
+		for(Polygon_2::Edge_const_iterator convexPolygonEdge = convexHullPolygon.edges_begin(); convexPolygonEdge != convexHullPolygon.edges_end(); convexPolygonEdge++){
 
-			if(isRedEdge(convexPolygonEdge, newPoint, polygon)){
+			if(isRedEdge(convexPolygonEdge, newPoint, convexHullPolygon)){
 
 				Polygon_2::Edge_const_iterator &redEdge = convexPolygonEdge;
-
 				redEdges.push_back(*redEdge);
 
 				//find visible edges
@@ -119,9 +117,10 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 						//if red edge belongs to polygon
 						if(redEdge->end() == *vertex){
-							visibleEdges.push_back(Segment_2(startPoint, endPoint));
-							vertex--;
-							break;
+							if(!CGAL::collinear(startPoint, endPoint, newPoint)){
+								visibleEdges.push_back(Segment_2(startPoint, endPoint));
+								break;
+							}
 						}
 						vertex--;
 
@@ -135,19 +134,9 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 							else
 								endPoint = *vertex;
 
-							if(isVisibleEdge(polygon, startPoint, endPoint, newPoint)){
+							if(isVisibleEdge(polygon, startPoint, endPoint, newPoint))
 								visibleEdges.push_back(Segment_2(startPoint, endPoint));
-							}
-							else{
-								//checks if the newPoint is on the edge of polygon
-								Segment_2 line = Segment_2(startPoint, endPoint);
-								if(line.has_on(newPoint)){
-									polygon.insert(vertex, newPoint);
-									std::cout << "point placed\n";
-									pointPlaced = true;
-									break;
-								}
-							}
+
 							if(vertex == polygon.end())
 								vertex = polygon.begin();
 						} while( *vertex != redEdge->end());
@@ -156,8 +145,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 					}
 				}
 
-				if(pointPlaced) break;
-
 				continue;
 			}
 
@@ -165,8 +152,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			// if(firstRedEdgeFound)
 			// 	break;
 		}
-
-		if(pointPlaced) break;
 
 		if(visibleEdges.empty()){
 			utils::printOutput(polygon, points, convexHullPolygon, redEdges, visibleEdges, newPoint);
@@ -193,8 +178,8 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			exit (EXIT_FAILURE);
 		}
 
-				
-		 if(!polygon.is_simple()){
+		if(!polygon.is_simple()){
+			// for debugging purpose
 			utils::printOutput(polygon, points, convexHullPolygon, redEdges, visibleEdges, newPoint);
 			std::cerr << "Polygon is no simple\n";
 			exit (EXIT_FAILURE);
@@ -218,7 +203,7 @@ void getConvexHullPolygonFromPoints(const std::vector<Point_2> &vertices, Polygo
 }
 
 //given an edge of the convex hull polygon it returns true if it is red 
-bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2 &polygon){
+bool isRedEdge(const Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2 &polygon){
 	double detA;
 	double detB;
 	for(Polygon_2::Vertex_iterator point = polygon.vertices_begin(); point != polygon.vertices_end(); point++){
@@ -232,10 +217,12 @@ bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2
 
 //checks if the given edge is visible from the newPoint
 bool isVisibleEdge(Polygon_2 &polygon, Point_2 &begin, Point_2 &end, const Point_2 &newPoint){
+
 	Segment_2 line1 = Segment_2(begin, newPoint);
 	Segment_2 line2 = Segment_2(end, newPoint);
 
 	for(int i = 0; i < polygon.edges().size(); i++){
+
 		Segment_2 intersectLine = Segment_2(polygon.edge(i).start(), polygon.edge(i).end());
 
 		bool firstLineIsNeighbor = intersectLine.start() == line1.start() || intersectLine.end() == line1.start();
@@ -266,6 +253,7 @@ bool isVisibleEdge(Polygon_2 &polygon, Point_2 &begin, Point_2 &end, const Point
 
 //void insertNewPointToPolygon(Polygon_2 &polygon, Segment_2 &edgeToBeReplaced, Point_2 newPoint){
 bool insertNewPointToPolygon(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint){
+
 	for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
 		if(*vertex == begin){
 			vertex++;

@@ -13,9 +13,13 @@ void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon
 
 bool isRedEdge(Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2 &polygon);
 
+<<<<<<< HEAD
 bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edgeUnderCheck, const Point_2 &newPoint);
 
 bool pointIsCollinearAndBetweenPreviousPoints(char* initialization, std::vector<Point_2> &points, int n);
+=======
+bool isVisibleEdge(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edge, const Point_2 &newPoint);
+>>>>>>> master
 
 int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
 
@@ -23,7 +27,19 @@ int minAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
 
 int maxAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
 
+<<<<<<< HEAD
 void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile){
+=======
+bool segment1BeforeSegment2AxisX(Segment_2 &seg1, Segment_2 &seg2);
+
+bool segment1BeforeSegment2AxisY(Segment_2 &seg1, Segment_2 &seg2);
+
+void test(int i ,int j, int k );
+
+void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile){
+
+	auto start = std::chrono::high_resolution_clock::now();
+>>>>>>> master
 
 	srand(time(0));
 
@@ -148,6 +164,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		}
 
 		if(visibleEdges.empty()){
+			std::cout << "Points:\n";
 			for(auto point : points)
 				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
 			std::cout << "Empty visible Edges" << std::endl;
@@ -364,4 +381,17 @@ int maxAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){
 	}
 
 	return index;
+<<<<<<< HEAD
+=======
+}
+
+// Because points are in order, we check if a line is behind another one before we call intersect
+bool segment1BeforeSegment2AxisX(Segment_2 &seg1, Segment_2 &seg2){
+	return seg1.start().x() < seg2.start().x() && seg1.start().x() < seg2.end().x() && seg1.end().x() < seg2.start().x() && seg1.end().x() < seg2.end().x();
+}
+
+// Because points are in order, we check if a line is behind another one before we call intersect
+bool segment1BeforeSegment2AxisY(Segment_2 &seg1, Segment_2 &seg2){
+	return seg1.start().y() < seg2.start().y() && seg1.start().y() < seg2.end().y() && seg1.end().y() < seg2.start().y() && seg1.end().y() < seg2.end().y();
+>>>>>>> master
 }

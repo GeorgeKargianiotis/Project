@@ -15,6 +15,7 @@ typedef std::vector<Segment_2> Segments;
 bool isVisibleEdgeCH(Polygon_2 &polygon, Polygon_2::Edge_const_iterator edge, const Point_2 &newPoint);
 
 // int check_inside(Point_2 pt, Point_2 start, Point_2 end, K traits);
+
 void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, std::ofstream &outFile){	
 
 	auto start = std::chrono::high_resolution_clock::now();
@@ -389,7 +390,6 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				}
 			}	
 		}
-
 	
 
 		// After each new point entry, the polygon needs to remain simple

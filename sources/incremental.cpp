@@ -189,7 +189,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	std::cout << "Success" << std::endl;
 }
 
-//, int lastPointExpandPolygonIndex,
+// int lastPointExpandPolygonIndex,
 void getConvexHullPolygonFromPoints(const std::vector<Point_2> &vertices, Polygon_2 &convexHullPolygon){
 	std::vector<Point_2> points;
 	CGAL::convex_hull_2(vertices.begin(), vertices.end(), std::back_inserter(points));

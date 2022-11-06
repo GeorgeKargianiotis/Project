@@ -11,6 +11,7 @@ namespace utils{
 
 	void polygonToPythonArray(Polygon_2 &polygon, const std::string &name = "polygon");
 	void vectorToPythonArray(std::vector<Point_2> &points);
+	void printOutput(Polygon_2 &polygon, std::vector<Point_2> &points, Polygon_2 &convexHullPolygon, std::vector<Segment_2> &redEdges, std::vector<Segment_2> &visibleEdges, Point_2 &newPoint);
 	
 	bool cmp1aPoint2(Point_2 &point1, Point_2 &point2);
 	bool cmp1bPoint2(Point_2 &point1, Point_2 &point2);

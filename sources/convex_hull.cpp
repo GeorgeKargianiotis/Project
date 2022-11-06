@@ -9,12 +9,9 @@
 #include "../headers/cgalConfig.hpp"
 #include "../headers/utils.hpp"
 
-typedef std::vector<Point_2>::iterator pveciterator;
 typedef std::vector<Segment_2> Segments; 
 
 int insertNewPointToPolygonCH(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint);
-
-// int check_inside(Point_2 pt, Point_2 start, Point_2 end, K traits);
 
 void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, std::ofstream &outFile){	
 
@@ -23,13 +20,13 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 	srand(time(NULL));
 
 	Polygon_2 mypolygon, polygonchain; // Initial polygon to be used in convex_hull (polygon chain)
-	Segment_2 chosen, current, edgeToBeReplaced; // Segments to be inserted or ketp in case we have visibility errors or an "external" point
+	Segment_2 edgeToBeReplaced; // Segment to be replaced (broken into two new ones)
 	// Used to store points not yet included in polygon, needs to be empty in the end, closest is the closest point to each edge (according to myseg)
-	std::vector<Point_2> RemainingPoints, ClosestPoints, DefectivePoints; // Defective is to store points that cause an error
-	std::vector<double> areav;
+	std::vector<Point_2> RemainingPoints, ClosestPoints;
+	std::vector<double> areav; // Areas formed, needed for cases 2 and 3
 
 	double distance; // Needed for the point we are about to add
-	// Initialising distances and areas, neede for edge selection
+	// Initialising distances and areas, needed for edge-point selection
 	double mindistance = DBL_MAX;
 	double minarea = DBL_MAX;
 	double maxarea = DBL_MIN;
@@ -42,7 +39,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 	char* attr = "none";
 	// Segments that provide the min and max area respectively
 	Segment_2 minemb, maxemb;
-	int random, index = 0, i = 0, defect = 0, index2 = 0;
+	int random, index = 0, i = 0, defect = 0, index2 = 0; // Indexes to find edges, defect is in case we have an "external" point 
 	double area; // Area calculated each time
 	
 	// Add all points to new vector
@@ -68,7 +65,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 	}	
 
 	// From each edge, find nearest visible point INSIDE THE CHAIN and add it to polygon	
-	// 3 ways: random, max and min area
+	// 3 ways: random, min and max area
 
 	while (RemainingPoints.size() != 0){
 		
@@ -88,10 +85,10 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			mindistance = DBL_MAX;
 		}
 
-
+		// Random Pair Selected
 		if (edge == 1){
 			while(true){
-				// Connect point with a random edge, create new edges and remove the point, old edge is also removed
+				
 				random = rand() % ClosestPoints.size();
 				newp = ClosestPoints.at(random);
 
@@ -101,7 +98,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 						std::cerr << "Visibility error" << std::endl;
 				}
 
-				// Insert the new point
+				// Insert the new point, but first find the correct edge inside the existing polygon
 				for (Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
 					if (index == random){
 						edgeToBeReplaced = *edge;
@@ -115,6 +112,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 					continue;
 				}
 
+				// We need to make sure that no other point is excluded
 				for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
 					if(CGAL::bounded_side_2(polygonchain.begin(), polygonchain.end(), *it, K()) == CGAL::ON_UNBOUNDED_SIDE){
 						std::cout << "Point Left Out" << *it << std::endl;
@@ -134,12 +132,14 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				}
 				break;
 			}
+			// Insertion Done, Point added
 			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
 				
 			ClosestPoints.clear();
 
 			defect = 0;
 		}	
+		// Min area selection
 		else if (edge == 2){
 			// Myseg and closest points have the same size, find area for each pair, keep them stored
 			for (Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
@@ -151,6 +151,8 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			i = 0;
 
 			while(true){
+				// Find areas and keep them uptaded
+				// If we have external points or visibility errors, look for another pair with area different than the defective one
 				for (int j = 0; j < areav.size(); j++){
 					if(areav.at(j) < minarea && areav.at(j) > newmin){
 						minarea = areav.at(j);
@@ -160,7 +162,6 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				}
 
 				newmin = minarea;
-				std::cout << newmin << std::endl; 
 				
 				// Visibility check, point must be able to "see" every edge
 				for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
@@ -203,6 +204,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				}
 				break;
 			}
+			// Clear vector and update areas
 			areav.clear();
 			newmin = DBL_MIN;
 
@@ -213,7 +215,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			defect = 0;
 
 		}
-
+		// Max area selection
 		else if (edge == 3){
 			// Myseg and closest points have the same size, find area for each pair, keep them stored
 			for (Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
@@ -234,7 +236,6 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				}
 
 				newmax = maxarea;
-				std::cout << newmax << std::endl; 
 				
 				// Visibility check, point must be able to "see" every edge
 				for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
@@ -281,7 +282,6 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			newmax = DBL_MAX;
 
 			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
-			std::cout << "Erasing Point " << newp << std::endl;	
 			ClosestPoints.clear();
 
 			defect = 0;

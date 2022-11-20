@@ -29,7 +29,7 @@ int main(int argc, char* argv[]){
 	}
 
 	inFile.close();
-	
+
 	if(std::string(algorithm).compare("incremental") == 0)
 		incremental::incrementalAlgorithm(Points2, initialization, std::stoi(edgeSelection), outFile);
 
@@ -38,42 +38,32 @@ int main(int argc, char* argv[]){
 		convex_hull::convex_HullAlgorithm(Points2, std::stoi(edgeSelection), outFile);
 
 	outFile.close();
-	// test
 
 	return 0;
 }
 
 void readArguments(int &argc, char* argv[]){
-	if(argc != 11){
-		std::cerr << "Λάθος αριθμός ορισμάτων. " << std::endl;
-		std::cerr << "$./polygonization –i <point set input file> –ο <output file> –algorithm <incremental or convex_hull or onion> -edge_selection <1 or 2 or 3 | όχι στο onion> -initialization <1a or 1b or 2a or 2b | μόνο στον αυξητικό αλγόριθμο> -onion_initialization <1 to 5>" << std::endl;
+	if(argc != 11 && argc != 9){
+		std::cerr << "Î›Î¬Î¸Î¿Ï‚ Î±ÏÎ¹Î¸Î¼ÏŒÏ‚ Î¿ÏÎ¹ÏƒÎ¼Î¬Ï„Ï‰Î½. " << std::endl;
+		std::cerr << "$./polygonization â€“i <point set input file> â€“Î¿ <output file> â€“algorithm <incremental or convex_hull> -edge_selection <1 or 2 or 3 | ÏŒÏ‡Î¹ ÏƒÏ„Î¿ onion> -initialization <1a or 1b or 2a or 2b | Î¼ÏŒÎ½Î¿ ÏƒÏ„Î¿Î½ Î±Ï…Î¾Î·Ï„Î¹ÎºÏŒ Î±Î»Î³ÏŒÏÎ¹Î¸Î¼Î¿>" << std::endl;
+		exit(EXIT_FAILURE);
 	}
 
 	for(int i = 1; i < argc; i += 2){
 
-		if(std::string(argv[i]).compare("-i") == 0){
+		if(std::string(argv[i]).compare("-i") == 0)
 			inputFile = argv[i+1];
-			continue;
-		}
-
-		if(std::string(argv[i]).compare("-o") == 0){
+		else if(std::string(argv[i]).compare("-o") == 0)
 			outputFile = argv[i+1];
-			continue;
-		}
-
-		if(std::string(argv[i]).compare("-algorithm") == 0){
+		else if(std::string(argv[i]).compare("-algorithm") == 0)
 			algorithm = argv[i+1];
-			continue;
-		}
-			
-		if(std::string(argv[i]).compare("-edge_selection") == 0){
+		else if(std::string(argv[i]).compare("-edge_selection") == 0)
 			edgeSelection = argv[i+1];
-			continue;
-		}
-
-		if(std::string(argv[i]).compare("-initialization") == 0){
+		else if(std::string(argv[i]).compare("-initialization") == 0)
 			initialization = argv[i+1];
-			continue;
+		else{
+			std::cout << "Wrong argument " << argv[i] << std::endl;
+			exit(EXIT_FAILURE);
 		}
 	}
 }

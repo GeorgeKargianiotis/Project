@@ -36,7 +36,6 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 
 	// Point selected to add to the chain
 	Point_2 toadd, newp;
-	char* attr = "none";
 	// Segments that provide the min and max area respectively
 	Segment_2 minemb, maxemb;
 	int random, index = 0, i = 0, defect = 0, index2 = 0; // Indexes to find edges, defect is in case we have an "external" point 
@@ -303,8 +302,8 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
 	//write output
-	utils::writeToOutputFile(outFile, Points, polygonchain, mypolygon, edge, attr, std::abs(mypolygon.area()), executionTime.count());
-	utils::polygonToPythonArray(polygonchain);	
+	utils::writeToOutputFile(outFile, Points, polygonchain, mypolygon, edge, std::abs(mypolygon.area()), executionTime.count(), "none");
+	std::cout << "Success" << std::endl;
 }	
 
 int insertNewPointToPolygonCH(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint){

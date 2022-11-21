@@ -8,6 +8,8 @@
 #include "../headers/incremental.hpp"
 #include "../headers/cgalConfig.hpp"
 #include "../headers/utils.hpp"
+#include "../headers/local_search.hpp"
+#include "../headers/simulated_annealing.hpp"
 
 void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon_2 &convexHullPolygon);
 
@@ -178,6 +180,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	//write output
 	utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, polygonArea, executionTime.count(), initialization);
 	std::cout << "Success" << std::endl;
+	local_search::local_search_algorithm(polygon, outFile);
 }
 
 // int lastPointExpandPolygonIndex,

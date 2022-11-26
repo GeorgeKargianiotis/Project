@@ -49,7 +49,7 @@ int main(int argc, char* argv[]){
 void readArguments(int &argc, char* argv[]){
 	if(argc != 13){
 		std::cerr << "Λάθος αριθμός ορισμάτων. " << std::endl;
-		std::cerr << "$./polygonization –i <point set input file> –ο <output file> –algorithm <incremental or convex_hull> -edge_selection <1 or 2 or 3 | όχι στο onion> -initialization <1a or 1b or 2a or 2b | μόνο στον αυξητικό αλγόριθμο>" << std::endl;
+		std::cerr << "$./optima_polygon –i <point set input file> –ο <output file> –algorithm <local_search or simulated_annealing> -L [L parameter according to algorithm] –max [maximal area polygonization] –min [minimal area polygonization] –threshold <double> [in local search] –annealing <'local' or 'global' or 'subdivision' in simulated annealing>" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 
@@ -69,6 +69,8 @@ void readArguments(int &argc, char* argv[]){
 			}
 			algorithm = argv[i+1];
 		}
+		else if(std::string(argv[i]).compare("-L") == 0)
+			max = argv[i+1];
 		else if(std::string(argv[i]).compare("-max") == 0)
 			max = argv[i+1];
 		else if(std::string(argv[i]).compare("-min") == 0)

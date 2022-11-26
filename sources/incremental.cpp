@@ -180,7 +180,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	//write output
 	utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, polygonArea, executionTime.count(), initialization);
 	std::cout << "Success" << std::endl;
-	local_search::local_search_algorithm(polygon, outFile);
+	utils::simulated_annealing_algorithm(polygon, outFile);
 }
 
 // int lastPointExpandPolygonIndex,

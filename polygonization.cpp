@@ -42,6 +42,7 @@ int main(int argc, char* argv[]){
 	return 0;
 }
 
+// EDIT READ ARGUMENTS TO INCLUDE EXTRA AGRUMENTS FOR 2ND PART OF PROJECT
 void readArguments(int &argc, char* argv[]){
 	if(argc != 11 && argc != 9){
 		std::cerr << "Î›Î¬Î¸Î¿Ï‚ Î±ÏÎ¹Î¸Î¼ÏŒÏ‚ Î¿ÏÎ¹ÏƒÎ¼Î¬Ï„Ï‰Î½. " << std::endl;

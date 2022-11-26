@@ -35,7 +35,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 	
 
 	// Point selected to add to the chain
-	Point_2 toadd, newp;
+	Point_2 toadd, newp, notuse(0, 0);
 	// Segments that provide the min and max area respectively
 	Segment_2 minemb, maxemb;
 	int random, index = 0, i = 0, defect = 0, index2 = 0; // Indexes to find edges, defect is in case we have an "external" point 
@@ -65,9 +65,10 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 
 	// From each edge, find nearest visible point INSIDE THE CHAIN and add it to polygon	
 	// 3 ways: random, min and max area
-
+	ClosestPoints.clear();
 	while (RemainingPoints.size() != 0){
-		
+		ClosestPoints.clear();
+		//std::cout << RemainingPoints.size() << " and " << polygonchain.size() << std::endl;
 		for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
 			Segment_2 temp = *edge;
 			for (auto it = RemainingPoints.begin(); it!= RemainingPoints.end(); it++){
@@ -81,9 +82,12 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			}
 			// Make the entry: Each edge now has a matching closest point in this vector
 			ClosestPoints.push_back(toadd);	
+			std::cout << ClosestPoints.size() << std::endl;
+			//std::cout << "Added points" << std::endl;
+
 			mindistance = DBL_MAX;
 		}
-
+		
 		// Random Pair Selected
 		if (edge == 1){
 			while(true){
@@ -140,10 +144,14 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 		}	
 		// Min area selection
 		else if (edge == 2){
+			//continue;
+			std::cout << ClosestPoints.size() << "cyka" << std::endl;
+			i = 0;
 			// Myseg and closest points have the same size, find area for each pair, keep them stored
 			for (Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
 				area = CGAL::area(ClosestPoints.at(i), edge->source(), edge->target());
 				areav.push_back(area);
+				//std::cout << i << std::endl;
 				i++;
 			}
 
@@ -153,14 +161,21 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				// Find areas and keep them uptaded
 				// If we have external points or visibility errors, look for another pair with area different than the defective one
 				for (int j = 0; j < areav.size(); j++){
+					//std::cout << j << std::endl;
 					if(areav.at(j) < minarea && areav.at(j) > newmin){
+						newp = ClosestPoints.at(j);
+						//std::cout << "Found Area" << std::endl;
+						if(newp == notuse){
+							continue;
+						}
 						minarea = areav.at(j);
 						index = j;
-						newp = ClosestPoints.at(j);
+						
 					}
 				}
 
 				newmin = minarea;
+				std::cout  << newp << " " << areav.at(index) << " " << newmin << std::endl;
 				
 				// Visibility check, point must be able to "see" every edge
 				for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
@@ -200,6 +215,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				if (defect == 1){
 					areav.clear();
 					continue;
+					std::cout << "We Got in Here" << std::endl;
 				}
 				break;
 			}
@@ -210,7 +226,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
 			std::cout << "Erasing Point " << newp << std::endl;	
 			ClosestPoints.clear();
-
+			notuse = newp;
 			defect = 0;
 
 		}
@@ -294,8 +310,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 		std::cout << "\n]\n";
 		utils::polygonToPythonArray(mypolygon, "convexHull");
 		utils::polygonToPythonArray(polygonchain);
-		std::cerr << "Polygon is not simple\n";
-		exit (EXIT_FAILURE); 
+		std::cerr << "Polygon is not simple\n"; 
 	}
 
 	auto stop = std::chrono::high_resolution_clock::now();
@@ -304,6 +319,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 	//write output
 	utils::writeToOutputFile(outFile, Points, polygonchain, mypolygon, edge, std::abs(mypolygon.area()), executionTime.count(), "none");
 	std::cout << "Success" << std::endl;
+	utils::local_search_algorithm(polygonchain, outFile, 1, "max", 0.0);
 }	
 
 int insertNewPointToPolygonCH(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint){

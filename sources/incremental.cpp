@@ -23,7 +23,7 @@ int minAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
 
 int maxAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
 
-void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile){
+void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile, Polygon_2 &polygon){
 
 	srand(time(0));
 
@@ -42,7 +42,8 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	else if(std::string(initialization).compare(SORT_BY_Y_DESC) == 0)
 		std::sort(points.begin(), points.end(), utils::cmp2bPoint2);
 
-	Polygon_2 polygon, convexHullPolygon;
+	//Polygon_2 polygon, convexHullPolygon;
+	Polygon_2 convexHullPolygon;
 	Point_2 lastPointExpandPolygon; 	//to teleytaio shmeio poy mphke sthn polygwnikh grammh kai thn epektine
 	int lastPointExpandPolygonIndex;
 	double polygonArea;
@@ -167,7 +168,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	auto executionTime = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
 	//write output
-	utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, polygonArea, executionTime.count(), initialization);
+	//utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, polygonArea, executionTime.count(), initialization);
 	std::cout << "Success" << std::endl;
 }
 

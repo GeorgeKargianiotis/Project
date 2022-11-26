@@ -142,11 +142,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			}
 		}
 
-		if(visibleEdges.empty()){
-			std::cerr << "No visible edges\n";
-			exit(EXIT_FAILURE);
-		}
-
 		//choose visible edge to replace
 		int index = 0;
 		if(edgeSelection == RANDOM_EDGE_SELECTION)

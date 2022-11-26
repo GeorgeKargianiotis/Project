@@ -15,11 +15,11 @@ void readArguments(int &argc, char* argv[]);
 char *inputFile, *outputFile, *algorithm, *max, *min, *threshold, *annealing;
 
 int main(int argc, char* argv[]){
+
 	readArguments(argc, argv);
 	std::ifstream inFile(inputFile);
 	std::ofstream outFile(outputFile);
 	std::string line;
-	std::vector<Point_2> Points2;
 
 	//ignore first two lines
 	std::getline(inFile, line);
@@ -32,13 +32,14 @@ int main(int argc, char* argv[]){
 
 	inFile.close();
 
+	std::vector<Point_2> Points2;
 	char initialization[2] = {'2', 'a'};
 	Polygon_2 polygon;
 
 	//get the starting simple polygon
 	incremental::incrementalAlgorithm(Points2, initialization, 2, outFile, polygon);
 
-	if(std::string(algorithm).compare("simulated_annealing") == 0 )
+	if(std::string(algorithm).compare("simulated_annealing") == 0)
 		simulated_annealing::function(polygon);
 
 	outFile.close();

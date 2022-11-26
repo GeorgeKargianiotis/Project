@@ -5,6 +5,14 @@ cmake_minimum_required(VERSION 3.1...3.23)
 
 project( polygonization )
 
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+set(CMAKE__CXX_FLAGS_RELEASE "-O3")
+set(CMAKE_CXX_FLAGS_DEBUG "-g")
+
 # CGAL and its components
 find_package( CGAL QUIET COMPONENTS  )
 

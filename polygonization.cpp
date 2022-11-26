@@ -29,7 +29,7 @@ int main(int argc, char* argv[]){
 	}
 
 	inFile.close();
-
+	
 	if(std::string(algorithm).compare("incremental") == 0)
 		incremental::incrementalAlgorithm(Points2, initialization, std::stoi(edgeSelection), outFile);
 

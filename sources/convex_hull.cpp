@@ -14,6 +14,16 @@ typedef std::vector<Segment_2> Segments;
 int insertNewPointToPolygonCH(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint);
 
 void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, std::ofstream &outFile){	
+<<<<<<< HEAD
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	srand(time(0));
+
+	Polygon_2 mypolygon, polygonchain; // Initial polygon to be used in convex_hull
+	Segments myseg; // Edges stored here
+	Segment_2 chosen;
+=======
 
 	auto start = std::chrono::high_resolution_clock::now();
 
@@ -21,6 +31,7 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 
 	Polygon_2 mypolygon, polygonchain; // Initial polygon to be used in convex_hull (polygon chain)
 	Segment_2 edgeToBeReplaced; // Segment to be replaced (broken into two new ones)
+>>>>>>> 8bbd801d13d069bc12b6da8c50c58b79f3f02e97
 	// Used to store points not yet included in polygon, needs to be empty in the end, closest is the closest point to each edge (according to myseg)
 	std::vector<Point_2> RemainingPoints, ClosestPoints;
 	std::vector<double> areav; // Areas formed, needed for cases 2 and 3
@@ -107,9 +118,22 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 					index++;
 				}
 					
+<<<<<<< HEAD
+			// Connect point with a random edge, create new edges and remove the point, old edge is also removed
+			random = rand() % ClosestPoints.size();
+			chosen = myseg.at(random);
+			newp = ClosestPoints.at(random);
+
+			myseg.push_back(Segment_2 (chosen.source(), newp));
+			myseg.push_back(Segment_2 (newp, chosen.target()));
+			myseg.erase(std::remove(myseg.begin(), myseg.end(), chosen), myseg.end());
+			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
+			
+=======
 				if(insertNewPointToPolygonCH(polygonchain, edgeToBeReplaced.start(), edgeToBeReplaced.end(), newp) == 0){
 					continue;
 				}
+>>>>>>> 8bbd801d13d069bc12b6da8c50c58b79f3f02e97
 
 				// We need to make sure that no other point is excluded
 				for (auto it = RemainingPoints.begin(); it != RemainingPoints.end(); ++it){
@@ -135,6 +159,18 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
 				
 			ClosestPoints.clear();
+<<<<<<< HEAD
+			// ΤΟ DO, VISIBILITY BEFORE INSERTION
+			// CHANGE INTERSECTION WITH DO_INTERSECT
+			// CLOCKWISE VS COUNTERCLOCKWISE ROTATION OF CONVEX HULL
+			// FOR OUTSIDE POINTS: DO_INERSECT POINT LEFT OUT WITH 2 NEW EDGES AND OLD ONE
+			for(Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
+				if(!isVisibleEdgeCH(polygonchain, edge, newp))
+					std::cerr << "Visibility error" << std::endl;
+			}
+			std::cout << "Conveeeex" << std::endl;
+=======
+>>>>>>> 8bbd801d13d069bc12b6da8c50c58b79f3f02e97
 
 			defect = 0;
 		}	
@@ -280,12 +316,47 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			areav.clear();
 			newmax = DBL_MAX;
 
+<<<<<<< HEAD
+		// After each new point entry, the polygon needs to remain simple
+		const bool simpl = polygonchain.is_simple();
+		if (!simpl){
+			std::cout << "points = [\n";
+			for(auto point : Points)
+				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
+			std::cout << "\n]\n";
+			utils::polygonToPythonArray(mypolygon, "convexHull");
+			utils::polygonToPythonArray(polygonchain);
+			std::cerr << "Polygon is no simple\n";
+			exit (EXIT_FAILURE); 
+		}
+		else{
+			std::cout << "points = [\n";
+			for(auto point : Points)
+				std::cout << "[" << point.x() << "," << point.y() << "], " << "[" << point.x() << "," << point.y() << "],";
+			std::cout << "\n]\n";
+			utils::polygonToPythonArray(mypolygon, "convexHull");
+			utils::polygonToPythonArray(polygonchain);
+			std::cerr << "Polygon is no simple\n";
+
+		}
+	}
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+	std::cout << "Made It" << std::endl;
+
+	//write output
+	utils::writeToOutputFile(outFile, Points, polygonchain, mypolygon, edge, "none", std::abs(mypolygon.area()), executionTime.count());
+	std::cout << "Made It" << std::endl;
+	utils::polygonToPythonArray(polygonchain);
+}
+=======
 			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
 			ClosestPoints.clear();
 
 			defect = 0;
 		}	
 	}
+>>>>>>> 8bbd801d13d069bc12b6da8c50c58b79f3f02e97
 
 	if(!polygonchain.is_simple()){
 		std::cout << "points = [\n";

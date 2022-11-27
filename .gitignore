@@ -7,9 +7,11 @@ CMakeCache.txt
 CMakeCache.txt.bak
 CMakeLists.txt.bak
 polygonization
+optimal_polygon
 Makefile
 headers/*.a
 sources/*.a
 updateMaster.sh
 output.*
 o
+c_cpp_properties.json

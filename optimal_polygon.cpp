@@ -20,6 +20,7 @@ int main(int argc, char* argv[]){
 	std::ifstream inFile(inputFile);
 	std::ofstream outFile(outputFile);
 	std::string line;
+	std::vector<Point_2> Points2;
 
 	//ignore first two lines
 	std::getline(inFile, line);
@@ -32,7 +33,6 @@ int main(int argc, char* argv[]){
 
 	inFile.close();
 
-	std::vector<Point_2> Points2;
 	char initialization[2] = {'2', 'a'};
 	Polygon_2 polygon;
 

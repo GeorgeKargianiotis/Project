@@ -32,7 +32,7 @@ void utils::writeToOutputFile(std::ofstream &outFile, std::vector<Point_2> &poin
 
 	outFile << "Alogrithm: incremental edge_selection " << edgeSelection; 
 	if(initialization != nullptr)
-		outFile << " initilization " << initialization[0] << initialization[1];  
+		std::cout << " initilization " << initialization[0] << initialization[1];  
 
 	outFile << "\narea: " << polygonArea << "\n";
 
@@ -139,7 +139,7 @@ void utils::simulated_annealing_algorithm(Polygon_2 greedypolygon, std::ofstream
 }
 
 void utils::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold){
-	int L; // Amount of points we can switch
+	// Amount of points we can switch
 	double optimal;
 
 	while (optimal >= threshhold){

@@ -8,8 +8,6 @@
 #include "../headers/incremental.hpp"
 #include "../headers/cgalConfig.hpp"
 #include "../headers/utils.hpp"
-#include "../headers/local_search.hpp"
-#include "../headers/simulated_annealing.hpp"
 
 void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon_2 &convexHullPolygon);
 
@@ -25,7 +23,7 @@ int minAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
 
 int maxAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
 
-void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile){
+void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile, Polygon_2 &polygon){
 
 	srand(time(0));
 
@@ -44,7 +42,8 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 	else if(std::string(initialization).compare(SORT_BY_Y_DESC) == 0)
 		std::sort(points.begin(), points.end(), utils::cmp2bPoint2);
 
-	Polygon_2 polygon, convexHullPolygon;
+	//Polygon_2 polygon, convexHullPolygon;
+	Polygon_2 convexHullPolygon;
 	Point_2 lastPointExpandPolygon; 	//to teleytaio shmeio poy mphke sthn polygwnikh grammh kai thn epektine
 	int lastPointExpandPolygonIndex;
 	double polygonArea;
@@ -91,7 +90,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			convexHullPolygon.reverse_orientation();
 
 		visibleEdges.clear();
-		//std::vector<Segment_2> redEdges;
 
 		//find the red edges of convex hull polygon
 		for(Polygon_2::Edge_const_iterator convexPolygonEdge = convexHullPolygon.edges_begin(); convexPolygonEdge != convexHullPolygon.edges_end(); convexPolygonEdge++){
@@ -99,7 +97,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			if(isRedEdge(convexPolygonEdge, newPoint, convexHullPolygon)){
 
 				Polygon_2::Edge_const_iterator &redEdge = convexPolygonEdge;
-				//redEdges.push_back(*redEdge);
 
 				//find visible edges
 				for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
@@ -145,11 +142,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 			}
 		}
 
-		if(visibleEdges.empty()){
-			std::cerr << "No visible edges\n";
-			exit(EXIT_FAILURE);
-		}
-
 		//choose visible edge to replace
 		int index = 0;
 		if(edgeSelection == RANDOM_EDGE_SELECTION)
@@ -165,22 +157,14 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 
 		//insert the new point to the right position in polygon
 		insertNewPointToPolygon(polygon, edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint);
-
-		if(!polygon.is_simple()){
-			// for debugging purpose
-			//utils::printOutput(polygon, points, convexHullPolygon, redEdges, visibleEdges, newPoint);
-			std::cerr << "Polygon is no simple\n";
-			exit (EXIT_FAILURE);
-		}
 	}
 
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto executionTime = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
 	//write output
-	utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, polygonArea, executionTime.count(), initialization);
+	//utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, polygonArea, executionTime.count(), initialization);
 	std::cout << "Success" << std::endl;
-	utils::simulated_annealing_algorithm(polygon, outFile);
 }
 
 // int lastPointExpandPolygonIndex,

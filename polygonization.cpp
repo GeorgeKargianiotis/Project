@@ -11,6 +11,7 @@
 void readArguments(int &argc, char* argv[]);
 
 char *inputFile, *outputFile, *algorithm, *initialization, *edgeSelection;
+Polygon_2 polygon;
 
 int main(int argc, char* argv[]){
 	readArguments(argc, argv);
@@ -31,7 +32,7 @@ int main(int argc, char* argv[]){
 	inFile.close();
 
 	if(std::string(algorithm).compare("incremental") == 0)
-		incremental::incrementalAlgorithm(Points2, initialization, std::stoi(edgeSelection), outFile);
+		incremental::incrementalAlgorithm(Points2, initialization, std::stoi(edgeSelection), outFile, polygon);
 
 	// Need int for convex hull edges
 	if(std::string(algorithm).compare("convex_hull") == 0)
@@ -45,8 +46,8 @@ int main(int argc, char* argv[]){
 // EDIT READ ARGUMENTS TO INCLUDE EXTRA AGRUMENTS FOR 2ND PART OF PROJECT
 void readArguments(int &argc, char* argv[]){
 	if(argc != 11 && argc != 9){
-		std::cerr << "Î›Î¬Î¸Î¿Ï‚ Î±ÏÎ¹Î¸Î¼ÏŒÏ‚ Î¿ÏÎ¹ÏƒÎ¼Î¬Ï„Ï‰Î½. " << std::endl;
-		std::cerr << "$./polygonization â€“i <point set input file> â€“Î¿ <output file> â€“algorithm <incremental or convex_hull> -edge_selection <1 or 2 or 3 | ÏŒÏ‡Î¹ ÏƒÏ„Î¿ onion> -initialization <1a or 1b or 2a or 2b | Î¼ÏŒÎ½Î¿ ÏƒÏ„Î¿Î½ Î±Ï…Î¾Î·Ï„Î¹ÎºÏŒ Î±Î»Î³ÏŒÏÎ¹Î¸Î¼Î¿>" << std::endl;
+		std::cerr << "Λάθος αριθμός ορισμάτων. " << std::endl;
+		std::cerr << "$./polygonization –i <point set input file> –ο <output file> –algorithm <incremental or convex_hull> -edge_selection <1 or 2 or 3 | όχι στο onion> -initialization <1a or 1b or 2a or 2b | μόνο στον αυξητικό αλγόριθμο>" << std::endl;
 		exit(EXIT_FAILURE);
 	}
 

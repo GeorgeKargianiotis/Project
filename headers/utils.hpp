@@ -18,8 +18,8 @@ namespace utils{
 	bool cmp2aPoint2(Point_2 &point1, Point_2 &point2);
 	bool cmp2bPoint2(Point_2 &point1, Point_2 &point2);
 
-	void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold);
-	void simulated_annealing_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile);	
+	//void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold);
+	//void simulated_annealing_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile);	
 }
 
 #endif

@@ -134,11 +134,11 @@ bool utils::cmp2bPoint2(Point_2 &point1, Point_2 &point2){
 	}
 }
 
-void utils::simulated_annealing_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile){
+/*void utils::simulated_annealing_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile){
 	std::cout << std::endl;
-}
+}*/
 
-void utils::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold){
+/*void utils::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold){
 	// Amount of points we can switch
 	double optimal;
 
@@ -170,5 +170,5 @@ Keep best solution S
 ; ∆A ← Area(S
 ′
 ) − Area(S)
-end while*/
-}
+end while
+}*/

@@ -4,7 +4,7 @@
 #include "../headers/cgalConfig.hpp"
 
 namespace local_search {
-	void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile);	
+	void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold);
 } 
 
 #endif

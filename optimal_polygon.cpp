@@ -42,6 +42,9 @@ int main(int argc, char* argv[]){
 	if(std::string(algorithm).compare("simulated_annealing") == 0)
 		//simulated_annealing::function(polygon);
 
+	if(std::string(algorithm).compare("local_search") == 0)
+		//simulated_annealing::function(polygon);	
+
 	outFile.close();
 
 	return 0;

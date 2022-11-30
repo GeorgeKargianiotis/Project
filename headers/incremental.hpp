@@ -18,4 +18,16 @@ namespace incremental {
 	//void incrementalAlgorithm(std::vector<Point_2> &Points, char *initialization, int edgeSelection, std::ofstream &outFile);
 }
 
+bool isRedEdge(const Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2 &polygon);
+
+bool isVisibleEdge(Polygon_2 &polygon, Point_2 &begin, Point_2 &end, const Point_2 &newPoint);
+
+void insertNewPointToPolygon(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint);
+
+int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
+
+int minAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
+
+int maxAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
+
 #endif

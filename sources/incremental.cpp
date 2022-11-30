@@ -23,7 +23,8 @@ int minAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
 
 int maxAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
 
-void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile, Polygon_2 &polygon){
+//void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile, Polygon_2 &polygon){
+void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, Polygon_2 &polygon){
 
 	srand(time(0));
 
@@ -168,7 +169,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 }
 
 // int lastPointExpandPolygonIndex,
-void getConvexHullPolygonFromPoints(const std::vector<Point_2> &vertices, Polygon_2 &convexHullPolygon){
+void incremental::getConvexHullPolygonFromPoints(const std::vector<Point_2> &vertices, Polygon_2 &convexHullPolygon){
 	std::vector<Point_2> points;
 	CGAL::convex_hull_2(vertices.begin(), vertices.end(), std::back_inserter(points));
 	for(auto it = points.begin(); it != points.end(); it++)

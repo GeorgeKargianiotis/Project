@@ -4,7 +4,8 @@
 #include "../headers/cgalConfig.hpp"
 
 namespace simulated_annealing{
-	void function(Polygon_2 &polygon);
+	Polygon_2* simulatedAnnealing(std::vector<Point_2> &points, char* annealing, bool max, int L);
+	Polygon_2* simulatedAnnealingWithSubdivision(std::vector<Point_2> &points, bool max);
 } 
 
 #endif

@@ -8,4 +8,7 @@ namespace simulated_annealing{
 	Polygon_2* simulatedAnnealingWithSubdivision(std::vector<Point_2> &points, bool max);
 } 
 
+void localTransitionStep(Polygon_2 &polygon, Tree &kdTree);
+void globalTransitionStep(Polygon_2 &polygon);
+
 #endif

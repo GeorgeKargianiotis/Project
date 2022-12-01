@@ -54,10 +54,30 @@ void localTransitionStep(Polygon_2 &polygon, Tree &kdTree){
 	int randomPoint = rand() % polygon.size();
 
 	int i = 0;
+	Polygon_2::Vertex_iterator pointA, pointB;
 	for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+		
 
-		if(i == randomPoint)
+		if(i == randomPoint){
+			pointA = vertex;
+			if(++vertex == polygon.end())
+				pointB = polygon.begin();
+			else
+				pointB = vertex;
+				
+			std::vector<Point_2> pointsInBox;
+			//Fuzzy_iso_box searchBox(Point_d((double)pointA->x(), (double)pointA->y()), Point_d(pointB->x(), pointB->y()));
+			Fuzzy_iso_box searchBox(Point_2(pointA->x(), pointA->y()), Point_2(pointB->x(), pointB->y()));
+			kdTree.search(std::back_inserter(pointsInBox), searchBox);
 
+			for(Point_2 p : pointsInBox)
+				std::cout << p << std::endl;
+
+			break;
+		}
+
+
+		i++;
 	}
 }
 

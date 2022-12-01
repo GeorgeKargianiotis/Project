@@ -9,21 +9,8 @@
 #include "../headers/cgalConfig.hpp"
 #include "../headers/utils.hpp"
 
-void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon_2 &convexHullPolygon);
-
-bool isRedEdge(const Polygon_2::Edge_const_iterator edge, Point_2 &newPoint, Polygon_2 &polygon);
-
-bool isVisibleEdge(Polygon_2 &polygon, Point_2 &begin, Point_2 &end, const Point_2 &newPoint);
-
-void insertNewPointToPolygon(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint);
-
-int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
-
-int minAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
-
-int maxAreaSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint);
-
-void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile, Polygon_2 &polygon){
+//void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile, Polygon_2 &polygon){
+void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, Polygon_2 &polygon){
 
 	srand(time(0));
 
@@ -168,7 +155,7 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 }
 
 // int lastPointExpandPolygonIndex,
-void getConvexHullPolygonFromPoints(const std::vector<Point_2> &vertices, Polygon_2 &convexHullPolygon){
+void incremental::getConvexHullPolygonFromPoints(const std::vector<Point_2> &vertices, Polygon_2 &convexHullPolygon){
 	std::vector<Point_2> points;
 	CGAL::convex_hull_2(vertices.begin(), vertices.end(), std::back_inserter(points));
 	for(auto it = points.begin(); it != points.end(); it++)

@@ -9,9 +9,9 @@
 #include <CGAL/Vector_3.h>
 #include <CGAL/determinant.h>
 #include <CGAL/Search_traits_2.h>
-#include <CGAL/Simple_cartesian.h>
 #include <CGAL/Kd_tree.h>
 #include <CGAL/tags.h>
+#include <CGAL/Fuzzy_iso_box.h>
 
 typedef CGAL::Exact_predicates_inexact_constructions_kernel K;
 typedef CGAL::Polygon_2<K> Polygon_2;
@@ -21,5 +21,6 @@ typedef CGAL::Vector_3<K> Vector_3;
 
 typedef CGAL::Search_traits_2<K> Traits;
 typedef CGAL::Kd_tree<Traits> Tree;
+typedef CGAL::Fuzzy_iso_box<Traits> Fuzzy_iso_box;
 
 #endif

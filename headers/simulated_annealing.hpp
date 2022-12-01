@@ -11,4 +11,9 @@ namespace simulated_annealing{
 void localTransitionStep(Polygon_2 &polygon, Tree &kdTree);
 void globalTransitionStep(Polygon_2 &polygon);
 
+int maxCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s);
+int maxCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s);
+int minCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s);
+int minCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s);
+
 #endif

@@ -49,53 +49,75 @@ Polygon_2* simulated_annealing::simulatedAnnealingWithSubdivision(std::vector<Po
 }
 
 void localTransitionStep(Polygon_2 &polygon, Tree &kdTree){
-	//take a random point in polygon to swap
-	int randomPoint = 1 + (rand() % (polygon.size() - 2));
-
-	std::cout << "random point : " << randomPoint << std::endl;
-
-	int i = randomPoint;
-
-	Point_2 p, q, r, s; // q and r are the points to be exchanged. p is previous to q and s is next to r
-	p = polygon[i-1];
-	q = polygon[i];
-	r = polygon[i+1];
-	s = polygon[i+2];
-
-	int maxX = maxCoordinateX(p, q, r, s);
-	int minX = minCoordinateX(p, q, r, s);
-	int maxY = maxCoordinateY(p, q, r, s);
-	int minY = minCoordinateY(p, q, r, s);
+	bool validPointSwap;
 	
-	std::vector<Point_2> pointsInBox;
-	Fuzzy_iso_box searchBox(Point_2(minX, minY), Point_2(maxX, maxY));
-	kdTree.search(std::back_inserter(pointsInBox), searchBox);
+	while(1){
 
-	// new lines
-	Segment_2 line1 = Segment_2(p, r);
-	Segment_2 line2 = Segment_2(q, s);
-	
-	for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+		validPointSwap = true;
 
-		for(std::vector<Point_2>::iterator point = pointsInBox.begin(); point != pointsInBox.end(); point++)
-			if(*point == *vertex){
-				Point_2 a = *vertex;	// point in box
-				--vertex;
-				Point_2 b = *vertex;	// previous point
-				++vertex; 
-				++vertex;
-				Point_2 c = *vertex;	// next point
+		//take a random point in polygon to swap
+		int randomPoint = 1 + (rand() % (polygon.size() - 2));
 
-				// the two lines from point in box
-				Segment_2 lineA = Segment_2(b, a);
-				Segment_2 lineB = Segment_2(a, c);
+		std::cout << "random point : " << randomPoint << std::endl;
 
+		int i = randomPoint;
 
-				pointsInBox.erase(point);
-				--vertex;
+		Point_2 p, q, r, s; // q and r are the points to be exchanged. p is previous to q and s is next to r
+		p = polygon[i-1];
+		q = polygon[i];
+		r = polygon[i+1];
+		s = polygon[i+2];
+
+		int maxX = maxCoordinateX(p, q, r, s);
+		int minX = minCoordinateX(p, q, r, s);
+		int maxY = maxCoordinateY(p, q, r, s);
+		int minY = minCoordinateY(p, q, r, s);
+		
+		std::vector<Point_2> pointsInBox;
+		Fuzzy_iso_box searchBox(Point_2(minX, minY), Point_2(maxX, maxY));
+		kdTree.search(std::back_inserter(pointsInBox), searchBox);
+
+		// new lines
+		Segment_2 line1 = Segment_2(p, r);
+		Segment_2 line2 = Segment_2(q, s);
+
+		if(CGAL::do_intersect(line1, line2))
+			continue;
+		
+		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+
+			for(std::vector<Point_2>::iterator point = pointsInBox.begin(); point != pointsInBox.end(); point++)
+				if(*point == *vertex){
+					Point_2 a = *vertex;	// point in box
+					--vertex;
+					Point_2 b = *vertex;	// previous point
+					++vertex; 
+					++vertex;
+					Point_2 c = *vertex;	// next point
+
+					// the two lines from point in box
+					Segment_2 lineA = Segment_2(b, a);
+					Segment_2 lineB = Segment_2(a, c);
+
+					pointsInBox.erase(point);
+
+					if(CGAL::do_intersect(line1, lineA) || CGAL::do_intersect(line1, lineB) || CGAL::do_intersect(line2, lineA) || CGAL::do_intersect(line2, lineB))
+						validPointSwap = false;
+
+					--vertex;
+					break;
+				}
+			
+			if(!validPointSwap)
 				break;
-			}
+
+			//swap points in polygon and return;
+		}
+
+		if(!validPointSwap)
+			continue;
 	}
+	
 }
 
 void globalTransitionStep(Polygon_2 &polygon){

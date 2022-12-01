@@ -7,7 +7,6 @@
 #include "../headers/incremental.hpp"
 #include "../headers/utils.hpp"
 
-
 Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points, char* annealing, bool max, int L){
 
 	srand(time(0));
@@ -51,36 +50,98 @@ Polygon_2* simulated_annealing::simulatedAnnealingWithSubdivision(std::vector<Po
 
 void localTransitionStep(Polygon_2 &polygon, Tree &kdTree){
 	//take a random point in polygon to swap
-	int randomPoint = rand() % polygon.size();
+	int randomPoint = 1 + (rand() % (polygon.size() - 2));
 
-	int i = 0;
-	Polygon_2::Vertex_iterator pointA, pointB;
+	std::cout << "random point : " << randomPoint << std::endl;
+
+	int i = randomPoint;
+
+	Point_2 p, q, r, s; // q and r are the points to be exchanged. p is previous to q and s is next to r
+	p = polygon[i-1];
+	q = polygon[i];
+	r = polygon[i+1];
+	s = polygon[i+2];
+
+	int maxX = maxCoordinateX(p, q, r, s);
+	int minX = minCoordinateX(p, q, r, s);
+	int maxY = maxCoordinateY(p, q, r, s);
+	int minY = minCoordinateY(p, q, r, s);
+	
+	std::vector<Point_2> pointsInBox;
+	Fuzzy_iso_box searchBox(Point_2(minX, minY), Point_2(maxX, maxY));
+	kdTree.search(std::back_inserter(pointsInBox), searchBox);
+
+	// new lines
+	Segment_2 line1 = Segment_2(p, r);
+	Segment_2 line2 = Segment_2(q, s);
+	
 	for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
-		
 
-		if(i == randomPoint){
-			pointA = vertex;
-			if(++vertex == polygon.end())
-				pointB = polygon.begin();
-			else
-				pointB = vertex;
-				
-			std::vector<Point_2> pointsInBox;
-			//Fuzzy_iso_box searchBox(Point_d((double)pointA->x(), (double)pointA->y()), Point_d(pointB->x(), pointB->y()));
-			Fuzzy_iso_box searchBox(Point_2(pointA->x(), pointA->y()), Point_2(pointB->x(), pointB->y()));
-			kdTree.search(std::back_inserter(pointsInBox), searchBox);
+		for(std::vector<Point_2>::iterator point = pointsInBox.begin(); point != pointsInBox.end(); point++)
+			if(*point == *vertex){
+				Point_2 a = *vertex;	// point in box
+				--vertex;
+				Point_2 b = *vertex;	// previous point
+				++vertex; 
+				++vertex;
+				Point_2 c = *vertex;	// next point
 
-			for(Point_2 p : pointsInBox)
-				std::cout << p << std::endl;
-
-			break;
-		}
+				// the two lines from point in box
+				Segment_2 lineA = Segment_2(b, a);
+				Segment_2 lineB = Segment_2(a, c);
 
 
-		i++;
+				pointsInBox.erase(point);
+				--vertex;
+				break;
+			}
 	}
 }
 
 void globalTransitionStep(Polygon_2 &polygon){
+	int x = 0;
+}
 
+int maxCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+	int max = p.x();
+	if(q.x() > max)	
+		max = q.x();
+	if(r.x() > max)
+		max = r.x();
+	if(s.x() > max)
+		max = s.x();
+	return max;
+}
+
+int maxCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+	int max = p.y();
+	if(q.y() > max)	
+		max = q.y();
+	if(r.y() > max)
+		max = r.y();
+	if(s.y() > max)
+		max = s.y();
+	return max;
+}
+
+int minCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+	int min = p.x();
+	if(q.x() < min)	
+		min = q.x();
+	if(r.x() < min)
+		min = r.x();
+	if(s.x() < min)
+		min = s.x();
+	return min;
+}
+
+int minCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+	int min = p.y();
+	if(q.y() < min)	
+		min = q.y();
+	if(r.y() < min)
+		min = r.y();
+	if(s.y() < min)
+		min = s.y();
+	return min;
 }

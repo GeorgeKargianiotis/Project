@@ -49,53 +49,100 @@ Polygon_2* simulated_annealing::simulatedAnnealingWithSubdivision(std::vector<Po
 }
 
 void localTransitionStep(Polygon_2 &polygon, Tree &kdTree){
-	//take a random point in polygon to swap
-	int randomPoint = 1 + (rand() % (polygon.size() - 2));
-
-	std::cout << "random point : " << randomPoint << std::endl;
-
-	int i = randomPoint;
-
-	Point_2 p, q, r, s; // q and r are the points to be exchanged. p is previous to q and s is next to r
-	p = polygon[i-1];
-	q = polygon[i];
-	r = polygon[i+1];
-	s = polygon[i+2];
-
-	int maxX = maxCoordinateX(p, q, r, s);
-	int minX = minCoordinateX(p, q, r, s);
-	int maxY = maxCoordinateY(p, q, r, s);
-	int minY = minCoordinateY(p, q, r, s);
+	bool validPointSwap;
 	
-	std::vector<Point_2> pointsInBox;
-	Fuzzy_iso_box searchBox(Point_2(minX, minY), Point_2(maxX, maxY));
-	kdTree.search(std::back_inserter(pointsInBox), searchBox);
+	while(1){
 
-	// new lines
-	Segment_2 line1 = Segment_2(p, r);
-	Segment_2 line2 = Segment_2(q, s);
-	
-	for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+		//take a random point in polygon to swap
+		int randomPoint = 1 + (rand() % (polygon.size() - 2));
 
-		for(std::vector<Point_2>::iterator point = pointsInBox.begin(); point != pointsInBox.end(); point++)
-			if(*point == *vertex){
-				Point_2 a = *vertex;	// point in box
-				--vertex;
-				Point_2 b = *vertex;	// previous point
-				++vertex; 
-				++vertex;
-				Point_2 c = *vertex;	// next point
+		Point_2 p, q, r, s; // q and r are the points to be exchanged. p is previous to q and s is next to r
+		p = polygon[randomPoint-1];
+		q = polygon[randomPoint];
+		r = polygon[randomPoint+1];
+		s = polygon[randomPoint+2];
 
-				// the two lines from point in box
-				Segment_2 lineA = Segment_2(b, a);
-				Segment_2 lineB = Segment_2(a, c);
+		//find max and min coordianates to form the search box
+		int maxX = maxCoordinateX(p, q, r, s);
+		int minX = minCoordinateX(p, q, r, s);
+		int maxY = maxCoordinateY(p, q, r, s);
+		int minY = minCoordinateY(p, q, r, s);
+		
+		//find the points of polygon in the box
+		std::vector<Point_2> pointsInBox;
+		Fuzzy_iso_box searchBox(Point_2(minX, minY), Point_2(maxX, maxY));
+		kdTree.search(std::back_inserter(pointsInBox), searchBox);
 
+		// new lines
+		Segment_2 line1 = Segment_2(p, r);
+		Segment_2 line2 = Segment_2(q, s);
 
-				pointsInBox.erase(point);
-				--vertex;
+		// if new lines intersect each other try again
+		if(CGAL::do_intersect(line1, line2))
+			continue;
+		
+		//check if lines from points in box intersect with new lines
+		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+
+			validPointSwap = true;
+
+			for(std::vector<Point_2>::iterator point = pointsInBox.begin(); point != pointsInBox.end(); point++){
+				if(*point == *vertex){
+					Point_2 a = *vertex;	// point in box
+					--vertex;
+					Point_2 b = *vertex;	// previous point
+					++vertex; 
+					++vertex;
+					Point_2 c = *vertex;	// next point
+
+					if(a == q || b == q || c == q || a == r || b == r || c == r)
+						continue;
+
+					// the two lines from point in box
+					Segment_2 lineA = Segment_2(b, a);
+					Segment_2 lineB = Segment_2(a, c);
+
+					pointsInBox.erase(point);
+
+					if(CGAL::do_intersect(line1, lineA) || CGAL::do_intersect(line1, lineB) || CGAL::do_intersect(line2, lineA) || CGAL::do_intersect(line2, lineB))
+						validPointSwap = false;
+
+					--vertex;
+					break;
+				}
+			}
+			
+			if(!validPointSwap)
+				break;
+		}
+
+		// if a line intersect with one of the new lines, try again
+		if(!validPointSwap)
+			continue;
+
+		utils::polygonToPythonArray(polygon);	
+		
+
+		//swap points in polygon and return;
+		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+			if(*vertex == p){
+				Polygon_2::Vertex_iterator vq = ++vertex; 
+				Polygon_2::Vertex_iterator vr = ++vertex; 
+				Polygon_2::Vertex_iterator vs = ++vertex; 
+
+				polygon.erase(vq);
+				polygon.erase(vr);
+				polygon.insert(vs, *vq);
+				polygon.insert(vq, *vr);
 				break;
 			}
+		}
+
+		utils::polygonToPythonArray(polygon);	
+		if(!polygon.is_simple())
+			exit(1);
 	}
+	
 }
 
 void globalTransitionStep(Polygon_2 &polygon){

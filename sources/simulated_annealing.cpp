@@ -139,6 +139,8 @@ void localTransitionStep(Polygon_2 &polygon, Tree &kdTree){
 		}
 
 		utils::polygonToPythonArray(polygon);	
+		if(!polygon.is_simple())
+			exit(1);
 	}
 	
 }

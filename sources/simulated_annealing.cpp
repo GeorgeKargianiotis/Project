@@ -54,7 +54,8 @@ void localTransitionStep(Polygon_2 &polygon, Tree &kdTree){
 	while(1){
 
 		//take a random point in polygon to swap
-		int randomPoint = 1 + (rand() % (polygon.size() - 2));
+		//int randomPoint = 1 + (rand() % (polygon.size() - 2));
+		int randomPoint = 40;
 
 		Point_2 p, q, r, s; // q and r are the points to be exchanged. p is previous to q and s is next to r
 		p = polygon[randomPoint-1];
@@ -67,7 +68,9 @@ void localTransitionStep(Polygon_2 &polygon, Tree &kdTree){
 		int minX = minCoordinateX(p, q, r, s);
 		int maxY = maxCoordinateY(p, q, r, s);
 		int minY = minCoordinateY(p, q, r, s);
-		
+
+		std::cout << '[' << minX << ',' << minY << "]," << '[' << maxX << ',' << minY << "]," << '[' << maxX << ',' << maxY << "]," << '[' << minX << ',' << maxY << "]," << '[' << minX << ',' << minY << ']' << std::endl;
+
 		//find the points of polygon in the box
 		std::vector<Point_2> pointsInBox;
 		Fuzzy_iso_box searchBox(Point_2(minX, minY), Point_2(maxX, maxY));
@@ -123,20 +126,37 @@ void localTransitionStep(Polygon_2 &polygon, Tree &kdTree){
 		utils::polygonToPythonArray(polygon);	
 		
 
-		//swap points in polygon and return;
-		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
-			if(*vertex == p){
-				Polygon_2::Vertex_iterator vq = ++vertex; 
-				Polygon_2::Vertex_iterator vr = ++vertex; 
-				Polygon_2::Vertex_iterator vs = ++vertex; 
+		//remove points from polygon;
+		// for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+		// 	if(*vertex == p){
+		// 		Polygon_2::Vertex_iterator vq = ++vertex; 
+		// 		Polygon_2::Vertex_iterator vr = ++vertex; 
+		// 		Polygon_2::Vertex_iterator vs = ++vertex; 
 
-				polygon.erase(vq);
-				polygon.erase(vr);
-				polygon.insert(vs, *vq);
-				polygon.insert(vq, *vr);
-				break;
-			}
+		// 		polygon.erase(vq);
+		// 		polygon.erase(vr);
+		// 		break;
+		// 	}
+		// }
+
+		 for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+		 	if(*vertex == q)
+				vertex = polygon.erase(vertex);
+			if(*vertex == r)
+				vertex = polygon.erase(vertex);
 		}
+
+		//insert points again in reverse order
+		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+			if(*vertex == s)
+				polygon.insert(vertex, q);
+		}
+
+		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+			if(*vertex == q)
+				polygon.insert(vertex, r);
+		}
+
 
 		utils::polygonToPythonArray(polygon);	
 		if(!polygon.is_simple())

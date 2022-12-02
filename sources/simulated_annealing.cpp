@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include <time.h>
+#include <CGAL/intersections.h>
 
 #include "../headers/simulated_annealing.hpp"
 #include "../headers/incremental.hpp"
@@ -40,6 +41,8 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 
 	}
 
+	std::cout << "success\n";
+
 	return nullptr;
 }
 
@@ -54,8 +57,7 @@ void localTransitionStep(Polygon_2 &polygon, Tree &kdTree){
 	while(1){
 
 		//take a random point in polygon to swap
-		//int randomPoint = 1 + (rand() % (polygon.size() - 2));
-		int randomPoint = 40;
+		int randomPoint = 1 + (rand() % (polygon.size() - 2));
 
 		Point_2 p, q, r, s; // q and r are the points to be exchanged. p is previous to q and s is next to r
 		p = polygon[randomPoint-1];
@@ -69,7 +71,7 @@ void localTransitionStep(Polygon_2 &polygon, Tree &kdTree){
 		int maxY = maxCoordinateY(p, q, r, s);
 		int minY = minCoordinateY(p, q, r, s);
 
-		std::cout << '[' << minX << ',' << minY << "]," << '[' << maxX << ',' << minY << "]," << '[' << maxX << ',' << maxY << "]," << '[' << minX << ',' << maxY << "]," << '[' << minX << ',' << minY << ']' << std::endl;
+		//std::cout << '[' << minX << ',' << minY << "]," << '[' << maxX << ',' << minY << "]," << '[' << maxX << ',' << maxY << "]," << '[' << minX << ',' << maxY << "]," << '[' << minX << ',' << minY << ']' << std::endl;
 
 		//find the points of polygon in the box
 		std::vector<Point_2> pointsInBox;
@@ -79,6 +81,25 @@ void localTransitionStep(Polygon_2 &polygon, Tree &kdTree){
 		// new lines
 		Segment_2 line1 = Segment_2(p, r);
 		Segment_2 line2 = Segment_2(q, s);
+
+		//checks if the line before p intersects with line q s
+		Point_2 t;
+		if(randomPoint - 2 >= 0)
+			t = polygon[randomPoint - 2];
+		else
+			t = polygon[polygon.size() - 1]; 	//if p is the first point in polygon
+		Segment_2 lineT = Segment_2(t, p);
+		if(CGAL::do_intersect(line2, lineT))
+			continue;
+
+		//checks if the line after s intersects with line p r 
+		if(randomPoint + 3 < polygon.size())
+			t = polygon[randomPoint + 3];
+		else
+			t = polygon[0];			//if s is the last point in polygon
+		lineT = Segment_2(s, t);
+		if(CGAL::do_intersect(line1, lineT))
+			continue;
 
 		// if new lines intersect each other try again
 		if(CGAL::do_intersect(line1, line2))
@@ -123,46 +144,45 @@ void localTransitionStep(Polygon_2 &polygon, Tree &kdTree){
 		if(!validPointSwap)
 			continue;
 
-		utils::polygonToPythonArray(polygon);	
-		
-
 		//remove points from polygon;
-		// for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
-		// 	if(*vertex == p){
-		// 		Polygon_2::Vertex_iterator vq = ++vertex; 
-		// 		Polygon_2::Vertex_iterator vr = ++vertex; 
-		// 		Polygon_2::Vertex_iterator vs = ++vertex; 
+		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+		 	if(*vertex == q){
+				polygon.erase(vertex);
+				break;
+			}
+		}
 
-		// 		polygon.erase(vq);
-		// 		polygon.erase(vr);
-		// 		break;
-		// 	}
-		// }
-
-		 for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
-		 	if(*vertex == q)
-				vertex = polygon.erase(vertex);
-			if(*vertex == r)
-				vertex = polygon.erase(vertex);
+		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+			if(*vertex == r){
+				polygon.erase(vertex);
+				break;
+			}
 		}
 
 		//insert points again in reverse order
 		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
-			if(*vertex == s)
+			if(*vertex == s){
 				polygon.insert(vertex, q);
+				break;
+			}
 		}
 
 		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
-			if(*vertex == q)
+			if(*vertex == q){
 				polygon.insert(vertex, r);
+				break;
+			}
 		}
 
 
-		utils::polygonToPythonArray(polygon);	
-		if(!polygon.is_simple())
-			exit(1);
+		// utils::polygonToPythonArray(polygon);	
+		// if(!polygon.is_simple()){
+		// 	std::cout << "Not ok\n";
+		// 	exit(1);
+		// }
+		// else
+	 	break;
 	}
-	
 }
 
 void globalTransitionStep(Polygon_2 &polygon){

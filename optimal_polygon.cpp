@@ -46,6 +46,15 @@ int main(int argc, char* argv[]){
 			simulated_annealing::simulatedAnnealingWithSubdivision(points, max);
 	}
 
+	if(std::string(algorithm).compare("local_search") == 0){
+		if(max){
+			local_search::local_search_algorithm(polygon, outFile, std::stoi(L), "max", std::stoi(threshold));
+		}
+		else if (min){
+			local_search::local_search_algorithm(polygon, outFile, std::stoi(L), "min", std::stoi(threshold));
+		}
+	}
+
 	outFile.close();
 
 	return 0;

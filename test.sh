@@ -4,4 +4,5 @@
 #./polygonization -i ../images/euro-night-0000200.instance -o output.txt -algorithm convex_hull -edge_selection 1
 #./optimal_polygon -i ../images/euro-night-0000100.instance -o output.txt -algorithm simulated_annealing -edge_selection 2 -initialization 2a
 #./optimal_polygon -i ../images/euro-night-0000100.instance -o output.txt -algorithm simulated_annealing -max -annealing local -L 10
+#./optimal_polygon -i ../images/euro-night-0000100.instance -o output.txt -algorithm local_search -L 10 -max -threshhold 50.0
 ./optimal_polygon -i ../images/euro-night-0000100.instance -o output.txt -algorithm simulated_annealing -L 10  -annealing local -max

@@ -17,7 +17,8 @@ struct change{
 
 void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold){
 	// Amount of points we can switch
-	double optimal;
+	double optimal = DBL_MAX;
+	bool error = false, apply = false;
 	std::vector<Point_2> Points;
 	std::vector<Point_2> Examined;
 	std::vector<Change> allchanges;
@@ -28,56 +29,76 @@ void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int
 	newpol = old;
 
 	// LEFT TO DO
-	// EXAMINED ARRAY TO CALCULATE MOVES LEFT
-	// CHANGES TO OLD/NEW POLYGON
 	// CONTINUES
-	
 
 	while (optimal >= threshhold){
+
+		for(Polygon_2::Vertex_iterator vertex = old.begin(); vertex != old.end(); vertex++){
+			Examined.push_back(*vertex);
+		}
+
 		for(Polygon_2::Edge_const_iterator edge = old.edges().begin(); edge != old.edges().end(); edge++){
 			//Use Examined Vector for searches
-			for(Polygon_2::Vertex_iterator vertex = old.begin(); vertex != old.end(); vertex++){
+			for(auto iter = Examined.begin(); iter != Examined.end(); iter++){
 				//Add single point to chain, if we still have space
 				if (Points.size() < L){
-					Points.push_back(*vertex);
-				}
-				newpol.erase(vertex);
-				if (local_search::InsertPointForLS(newpol, edge->start(), edge->end(), *vertex) == 0){
-					std::cout << "Testing Point" << std::endl;
-				}
-
-				// Visibility check, point must be able to "see" every edge
-				for(Polygon_2::Edge_const_iterator edge = newpol.edges().begin(); edge != newpol.edges().end(); edge++){
-					if(!CGAL::do_intersect(Segment_2(edge->start(), *vertex), Segment_2(*vertex, edge->end())))
-						std::cerr << "Visibility error" << std::endl;
-				}
-
-				if(!newpol.is_simple()){
-					std::cerr << "Simplicity error" << std::endl;
-				}
-				//Move points in reverse order (end point of chain then start point) 
-				if (std::string(area).compare("max") == 0){
-					if (newpol.area() - old.area() >= threshhold){
-						//Change temp;
-						temp.edge = edge;
-						temp.Points.push_back(*vertex);
+					Points.push_back(*iter);
+				
+					newpol.erase(iter);
+					if (local_search::InsertPointForLS(newpol, edge->start(), edge->end(), *iter) == 0){
+						std::cout << "Testing Point" << std::endl;
 					}
-				}
-				else if (std::string(area).compare("min") == 0){
-					if (old.area() - newpol.area() >= threshhold){
-						//Change temp;
-						temp.edge = edge;
-						temp.Points.push_back(*vertex);
-					}
-				}
-				else{
-					std::cerr << "Wrong arguments given! " << std::endl;
-					exit(EXIT_FAILURE);
-				}
 
+					// Visibility check, point must be able to "see" every edge
+					for(Polygon_2::Edge_const_iterator edge = newpol.edges().begin(); edge != newpol.edges().end(); edge++){
+						if(!CGAL::do_intersect(Segment_2(edge->start(), *iter), Segment_2(*iter, edge->end())))
+							std::cerr << "Visibility error" << std::endl;
+							error = true;
+					}
+
+					if(!newpol.is_simple()){
+						std::cerr << "Simplicity error" << std::endl;
+						error = true;
+					}
+
+					if(error){
+						newpol = old;
+						error = false;
+						continue;
+					}
+
+					
+					if (std::string(area).compare("max") == 0){
+						if (newpol.area() - old.area() > 0){
+							temp.edge = edge;
+							temp.Points.push_back(*iter);
+						}
+						else if (temp.Points.size() > 0){
+							Points.pop_back();
+							apply = true;
+						}
+					}
+					else if (std::string(area).compare("min") == 0){
+						if (old.area() - newpol.area() > 0){
+							temp.edge = edge;
+							temp.Points.push_back(*iter);
+						}
+						else if (temp.Points.size() > 0){
+							Points.pop_back();
+							apply = true;
+						}
+					}
+					else{
+						std::cerr << "Wrong arguments given! " << std::endl;
+						exit(EXIT_FAILURE);
+					}
+				}	
 			}
-			local_search::ApplyChanges(old, temp);
+			allchanges.push_back(temp);
+			Change temp2;
+			temp = temp2;
 		}
+	local_search::ApplyChanges(old, allchanges);
 	}
 }	
 
@@ -114,22 +135,25 @@ int local_search::InsertPointForLS(Polygon_2 &polygon, const Point_2 &begin, con
 	return 0;
 }
 
-void local_search::ApplyChanges(Polygon_2 &polygon, Change mychange){
+void local_search::ApplyChanges(Polygon_2 &polygon, std::vector<Change> allchanges){
 	//Insert First One with the given edge, then 
-	if (local_search::InsertPointForLS(polygon, mychange.edge->start(), mychange.edge->end(), mychange.Points.back()) == 0){
-		std::cout << "Testing Point" << std::endl;
-	}
-
-	mychange.Points.pop_back();
-
-	for (auto iter=mychange.Points.end(); iter!=mychange.Points.begin(); iter--){
-		for (Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++){
-			if(edge->start() == *iter){
-				if (local_search::InsertPointForLS(polygon, edge->start(), edge->end(), *iter) == 0){
-					std::cout << "Testing Point" << std::endl;
-				}
-			}		
+	for(auto iter = allchanges.begin(); iter != allchanges.end(); iter++){
+		Change mychange = *iter;
+		if (local_search::InsertPointForLS(polygon, mychange.edge->start(), mychange.edge->end(), mychange.Points.back()) == 0){
+			std::cout << "Testing Point" << std::endl;
 		}
+
+		mychange.Points.pop_back();
+
+		for (auto iter=mychange.Points.end(); iter!=mychange.Points.begin(); iter--){
+			for (Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++){
+				if(edge->start() == *iter){
+					if (local_search::InsertPointForLS(polygon, edge->start(), edge->end(), *iter) == 0){
+						std::cout << "Testing Point" << std::endl;
+					}
+				}		
+			}
+		}	
 	}	
 }
 

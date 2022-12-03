@@ -18,6 +18,8 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 	incremental::incrementalAlgorithm(points, initialization, 1, polygon);
 	incremental::getConvexHullPolygonFromPoints(polygon.vertices(), convexHullPolygon);
 
+	std::cout << "Area before: " << polygon.area() << std::endl;
+
 	double energy = 0, temperature = 1, DE, R = rand() / (RAND_MAX);
 	double convexHullArea = convexHullPolygon.area();
 	double polygonArea = polygon.area();
@@ -31,18 +33,14 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 	for(int i = 0; i < L; i++){
 
 		int indexOfFirstPoint;
+		double areaRemoved = 0.0, areaAdded = 0.0;
 
-		if(strcmp(annealing, "local") == 0){
-
-			double areaRemoved = 0.0, areaAdded = 0.0;
-
+		if(strcmp(annealing, "local") == 0)
 			localTransitionStep(polygon, areaRemoved, areaAdded, indexOfFirstPoint);
-
-			polygonAreaAfterStep = polygonArea - areaRemoved + areaAdded;
-		}
-		else{
+		else
 			globalTransitionStep(polygon);
-		}
+
+		polygonAreaAfterStep = polygonArea - areaRemoved + areaAdded;
 
 		//check if step is acceptable
 		if(max){
@@ -50,21 +48,24 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 			DE = energyAfterStep - energy;
 			if(DE > 0 || exp(-DE / temperature) > R)
 				energy = energyAfterStep;
-			else{
-				// if step is not acceptable, undo change
-				swapTwoPoints(polygon, indexOfFirstPoint);
-			}
-
+			else
+				swapTwoPoints(polygon, indexOfFirstPoint); // if step is not acceptable, undo the step 
 		}
 		else{
 			energyAfterStep = points.size() * polygonAreaAfterStep / convexHullArea;
 			DE = energyAfterStep - energy;
-			if(DE < 0 || exp(-DE / temperature) > R){
-
-			}
+			if(DE < 0 || exp(-DE / temperature) > R)
+				energy = energyAfterStep;
+			else
+				swapTwoPoints(polygon, indexOfFirstPoint); // if step is not acceptable, undo the step
 		}
 
+		//reduce temperature	
+		temperature = temperature - 1 / L;
+
 	}
+
+	std::cout << "Area after: " << polygon.area() << std::endl;
 
 	std::cout << "success\n";
 

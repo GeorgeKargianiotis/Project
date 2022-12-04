@@ -8,10 +8,11 @@ namespace simulated_annealing{
 	Polygon_2* simulatedAnnealingWithSubdivision(std::vector<Point_2> &points, bool max);
 } 
 
-void localTransitionStep(Polygon_2 &polygon, double &areaRemoved, double &areaAdded, int &indexOfFirstPoint);
-void globalTransitionStep(Polygon_2 &polygon);
+void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfFirstPoint);
+void globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfPoint, int &indexOfNewPlace);
 
 void swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint);
+void changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNewPosition);
 int triangleOrientation(Point_2 &a, Point_2 &b, Point_2 &c);
 
 int maxCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s);

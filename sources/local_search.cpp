@@ -61,9 +61,12 @@ void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int
 					}
 
 					if(error){
-						newpol = old;
 						error = false;
-						continue;
+						// No Point  in chain, so no change that needs to be done
+						if (Points.size() == 0){
+							newpol = old;
+							continue;
+						}	
 					}
 
 					// Depending on user, determine if the new polygon is bigger or smaller
@@ -71,6 +74,7 @@ void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int
 						if (newpol.area() - old.area() > 0){
 							temp.edge = edge;
 							temp.Points.push_back(*vertex);
+							apply = true;
 						}
 						else if (temp.Points.size() > 0){
 							Points.pop_back();
@@ -81,6 +85,7 @@ void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int
 						if (old.area() - newpol.area() > 0){
 							temp.edge = edge;
 							temp.Points.push_back(*vertex);
+							apply = true;
 						}
 						else if (temp.Points.size() > 0){
 							Points.pop_back();
@@ -91,11 +96,17 @@ void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int
 						std::cerr << "Wrong arguments given! " << std::endl;
 						exit(EXIT_FAILURE);
 					}
+					// We appllied the change, so we need to keep working on new 
+					old = newpol;
 				}	
 			}
-			allchanges.push_back(temp);
-			Change temp2;
-			temp = temp2;
+			if(apply){
+				allchanges.push_back(temp);
+				Change temp2;
+				temp = temp2;
+				Points.clear();
+				apply = false;
+			}	
 		}
 	// After going through every point for a specific edge, apply the changes and update the optimal change	
 	newpol = old;	

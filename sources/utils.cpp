@@ -82,6 +82,23 @@ void utils::printOutput(Polygon_2 &polygon, std::vector<Point_2> &points, Polygo
 	std::cout << "newPoint = [[" << newPoint.x() << ", " << newPoint.y() << "]]" << "\n";
 }
 
+void utils::printOutput2(Polygon_2 &polygonAfterStep, std::vector<Point_2> &pointsInBox, Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+	std::cout << "points = [\n";
+	for(auto point : polygonAfterStep.vertices())
+		std::cout << "[" << point.x() << "," << point.y() << "],";
+	std::cout << "\b \b";
+	std::cout << "]\n";
+	utils::polygonToPythonArray(polygonAfterStep, "polygonAfterStep");
+	std::cout << "pointsInBox= [\n";
+	for(auto point : pointsInBox)
+		std::cout << "[" << point.x() << "," << point.y() << "],";
+	std::cout << "\b \b";
+	std::cout << "]\n";
+	std::cout << "pqrs = [\n";
+		std::cout << '[' << p.x() << ',' << p.y() << "]," << '[' << q.x() << ',' << q.y() << "]," << '[' << r.x() << ',' << r.y() << "]," << '[' << s.x() << ',' << s.y() << "]," << '[' << p.x() << ',' << p.y() << ']' << std::endl;
+	std::cout << "]\n";
+}
+
 bool utils::cmp1aPoint2(Point_2 &point1, Point_2 &point2){
 	if(point1.x() < point2.x())
 		return true;

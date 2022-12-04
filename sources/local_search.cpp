@@ -20,7 +20,6 @@ void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int
 	double optimal = DBL_MAX;
 	bool error = false, apply = false;
 	std::vector<Point_2> Points;
-	std::vector<Point_2> Examined;
 	std::vector<Change> allchanges;
 	Polygon_2 old;
 	Change temp;
@@ -28,30 +27,30 @@ void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int
 	old = greedypolygon;
 	newpol = old;
 
-	// LEFT TO DO
-	// CONTINUES
+	// Setting Time For Algorithm
+	auto start = std::chrono::high_resolution_clock::now();
+
+	srand(time(NULL));
 
 	while (optimal >= threshhold){
 
-		for(Polygon_2::Vertex_iterator vertex = old.begin(); vertex != old.end(); vertex++){
-			Examined.push_back(*vertex);
-		}
-
+		//For every edge, find paths of maximum L points and see if changing them is beneficial	
 		for(Polygon_2::Edge_const_iterator edge = old.edges().begin(); edge != old.edges().end(); edge++){
-			//Use Examined Vector for searches
-			for(auto iter = Examined.begin(); iter != Examined.end(); iter++){
+			
+			for(Polygon_2::Vertex_iterator vertex = old.begin(); vertex != old.end(); vertex++){
 				//Add single point to chain, if we still have space
 				if (Points.size() < L){
-					Points.push_back(*iter);
+					Points.push_back(*vertex);
 				
-					newpol.erase(iter);
-					if (local_search::InsertPointForLS(newpol, edge->start(), edge->end(), *iter) == 0){
+					// Make the change and test the new polygon
+					newpol.erase(vertex);
+					if (local_search::InsertPointForLS(newpol, edge->start(), edge->end(), *vertex) == 0){
 						std::cout << "Testing Point" << std::endl;
 					}
 
 					// Visibility check, point must be able to "see" every edge
 					for(Polygon_2::Edge_const_iterator edge = newpol.edges().begin(); edge != newpol.edges().end(); edge++){
-						if(!CGAL::do_intersect(Segment_2(edge->start(), *iter), Segment_2(*iter, edge->end())))
+						if(!CGAL::do_intersect(Segment_2(edge->start(), *vertex), Segment_2(*vertex, edge->end())))
 							std::cerr << "Visibility error" << std::endl;
 							error = true;
 					}
@@ -67,11 +66,11 @@ void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int
 						continue;
 					}
 
-					
+					// Depending on user, determine if the new polygon is bigger or smaller
 					if (std::string(area).compare("max") == 0){
 						if (newpol.area() - old.area() > 0){
 							temp.edge = edge;
-							temp.Points.push_back(*iter);
+							temp.Points.push_back(*vertex);
 						}
 						else if (temp.Points.size() > 0){
 							Points.pop_back();
@@ -81,7 +80,7 @@ void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int
 					else if (std::string(area).compare("min") == 0){
 						if (old.area() - newpol.area() > 0){
 							temp.edge = edge;
-							temp.Points.push_back(*iter);
+							temp.Points.push_back(*vertex);
 						}
 						else if (temp.Points.size() > 0){
 							Points.pop_back();
@@ -98,8 +97,22 @@ void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int
 			Change temp2;
 			temp = temp2;
 		}
+	// After going through every point for a specific edge, apply the changes and update the optimal change	
+	newpol = old;	
 	local_search::ApplyChanges(old, allchanges);
+	if (std::string(area).compare("max") == 0){
+		optimal = old.area() - newpol.area();
 	}
+	else if (std::string(area).compare("min") == 0){
+		optimal = newpol.area() - old.area();
+	}
+	}
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+
+	//write output
+	utils::writeToOutputFile(outFile, Points, old, greedypolygon, 0, std::abs(old.area()), executionTime.count(), "none");
+	std::cout << "Success" << std::endl;
 }	
 
 int local_search::InsertPointForLS(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint){
@@ -136,7 +149,7 @@ int local_search::InsertPointForLS(Polygon_2 &polygon, const Point_2 &begin, con
 }
 
 void local_search::ApplyChanges(Polygon_2 &polygon, std::vector<Change> allchanges){
-	//Insert First One with the given edge, then 
+	//Insert First One with the given edge, then insert the other in reverse
 	for(auto iter = allchanges.begin(); iter != allchanges.end(); iter++){
 		Change mychange = *iter;
 		if (local_search::InsertPointForLS(polygon, mychange.edge->start(), mychange.edge->end(), mychange.Points.back()) == 0){

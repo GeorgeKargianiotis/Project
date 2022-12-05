@@ -15,7 +15,7 @@ struct change{
 	Polygon_2::Edge_const_iterator edge;
 };
 
-void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold){
+void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold){
 	// Amount of points we can switch
 	double optimal = DBL_MAX;
 	bool error = false, apply = false;
@@ -55,7 +55,7 @@ void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int
 							error = true;
 					}
 
-					if(!newpol.is_simple()){
+					if(newpol.is_simple()){
 						std::cerr << "Simplicity error" << std::endl;
 						error = true;
 					}
@@ -98,13 +98,27 @@ void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int
 					}
 					// We appllied the change, so we need to keep working on new 
 					old = newpol;
+				}
+				else{
+					apply = true;
+					if(apply){
+						allchanges.push_back(temp);
+						Change temp2;
+						temp = temp2;
+						if (Points.size() != 0){
+							Points.clear();
+						}
+						apply = false;
+					}	
 				}	
 			}
 			if(apply){
 				allchanges.push_back(temp);
 				Change temp2;
 				temp = temp2;
-				Points.clear();
+				if (Points.size() != 0){
+					Points.clear();
+				}
 				apply = false;
 			}	
 		}

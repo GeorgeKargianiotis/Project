@@ -37,7 +37,8 @@ int main(int argc, char* argv[]){
 	//get the starting simple polygon
 	char initialization[2] = {'2', 'a'};
 	Polygon_2 polygon;
-	//incremental::incrementalAlgorithm(points, initialization, 2, polygon);
+	std::cout << "Calling Incremental" << std::endl;
+	incremental::incrementalAlgorithm(points, initialization, 2, polygon);
 
 	if(std::string(algorithm).compare("simulated_annealing") == 0){
 		if(std::string(annealing).compare("subdivision") != 0)

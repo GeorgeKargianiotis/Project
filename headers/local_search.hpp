@@ -11,4 +11,5 @@ namespace local_search {
 	void ApplyChanges(Polygon_2 &polygon, std::vector<Change> allchanges);
 } 
 
+
 #endif

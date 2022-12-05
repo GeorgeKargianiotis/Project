@@ -12,14 +12,12 @@ namespace utils{
 	void polygonToPythonArray(Polygon_2 &polygon, const std::string &name = "polygon");
 	void vectorToPythonArray(std::vector<Point_2> &points);
 	void printOutput(Polygon_2 &polygon, std::vector<Point_2> &points, Polygon_2 &convexHullPolygon, std::vector<Segment_2> &redEdges, std::vector<Segment_2> &visibleEdges, Point_2 &newPoint);
+	void printOutput2(Polygon_2 &polygonAfterStep, std::vector<Point_2> &pointsInBox, Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s);
 	
 	bool cmp1aPoint2(Point_2 &point1, Point_2 &point2);
 	bool cmp1bPoint2(Point_2 &point1, Point_2 &point2);
 	bool cmp2aPoint2(Point_2 &point1, Point_2 &point2);
 	bool cmp2bPoint2(Point_2 &point1, Point_2 &point2);
-
-	//void local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold);
-	//void simulated_annealing_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile);	
 }
 
 #endif

@@ -34,20 +34,18 @@ int main(int argc, char* argv[]){
 
 	inFile.close();
 
-	//get the starting simple polygon
-	char initialization[2] = {'2', 'a'};
-	Polygon_2 polygon;
-	std::cout << "Calling Incremental" << std::endl;
-	incremental::incrementalAlgorithm(points, initialization, 2, polygon);
-
 	if(std::string(algorithm).compare("simulated_annealing") == 0){
 		if(std::string(annealing).compare("subdivision") != 0)
 			simulated_annealing::simulatedAnnealing(points, annealing, max, std::stoi(L));
 		else
 			simulated_annealing::simulatedAnnealingWithSubdivision(points, max);
 	}
+	else if(std::string(algorithm).compare("local_search") == 0){
+		//get the starting simple polygon
+		char initialization[2] = {'2', 'a'};
+		Polygon_2 polygon;
+		incremental::incrementalAlgorithm(points, initialization, 2, polygon);
 
-	if(std::string(algorithm).compare("local_search") == 0){
 		if(max){
 			local_search::local_search_algorithm(polygon, outFile, std::stoi(L), "max", std::stoi(threshold));
 		}

@@ -1,7 +1,6 @@
 {
 	"cmake.configureOnOpen": false,
 	"files.associations": {
-<<<<<<< HEAD
 		"cctype": "cpp",
 		"clocale": "cpp",
 		"cmath": "cpp",
@@ -65,8 +64,5 @@
 		"typeinfo": "cpp",
 		"variant": "cpp",
 		"bit": "cpp"
-=======
-		"chrono": "cpp"
->>>>>>> master
 	}
 }

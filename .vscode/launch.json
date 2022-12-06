@@ -12,16 +12,16 @@
 			"program": "${workspaceFolder}/optimal_polygon",
 			"args": [
 				"-i",
-				"../images/euro-night-0001000.instance",
+				"euro-night-0000200.instance",
 				"-o", 
 				"output.txt",
 				"-algorithm",
-				"simulated_annealing",
+				"local_search",
 				"-L",
 				"10",
 				"-max",
-				"-annealing",
-				"local"
+				"-threshold",
+				"50.0"
 			],
 			// "args": [
 			// 	"-i",

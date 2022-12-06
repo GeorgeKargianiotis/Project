@@ -192,12 +192,15 @@ int local_search::InsertPointForLS(Polygon_2 &polygon, const Point_2 &begin, con
 }
 
 void local_search::ApplyChanges(Polygon_2 &polygon, std::vector<Change> allchanges){
+	int first = 0, second = 0;
 	//Insert First One with the given edge, then insert the other in reverse
 	for(auto iter = allchanges.begin(); iter != allchanges.end(); iter++){
 		Change mychange = *iter;
-		if (local_search::InsertPointForLS(polygon, mychange.edge->start(), mychange.edge->end(), mychange.Points.back()) == 0){
+		
+
+		/*if (local_search::InsertPointForLS(polygon, mychange.edge->start(), mychange.edge->end(), mychange.Points.back()) == 0){
 			std::cout << "Testing Point" << std::endl;
-		}
+		}*/
 
 		mychange.Points.pop_back();
 

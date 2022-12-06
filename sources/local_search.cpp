@@ -53,6 +53,7 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 					// Store area before any change and attempt to remove point
 					before = newpol.area();
 					local_search::changePositionOfPoint(newpol, firstpoint, secondpoint);
+					std::cout << "Here Here Here" << std::endl;
 
 					// Visibility check, point must be able to "see" every edge
 					for(Polygon_2::Edge_const_iterator edge = newpol.edges().begin(); edge != newpol.edges().end(); edge++){
@@ -62,8 +63,10 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 							local_search::changePositionOfPoint(newpol, secondpoint, firstpoint);
 					}
 
+					// Invalid move, check next point
 					if(error){
 						secondpoint = 0;
+						error = false;
 						continue;
 					}
 
@@ -73,20 +76,15 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 						local_search::changePositionOfPoint(newpol, secondpoint, firstpoint);
 					}
 
+					// Invalid move, check next point
 					if(error){
 						secondpoint = 0;
+						error = false;
 						continue;
 					}
 					after = newpol.area();
-					/*if(error){
-						error = false;
-						// No Point  in chain, so no change that needs to be done
-						if (Points.size() == 0){
-							newpol = old;
-							continue;
-						}	
-					}*/
 
+					// Turn this into a function
 					// Depending on user, determine if the new polygon is bigger or smaller
 					if (std::string(area).compare("max") == 0){
 						if (after - before > 0){
@@ -117,6 +115,7 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 					// We appllied the change, so we need to keep working on new 
 					//old = newpol;
 				}
+				// Max point reached, add them
 				else{
 					apply = true;
 					if(apply){
@@ -139,9 +138,9 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 				}
 				apply = false;
 			}	
+			firstpoint = 0;
 		}
 	// After going through every point for a specific edge, apply the changes and update the optimal change	
-	//newpol = old;	
 	local_search::ApplyChanges(greedypolygon, allchanges);
 	if (std::string(area).compare("max") == 0){
 		optimal = greedypolygon.area() - newpol.area();
@@ -192,6 +191,7 @@ int local_search::InsertPointForLS(Polygon_2 &polygon, const Point_2 &begin, con
 }
 
 void local_search::ApplyChanges(Polygon_2 &polygon, std::vector<Change> allchanges){
+	std::cout <<"Made it to function"<< std::endl;
 	int first = 0, second = 0;
 	// For Every Change, delete/add point in reverse order
 	for(auto iter = allchanges.begin(); iter != allchanges.end(); iter++){

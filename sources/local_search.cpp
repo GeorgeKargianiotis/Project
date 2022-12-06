@@ -193,26 +193,32 @@ int local_search::InsertPointForLS(Polygon_2 &polygon, const Point_2 &begin, con
 
 void local_search::ApplyChanges(Polygon_2 &polygon, std::vector<Change> allchanges){
 	int first = 0, second = 0;
-	//Insert First One with the given edge, then insert the other in reverse
+	// For Every Change, delete/add point in reverse order
 	for(auto iter = allchanges.begin(); iter != allchanges.end(); iter++){
 		Change mychange = *iter;
-		
 
-		/*if (local_search::InsertPointForLS(polygon, mychange.edge->start(), mychange.edge->end(), mychange.Points.back()) == 0){
-			std::cout << "Testing Point" << std::endl;
-		}*/
-
-		mychange.Points.pop_back();
-
-		for (auto iter=mychange.Points.end(); iter!=mychange.Points.begin(); iter--){
-			for (Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++){
-				if(edge->start() == *iter){
-					if (local_search::InsertPointForLS(polygon, edge->start(), edge->end(), *iter) == 0){
-						std::cout << "Testing Point" << std::endl;
-					}
-				}		
+		// Position of point to insert
+		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+			first++;
+			if (*vertex == mychange.Points.back()){
+				break;
 			}
-		}	
+		}
+
+		// Position of Point where the insertion will be made
+		for (Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++){
+			second++;
+			if(edge->end() == mychange.edge->end()){
+				break;
+			}		
+		}
+
+		local_search::changePositionOfPoint(polygon, first, second);
+
+		first = 0;
+		second = 0;
+		mychange.Points.pop_back();
+	
 	}	
 }
 

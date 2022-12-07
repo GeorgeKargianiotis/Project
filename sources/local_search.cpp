@@ -57,6 +57,7 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 
 					// Visibility check, point must be able to "see" every edge
 					for(Polygon_2::Edge_const_iterator edge = newpol.edges().begin(); edge != newpol.edges().end(); edge++){
+						//std::cout << "Checked Visibility" << std::endl;
 						if(!CGAL::do_intersect(Segment_2(edge->start(), *vertex), Segment_2(*vertex, edge->end()))){
 							std::cerr << "Visibility error" << std::endl;
 							error = true;
@@ -66,11 +67,13 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 
 					// Invalid move, check next point
 					if(error == true){
+						std::cout << "Not In Here" << std::endl;
 						secondpoint = 0;
 						error = false;
 						continue;
 					}
 
+					//std::cout << "Checking Simplicity" << std::endl;
 					// New polygon must still be simple 
 					if(newpol.is_simple()){
 						std::cerr << "Simplicity error" << std::endl;
@@ -80,6 +83,7 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 
 					// Invalid move, check next point
 					if(error == true){
+						std::cout << "Not In Here 2" << std::endl;
 						secondpoint = 0;
 						error = false;
 						continue;
@@ -93,10 +97,12 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 						if (after - before > 0){
 							temp.edge = edge;
 							temp.Points.push_back(*vertex);
+							std::cout << "Point In" << std::endl;
 							apply = true;
 						}
 						else if (temp.Points.size() > 0){
 							Points.pop_back();
+							std::cout  << "Removed" << std::endl;
 							apply = true;
 						}
 					}
@@ -255,6 +261,7 @@ void local_search::changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, 
 
 	//insert in new position
 	polygon.insert(polygon.begin() + indexOfNewPosition-1, newpoint);
+	std::cout << "Change Successful" << std::endl;
 }
 
 

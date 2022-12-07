@@ -51,41 +51,44 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 						}
 					}
 					// Store area before any change and attempt to remove point
-					before = newpol.area();
+					before = greedypolygon.area();
 					local_search::changePositionOfPoint(newpol, firstpoint, secondpoint);
-					std::cout << "Here Here Here" << std::endl;
+					
 
 					// Visibility check, point must be able to "see" every edge
 					for(Polygon_2::Edge_const_iterator edge = newpol.edges().begin(); edge != newpol.edges().end(); edge++){
-						if(!CGAL::do_intersect(Segment_2(edge->start(), *vertex), Segment_2(*vertex, edge->end())))
+						if(!CGAL::do_intersect(Segment_2(edge->start(), *vertex), Segment_2(*vertex, edge->end()))){
 							std::cerr << "Visibility error" << std::endl;
 							error = true;
 							local_search::changePositionOfPoint(newpol, secondpoint, firstpoint);
+						}	
 					}
 
 					// Invalid move, check next point
-					if(error){
+					if(error == true){
 						secondpoint = 0;
 						error = false;
 						continue;
 					}
 
+					// New polygon must still be simple 
 					if(newpol.is_simple()){
 						std::cerr << "Simplicity error" << std::endl;
-						//error = true;
+						error = true;
 						local_search::changePositionOfPoint(newpol, secondpoint, firstpoint);
 					}
 
 					// Invalid move, check next point
-					if(error){
+					if(error == true){
 						secondpoint = 0;
 						error = false;
 						continue;
 					}
 					after = newpol.area();
 
-					// Turn this into a function
+					
 					// Depending on user, determine if the new polygon is bigger or smaller
+					// If so, the point and edge are stored for the actual polygon change later
 					if (std::string(area).compare("max") == 0){
 						if (after - before > 0){
 							temp.edge = edge;
@@ -113,9 +116,9 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 						exit(EXIT_FAILURE);
 					}
 					// We appllied the change, so we need to keep working on new 
-					//old = newpol;
 				}
 				// Max point reached, add them
+				// Changes do not need to be consecutive
 				else{
 					apply = true;
 					if(apply){
@@ -200,6 +203,7 @@ void local_search::ApplyChanges(Polygon_2 &polygon, std::vector<Change> allchang
 		// Position of point to insert
 		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
 			first++;
+			std::cout << *vertex << " " << mychange.Points.back() << std::endl;
 			if (*vertex == mychange.Points.back()){
 				break;
 			}
@@ -230,12 +234,12 @@ void local_search::swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint, int 
 	Polygon_2::Vertex_iterator vertex = polygon.begin() + indexOfFirstPoint; 
 	Point_2 current = Point_2(*vertex);
 
-	//remove q point
+	
 	polygon.erase(vertex);
 
 	vertex = polygon.begin() + indexOfSecondPoint;
 
-	// add point q after r (or before s)
+	
 	polygon.insert(vertex, current);
 }
 
@@ -244,13 +248,13 @@ void local_search::changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, 
 	
 	// indexOfPoint points to the point we currently have and indexOfNewPosition points to the point at the new postiion of insertion
 
-	Point_2 q = Point_2(*(polygon.begin() + indexOfPoint));
+	Point_2 newpoint = Point_2(*(polygon.begin() + indexOfPoint));
 
 	//remove point from polygon
-	polygon.erase(polygon.begin() + indexOfPoint);
+	polygon.erase(polygon.begin() + indexOfPoint-1);
 
 	//insert in new position
-	polygon.insert(polygon.begin() + indexOfNewPosition, q);
+	polygon.insert(polygon.begin() + indexOfNewPosition-1, newpoint);
 }
 
 

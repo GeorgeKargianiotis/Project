@@ -144,14 +144,11 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 		}	
 		// Min area selection
 		else if (edge == 2){
-			//continue;
-			std::cout << ClosestPoints.size() << "cyka" << std::endl;
 			i = 0;
 			// Myseg and closest points have the same size, find area for each pair, keep them stored
 			for (Polygon_2::Edge_const_iterator edge = polygonchain.edges().begin(); edge != polygonchain.edges().end(); edge++){
 				area = CGAL::area(ClosestPoints.at(i), edge->source(), edge->target());
 				areav.push_back(area);
-				//std::cout << i << std::endl;
 				i++;
 			}
 
@@ -215,7 +212,6 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 				if (defect == 1){
 					areav.clear();
 					continue;
-					std::cout << "We Got in Here" << std::endl;
 				}
 				break;
 			}
@@ -224,7 +220,6 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 			newmin = DBL_MIN;
 
 			RemainingPoints.erase(std::remove(RemainingPoints.begin(), RemainingPoints.end(), newp), RemainingPoints.end());
-			std::cout << "Erasing Point " << newp << std::endl;	
 			ClosestPoints.clear();
 			notuse = newp;
 			defect = 0;

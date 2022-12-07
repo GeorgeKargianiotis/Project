@@ -46,10 +46,10 @@ int main(int argc, char* argv[]){
 		Polygon_2 polygon;
 		incremental::incrementalAlgorithm(points, initialization, 2, polygon);
 
-		if(max){
+		if(max == true){
 			local_search::local_search_algorithm(polygon, outFile, std::stoi(L), "max", std::stoi(threshold));
 		}
-		else if (min){
+		else if (min == true){
 			local_search::local_search_algorithm(polygon, outFile, std::stoi(L), "min", std::stoi(threshold));
 		}
 	}

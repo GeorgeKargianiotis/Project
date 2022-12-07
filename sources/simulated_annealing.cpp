@@ -71,6 +71,46 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 }
 
 Polygon_2* simulated_annealing::simulatedAnnealingWithSubdivision(std::vector<Point_2> &points, bool max){
+
+	int m;
+
+	// take input from the user
+	std::cout << "Enter number of sub-polygons (10 <= m <= 100): \n";
+	std::cin >> m;
+
+	//configuration for incremental algorithm
+	char initialization[2] = {'1', 'a'};
+
+	//order by x ascending
+	std::sort(points.begin(), points.end(), utils::cmp1aPoint2);
+
+	std::vector<Polygon_2> subPolygons;
+	int freePoints = points.size(); 
+	int k = std::ceil( (points.size() - 1) / (m - 1) );
+
+	// creating sub-polygons
+	while( freePoints > 100 ){
+
+		int commonPoint = k;
+
+		// find a valid point to be common
+		while(points[commonPoint].y() <= points[commonPoint - 1].y() || points[commonPoint].y() <= points[commonPoint + 1].y())
+			commonPoint++;
+
+		// create a subset of points
+		std::vector<Point_2> subPoints;
+		for(int i = 0; i < commonPoint; i++)
+			subPoints.push_back(points[i]);
+
+		// create the sub-polygon
+		Polygon_2 subPolygon;
+		//incremental::incrementalAlgorithm(subPoints, )
+		
+		//subPolygons.push_back();
+
+
+	}
+
 	
 	return nullptr;
 }
@@ -183,10 +223,12 @@ void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &i
 
 		double areaRemoved, areaAdded;
 
-		//	calculate the area removed and area add because of swap
-		//	if triangle p, q, r has the same orientation as the polygon
-		// 	then the area of the triangle is inside the polygon
-		//	else it is outside.
+		/*
+			calculate the area removed and area add because of swap
+			if triangle p, q, r has the same orientation as the polygon
+		 	then the area of the triangle is inside the polygon
+			else it is outside.
+		*/
 		if(polygon.orientation() == triangleOrientation(p, q, r)){
 			areaRemoved = CGAL::area(p, q, r);
 			areaAdded = CGAL::area(q, r, s);
@@ -238,6 +280,12 @@ void globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &
 		Point_2 s = *(polygon.begin() + indexOfNewPosition - 1);	
 		Point_2 t = *(polygon.begin() + indexOfNewPosition);	
 
+		/*
+		 because we temporarily remove the point from polygon, before
+		 placing it to the new position, the size of polygon decrease
+		 by 1, so all indexes decrease by one. That holds only when
+		 the point to be move, is before the newPosition
+		*/
 		if(indexOfPoint < indexOfNewPosition)
 			indexOfNewPosition--;
 
@@ -246,6 +294,7 @@ void globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &
 
 		// if the change of position was not valid, we undo the change
 		if(!polygon.is_simple()){
+
 			changePositionOfPoint(polygon, indexOfNewPosition, indexOfPoint);
 			continue;
 		}
@@ -283,6 +332,9 @@ void changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNe
 
 	// Let r, q, p be three consecutive points. We remove point q and place it in between points s and t
 	// indexOfPoint points to q and indexOfNewPosition points to point t
+
+	// if(indexOfPoint < indexOfNewPosition)
+	// 	indexOfNewPosition--;
 
 	Point_2 q = Point_2(*(polygon.begin() + indexOfPoint));
 

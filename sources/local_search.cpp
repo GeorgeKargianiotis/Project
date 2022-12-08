@@ -35,7 +35,7 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 
 		// For every edge, find paths of maximum L points and see if changing them is beneficial	
 		for(Polygon_2::Edge_const_iterator edge = greedypolygon.edges().begin(); edge != greedypolygon.edges().end(); edge++){
-			
+			std::cout << "New Edge Iterated" << std::endl;
 			// Check every consecutive point for potential chains
 			for(Polygon_2::Vertex_iterator vertex = greedypolygon.begin(); vertex != greedypolygon.end(); vertex++){
 				// Add single point to chain, if we still have space
@@ -103,7 +103,10 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 						else if (temp.Points.size() > 0){
 							Points.pop_back();
 							std::cout  << "Removed" << std::endl;
-							apply = true;
+							local_search::changePositionOfPoint(newpol, secondpoint, firstpoint);
+							if (temp.Points.size() > 0){
+								apply = true;
+							}
 						}
 					}
 					else if (std::string(area).compare("min") == 0){

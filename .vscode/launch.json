@@ -21,7 +21,8 @@
 				"10",
 				"-max",
 				"-annealing",
-				"local"
+				"subdivision"
+				// "local"
 			],
 			// "args": [
 			// 	"-i",

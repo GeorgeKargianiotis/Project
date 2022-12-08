@@ -14,8 +14,13 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 
 	//get the starting simple polygon
 	char initialization[2] = {'1', 'a'};
+	int edgeSelection; 
+	if(max)
+		edgeSelection = 3;
+	else
+		edgeSelection = 2;
 	Polygon_2 polygon, convexHullPolygon;
-	incremental::incrementalAlgorithm(points, initialization, 1, polygon);
+	incremental::incrementalAlgorithm(points, initialization, edgeSelection, polygon);
 	incremental::getConvexHullPolygonFromPoints(polygon.vertices(), convexHullPolygon);
 
 	std::cout << "Area before: " << polygon.area() << std::endl;
@@ -72,10 +77,15 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 
 Polygon_2* simulated_annealing::simulatedAnnealingWithSubdivision(std::vector<Point_2> &points, bool max){
 
-	int m;
+
+	int m, edgeSelection;
+	if(max)
+		edgeSelection = 3;
+	else
+		edgeSelection = 2;
 
 	// take input from the user
-	std::cout << "Enter number of sub-polygons (10 <= m <= 100): \n";
+	std::cout << "Enter number of points in sub-polygons (10 <= m <= 100): \n";
 	std::cin >> m;
 
 	//configuration for incremental algorithm
@@ -84,34 +94,59 @@ Polygon_2* simulated_annealing::simulatedAnnealingWithSubdivision(std::vector<Po
 	//order by x ascending
 	std::sort(points.begin(), points.end(), utils::cmp1aPoint2);
 
-	std::vector<Polygon_2> subPolygons;
-	int freePoints = points.size(); 
-	int k = std::ceil( (points.size() - 1) / (m - 1) );
+	std::vector<int> indexOfLastPointInSubset;
+	int numOfSubPolygons = std::ceil( (points.size() - 1) / (m - 1) );
+	int indexOfLastPoint = 0;
 
-	// creating sub-polygons
-	while( freePoints > 100 ){
-
-		int commonPoint = k;
-
-		// find a valid point to be common
-		while(points[commonPoint].y() <= points[commonPoint - 1].y() || points[commonPoint].y() <= points[commonPoint + 1].y())
-			commonPoint++;
-
-		// create a subset of points
-		std::vector<Point_2> subPoints;
-		for(int i = 0: i < commonPoint; i++)
-			subPoints.push_back(points[i]);
-
-		// create the sub-polygon
-		Polygon_2 subPolygon;
-		incremental::incrementalAlgorithm(subPoints, )
-		
-		subPolygons.push_back()
-
-
+	// initialize sub-sets, with m points
+	for(int i = 0; i < numOfSubPolygons; i++){
+		indexOfLastPoint += m - 1;
+		indexOfLastPointInSubset.push_back(indexOfLastPoint);
 	}
 
-	
+	// if there are remaining points, add them to the last sub-set 
+	if(indexOfLastPoint != points.size() - 1)
+		indexOfLastPointInSubset.at(numOfSubPolygons - 1) = points.size() - 1;
+
+	Polygon_2 lowerHullLeft;	
+	Polygon_2 lowerHullRight;	
+
+	// find the left-most lower hull
+	getLowerHullPolygonFromPoints(points, 0, indexOfLastPointInSubset[0], lowerHullLeft);
+
+	// find segments of lower hull for every set of sub-sets
+	//for(int i = 1; i < numOfSubPolygons; i++){
+	for(int i = 1; i < 2; i++){
+		getLowerHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1], indexOfLastPointInSubset[i], lowerHullRight);
+
+		// check if there are two segments meeting the requirements 
+		while(1){
+			Point_2 rightMostPoint = lowerHullLeft.right_vertex();
+			Point_2 previousRightMostPoint = lowerHullLeft.right_vertex() - 1;
+			Point_2 leftMostPoint = lowerHullRight.left_vertex();
+			Point_2 nextLeftMostPoint = lowerHullRight.left_vertex() + 1;
+
+			// if segments dont meet the requirements, we add 1 point to left sub-set and calculate new lower-hulls 
+			if(rightMostPoint.y() < previousRightMostPoint.y() || leftMostPoint.y() < nextLeftMostPoint.y()){
+				indexOfLastPointInSubset[i-1] += 1;
+
+				lowerHullLeft.clear();
+				if(i == 1)
+					getLowerHullPolygonFromPoints(points, 0, indexOfLastPointInSubset[0], lowerHullLeft);
+				else
+					getLowerHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1], indexOfLastPointInSubset[i], lowerHullLeft);
+
+				lowerHullRight.clear();
+				getLowerHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1], indexOfLastPointInSubset[i], lowerHullRight);
+			}
+		}
+
+		//utils::polygonToPythonArray(lowerHullLeft);
+		//utils::polygonToPythonArray(lowerHullRight);
+	}
+
+	std::vector<Polygon_2> subPolygons;
+
 	return nullptr;
 }
 
@@ -314,8 +349,6 @@ void globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &
 void swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint){
 
 	// Let p, q, r, s be four consecutive points in polygon. We remove point q and place it before s
-	// indexOfFirstPoint points to q
-
 	Polygon_2::Vertex_iterator vertex = polygon.begin() + indexOfFirstPoint; 
 	Point_2 q = Point_2(*vertex);
 
@@ -331,11 +364,6 @@ void swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint){
 void changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNewPosition){
 
 	// Let r, q, p be three consecutive points. We remove point q and place it in between points s and t
-	// indexOfPoint points to q and indexOfNewPosition points to point t
-
-	// if(indexOfPoint < indexOfNewPosition)
-	// 	indexOfNewPosition--;
-
 	Point_2 q = Point_2(*(polygon.begin() + indexOfPoint));
 
 	//remove point q from polygon
@@ -349,6 +377,13 @@ int triangleOrientation(Point_2 &a, Point_2 &b, Point_2 &c){
 	int orientation = (b.y() - a.y()) * (c.x() - b.x()) - (b.x() - a.x()) * (c.y() - b.y());
 	if(orientation == 0) return 0;
 	return orientation < 0 ? 1 : -1;	// 1 for counter-clockwise, -1 for clockwise
+}
+
+void getLowerHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &convexHullPolygon){
+	std::vector<Point_2> p;
+	CGAL::lower_hull_points_2(points.begin() + begin, points.begin() + end, std::back_inserter(p));
+	for(auto it = p.begin(); it != p.end(); it++)
+		convexHullPolygon.push_back(*it);
 }
 
 int maxCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){

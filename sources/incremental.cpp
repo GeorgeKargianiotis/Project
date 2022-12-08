@@ -240,7 +240,7 @@ void insertNewPointToPolygon(Polygon_2 &polygon, const Point_2 &begin, const Poi
 		 }
 	}
 
-	std::cout << "Problem inserting point " << std::endl;
+	std::cout << "Problem inserting point " << newPoint << std::endl;
 }
 
 int randomSelectEdge(std::vector<Segment_2> &visibleEdges, Point_2 newPoint){

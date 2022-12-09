@@ -108,46 +108,76 @@ Polygon_2* simulated_annealing::simulatedAnnealingWithSubdivision(std::vector<Po
 	if(indexOfLastPoint != points.size() - 1)
 		indexOfLastPointInSubset.at(numOfSubPolygons - 1) = points.size() - 1;
 
-	Polygon_2 lowerHullLeft;	
-	Polygon_2 lowerHullRight;	
+	Polygon_2 leftConvexHull;	
+	Polygon_2 rightConvexHull;	
+	std::vector<Segment_2> leftLowerSegments; // for each sub-polygon, it holds the left segments that are stable
+	leftLowerSegments.push_back(Segment_2(Point_2(-1,-1), Point_2(-1,-1))); // left segment of first polygon set to -1
+	std::vector<Segment_2> rightLowerSegments; // for each sub-polygon, it holds the right segments that are stable
 
-	// find the left-most lower hull
-	getLowerHullPolygonFromPoints(points, 0, indexOfLastPointInSubset[0], lowerHullLeft);
+	// find the convex hull of leftmost subset 
+	getConvexHullPolygonFromPoints(points, 0, indexOfLastPointInSubset[0], leftConvexHull);
 
 	// find segments of lower hull for every set of sub-sets
 	//for(int i = 1; i < numOfSubPolygons; i++){
 	for(int i = 1; i < 2; i++){
-		getLowerHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1], indexOfLastPointInSubset[i], lowerHullRight);
+		getConvexHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1] - 1, indexOfLastPointInSubset[i], rightConvexHull);
 
 		// check if there are two segments meeting the requirements 
 		while(1){
-			Point_2 rightMostPoint = lowerHullLeft.right_vertex();
-			Point_2 previousRightMostPoint = lowerHullLeft.right_vertex() - 1;
-			Point_2 leftMostPoint = lowerHullRight.left_vertex();
-			Point_2 nextLeftMostPoint = lowerHullRight.left_vertex() + 1;
+			Point_2 rightMostPoint = *(leftConvexHull.right_vertex());
+			Point_2 previousRightMostPoint = *(leftConvexHull.right_vertex() - 1);
+			Point_2 leftMostPoint = *(rightConvexHull.left_vertex());
+			Point_2 nextLeftMostPoint = *(rightConvexHull.left_vertex() + 1);
 
-			// if segments dont meet the requirements, we add 1 point to left sub-set and calculate new lower-hulls 
+			// if segments dont meet the requirements, we add 1 point to left sub-set and calculate new lower-hulls and repeat the progress 
 			if(rightMostPoint.y() < previousRightMostPoint.y() || leftMostPoint.y() < nextLeftMostPoint.y()){
 				indexOfLastPointInSubset[i-1] += 1;
 
-				lowerHullLeft.clear();
+				leftConvexHull.clear();
 				if(i == 1)
-					getLowerHullPolygonFromPoints(points, 0, indexOfLastPointInSubset[0], lowerHullLeft);
+					getConvexHullPolygonFromPoints(points, 0, indexOfLastPointInSubset[0], leftConvexHull);
 				else
-					getLowerHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1], indexOfLastPointInSubset[i], lowerHullLeft);
+					getConvexHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1] - 1, indexOfLastPointInSubset[i], leftConvexHull);
 
-				lowerHullRight.clear();
-				getLowerHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1], indexOfLastPointInSubset[i], lowerHullRight);
+				rightConvexHull.clear();
+				getConvexHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1] - 1, indexOfLastPointInSubset[i], rightConvexHull);
+				continue;
 			}
+
+			rightLowerSegments.push_back(Segment_2(leftMostPoint, nextLeftMostPoint));
+			leftLowerSegments.push_back(Segment_2(previousRightMostPoint, rightMostPoint));
+
+			// utils::polygonToPythonArray(leftConvexHull);
+			// utils::polygonToPythonArray(rightConvexHull, "polygonAfterStep");
+
+			leftConvexHull = rightConvexHull;
+			break;
 		}
 
-		//utils::polygonToPythonArray(lowerHullLeft);
-		//utils::polygonToPythonArray(lowerHullRight);
+		// set the last sub-polygon, set the lower segment -1
+		rightLowerSegments.push_back(Segment_2(Point_2(-1,-1), Point_2(-1,-1))); // right segment of last polygon set to -1
+
+		//utils::polygonToPythonArray(leftConvexHull);
+		//utils::polygonToPythonArray(rightConvexHull);
 	}
 
 	std::vector<Polygon_2> subPolygons;
 
 	return nullptr;
+}
+
+void getConvexHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &convexHullPolygon){
+	std::vector<Point_2> p;
+	CGAL::convex_hull_2(points.begin() + begin, points.begin() + end, std::back_inserter(p));
+	for(auto it = p.begin(); it != p.end(); it++)
+		convexHullPolygon.push_back(*it);
+}
+
+void getLowerHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &lowerHullPolygon){
+	std::vector<Point_2> p;
+	CGAL::lower_hull_points_2(points.begin() + begin, points.begin() + end, std::back_inserter(p));
+	for(auto it = p.begin(); it != p.end(); it++)
+		lowerHullPolygon.push_back(*it);
 }
 
 void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfFirstPoint){
@@ -377,13 +407,6 @@ int triangleOrientation(Point_2 &a, Point_2 &b, Point_2 &c){
 	int orientation = (b.y() - a.y()) * (c.x() - b.x()) - (b.x() - a.x()) * (c.y() - b.y());
 	if(orientation == 0) return 0;
 	return orientation < 0 ? 1 : -1;	// 1 for counter-clockwise, -1 for clockwise
-}
-
-void getLowerHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &convexHullPolygon){
-	std::vector<Point_2> p;
-	CGAL::lower_hull_points_2(points.begin() + begin, points.begin() + end, std::back_inserter(p));
-	for(auto it = p.begin(); it != p.end(); it++)
-		convexHullPolygon.push_back(*it);
 }
 
 int maxCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){

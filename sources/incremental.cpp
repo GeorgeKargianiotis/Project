@@ -9,6 +9,197 @@
 #include "../headers/cgalConfig.hpp"
 #include "../headers/utils.hpp"
 
+void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &points, char *initialization, int edgeSelection, Segment_2 &leftSegment, Segment_2 &rightSegment, Polygon_2 &polygon){
+
+	srand(time(0));
+
+	auto start = std::chrono::high_resolution_clock::now();
+
+	bool leftSegmentIsInPolygon = false;
+	bool rightSegmentIsInPolygon = false;
+
+	//order by x ascending
+	if(std::string(initialization).compare(SORT_BY_X_ASC) == 0)
+		std::sort(points.begin(), points.end(), utils::cmp1aPoint2);
+	//order by x descending 
+	else if(std::string(initialization).compare(SORT_BY_X_DESC) == 0)
+		std::sort(points.begin(), points.end(), utils::cmp1bPoint2);
+	//order by y ascending
+	else if(std::string(initialization).compare(SORT_BY_Y_ASC) == 0)
+		std::sort(points.begin(), points.end(), utils::cmp2aPoint2);
+	//order by y descending
+	else if(std::string(initialization).compare(SORT_BY_Y_DESC) == 0)
+		std::sort(points.begin(), points.end(), utils::cmp2bPoint2);
+
+	//Polygon_2 polygon, convexHullPolygon;
+	Polygon_2 convexHullPolygon;
+	Point_2 lastPointExpandPolygon; 	//to teleytaio shmeio poy mphke sthn polygwnikh grammh kai thn epektine
+	int lastPointExpandPolygonIndex;
+	double polygonArea;
+	
+	// initialize polygon with the 3 first sorted points
+	polygon.push_back(points[0]);
+	polygon.push_back(points[1]);
+	polygon.push_back(points[2]);
+
+	if(polygon[0] == leftSegment.start() && (polygon[1] == leftSegment.end() || polygon[2] == leftSegment.end()) )
+		leftSegmentIsInPolygon = true;
+
+	// add points until a triangle get shaped
+	int i = 0;
+	while(CGAL::collinear(points[i], points[i+1], points[i+2])){
+		i++;
+		polygon.push_back(points[i+2]);
+
+		if(i == points.size()){
+			std::cerr << "Given points are all collinear. Can't create polygon" << std::endl;
+			exit (EXIT_FAILURE);
+		}
+	}
+
+	lastPointExpandPolygonIndex = i + 2;
+	lastPointExpandPolygon = points[lastPointExpandPolygonIndex];
+	polygonArea = std::abs(CGAL::area(points[0], points[1], points[i+2]));
+	std::vector<Segment_2> visibleEdges;
+
+	while(lastPointExpandPolygonIndex != points.size() - 1){
+		lastPointExpandPolygonIndex++;
+
+		Point_2 newPoint = points[lastPointExpandPolygonIndex];
+		
+		//ignore duplicate points
+		if(newPoint == points[lastPointExpandPolygonIndex - 1])
+			continue;
+
+		//find the convex hull polygon
+		convexHullPolygon.clear();
+		getConvexHullPolygonFromPoints(polygon.vertices(), convexHullPolygon);
+
+		if(polygon.is_clockwise_oriented())
+			polygon.reverse_orientation();
+
+		if(convexHullPolygon.is_clockwise_oriented() != polygon.is_clockwise_oriented())
+			convexHullPolygon.reverse_orientation();
+
+		visibleEdges.clear();
+
+		//find the red edges of convex hull polygon
+		for(Polygon_2::Edge_const_iterator convexPolygonEdge = convexHullPolygon.edges_begin(); convexPolygonEdge != convexHullPolygon.edges_end(); convexPolygonEdge++){
+
+			if(isRedEdge(convexPolygonEdge, newPoint, convexHullPolygon)){
+
+				Polygon_2::Edge_const_iterator &redEdge = convexPolygonEdge;
+
+				//find visible edges
+				for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
+
+					if(vertex == polygon.end())
+						break;
+
+					if(redEdge->start() == *vertex){
+
+						Point_2 startPoint = *vertex;
+						vertex++;
+						Point_2 endPoint = *vertex;
+
+						//if red edge belongs to polygon
+						if(redEdge->end() == *vertex){
+							if( !CGAL::collinear(startPoint, endPoint, newPoint) )
+								visibleEdges.push_back(Segment_2(startPoint, endPoint));
+							break;
+						}
+						vertex--;
+
+						//check if all polygon edges "behind" the red edge are visible to the newPoint
+						do{
+							Point_2 startPoint = *vertex;
+							vertex++;
+							Point_2 endPoint;
+							if(vertex == polygon.end())
+								endPoint = *polygon.begin();
+							else
+								endPoint = *vertex;
+
+							if(isVisibleEdge(polygon, startPoint, endPoint, newPoint))
+								visibleEdges.push_back(Segment_2(startPoint, endPoint));
+
+							if(vertex == polygon.end())
+								vertex = polygon.begin();
+						} while( *vertex != redEdge->end());
+
+						break;
+					}
+				}
+				continue;
+			}
+		}
+
+		int index = -1;
+
+		//choose visible edge to replace
+		if(newPoint != rightSegment.start() && newPoint != rightSegment.end()){
+			while(1){
+					if(edgeSelection == RANDOM_EDGE_SELECTION)
+						index = randomSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
+					else if(edgeSelection == MIN_AREA_EDGE_SELECTION)
+						index = minAreaSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
+					else if(edgeSelection == MAX_AREA_EDGE_SELECTION)
+						index = maxAreaSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
+
+				if(visibleEdges[index].end() == leftSegment.end() || visibleEdges[index].end() == rightSegment.end())
+					visibleEdges.erase[index];
+
+				if(visibleEdges.size() == 0){
+					std::cout << "No valid visibleEdges\n";
+					exit(1);
+				}
+				else
+					continue;
+				
+				break;
+			}
+		}
+		// place left segment end point after left-most point
+		else if(newPoint == rightSegment.end()){
+			for(int i = 0; i < visibleEdges.size(); i++){
+				if(visibleEdges[i].start() == leftSegment.start()){
+					index = i;
+					break;
+				}
+			}
+		}
+		// place right-most point after right segment's start
+		else if(newPoint == leftSegment.end()){
+			for(int i = 0; i < visibleEdges.size(); i++){
+				if(visibleEdges[i].start() == rightSegment.start()){
+					index = i;
+					break;
+				}
+			}
+		}
+
+		if(index == -1){
+			std::cout << "No valid visibleEdges\n";
+			exit(1);
+		}
+
+
+		Segment_2 edgeToBeReplaced = visibleEdges[index];
+
+		polygonArea += std::abs(CGAL::area(edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint));
+
+		//insert the new point to the right position in polygon
+		insertNewPointToPolygon(polygon, edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint);
+	}
+
+	auto stop = std::chrono::high_resolution_clock::now();
+	auto executionTime = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+
+	//write output
+	//utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, polygonArea, executionTime.count(), initialization);
+	//std::cout << "Success" << std::endl;
+}
+
 //void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile, Polygon_2 &polygon){
 void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, Polygon_2 &polygon){
 

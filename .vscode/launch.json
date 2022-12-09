@@ -12,7 +12,7 @@
 			"program": "${workspaceFolder}/optimal_polygon",
 			"args": [
 				"-i",
-				"euro-night-0000200.instance",
+				"uniform-0000050-1.instance",
 				"-o", 
 				"output.txt",
 				"-algorithm",

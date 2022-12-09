@@ -17,7 +17,7 @@ struct change{
 
 void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold){
 	
-	int firstpoint = 0, secondpoint = 0; // Positions of points for each change we make
+	int firstpoint = 0, secondpoint = 0, found = 0; // Positions of points for each change we make
 	double optimal = DBL_MAX; // New area - Old area to calculate diffirence 
 	bool error = false, apply = false; // Indicates whenever a move is invalid, and when a valid move must be applied
 	std::vector<Point_2> Points; // Store the chain here, with the corresponding edge
@@ -38,20 +38,25 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 			std::cout << "New Edge Iterated" << std::endl;
 			// Check every consecutive point for potential chains
 			for(Polygon_2::Vertex_iterator vertex = greedypolygon.begin(); vertex != greedypolygon.end(); vertex++){
+				std::cout << *vertex << std::endl;
 				// Add single point to chain, if we still have space
 				firstpoint++;
 				if (Points.size() < L){
 					Points.push_back(*vertex);
 				
 					// Find the position of the edge end to make the change
-					for(Polygon_2::Vertex_iterator vertex = greedypolygon.begin(); vertex != greedypolygon.end(); vertex++){
-						secondpoint++;
-						if (*vertex == edge->end()){
-							break;
+					if(found == 0){
+						for(Polygon_2::Vertex_iterator vertex = greedypolygon.begin(); vertex != greedypolygon.end(); vertex++){
+							secondpoint++;
+							if (*vertex == edge->end()){
+								found = 1;
+								break;
+							}
 						}
 					}
 					// Store area before any change and attempt to remove point
 					before = greedypolygon.area();
+					std::cout << firstpoint << " " << secondpoint << std::endl;
 					local_search::changePositionOfPoint(newpol, firstpoint, secondpoint);
 					
 
@@ -67,9 +72,9 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 
 					// Invalid move, check next point
 					if(error == true){
-						std::cout << "Not In Here" << std::endl;
 						secondpoint = 0;
 						error = false;
+						found = 0;
 						continue;
 					}
 
@@ -83,9 +88,9 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 
 					// Invalid move, check next point
 					if(error == true){
-						std::cout << "Not In Here 2" << std::endl;
 						secondpoint = 0;
 						error = false;
+						found = 0;
 						continue;
 					}
 					after = newpol.area();
@@ -240,13 +245,13 @@ void local_search::swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint, int 
 	
 	// indexOfFirstPoint points to the current point we examine
 
-	Polygon_2::Vertex_iterator vertex = polygon.begin() + indexOfFirstPoint; 
+	Polygon_2::Vertex_iterator vertex = polygon.begin() + indexOfFirstPoint-1; 
 	Point_2 current = Point_2(*vertex);
 
 	
 	polygon.erase(vertex);
 
-	vertex = polygon.begin() + indexOfSecondPoint;
+	vertex = polygon.begin() + indexOfSecondPoint-1;
 
 	
 	polygon.insert(vertex, current);
@@ -257,7 +262,8 @@ void local_search::changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, 
 	
 	// indexOfPoint points to the point we currently have and indexOfNewPosition points to the point at the new postiion of insertion
 
-	Point_2 newpoint = Point_2(*(polygon.begin() + indexOfPoint));
+	Point_2 newpoint = Point_2(*(polygon.begin() + indexOfPoint-1));
+	std::cout << newpoint << "  Is Removed And Then Inserted" << std::endl;
 
 	//remove point from polygon
 	polygon.erase(polygon.begin() + indexOfPoint-1);

@@ -5,7 +5,7 @@
 
 namespace simulated_annealing{
 	Polygon_2* simulatedAnnealing(std::vector<Point_2> &points, char* annealing, bool max, int L);
-	Polygon_2* simulatedAnnealingWithSubdivision(std::vector<Point_2> &points, bool max);
+	//Polygon_2* simulatedAnnealingWithSubdivision(std::vector<Point_2> &points, bool max);
 } 
 
 void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfFirstPoint);

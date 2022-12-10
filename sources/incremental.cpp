@@ -168,18 +168,8 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 					continue;
 			}
 		}
-		// place left segment end point after left-most point
-		else if(newPoint == rightSegment.end()){
-			for(int i = 0; i < visibleEdges.size(); i++){
-				if(visibleEdges[i].start() == leftSegment.start()){
-					index = i;
-					leftSegmentIsInPolygon = true;
-					break;
-				}
-			}
-		}
 		// place right-most point after right segment's start
-		else if(newPoint == leftSegment.end()){
+		else if(newPoint == rightSegment.end()){
 			for(int i = 0; i < visibleEdges.size(); i++){
 				if(visibleEdges[i].start() == rightSegment.start()){
 					index = i;
@@ -188,8 +178,19 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 				}
 			}
 		}
+		// place left segment end point after left-most point
+		else if(newPoint == leftSegment.end()){
+			for(int i = 0; i < visibleEdges.size(); i++){
+				if(visibleEdges[i].start() == leftSegment.start()){
+					index = i;
+					leftSegmentIsInPolygon = true;
+					break;
+				}
+			}
+		}
 
 		if(index == -1){
+			utils::polygonToPythonArray(polygon, "polygonAfterStep");
 			std::cout << "No valid visibleEdges " << newPoint <<  '\n';
 			exit(1);
 		}
@@ -210,7 +211,7 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 		exit(1);
 	}
 
-	std::cout << "Segments inserted correct in polygon\n";
+	//std::cout << "Segments inserted correct in polygon\n";
 
 	//write output
 	//utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, polygonArea, executionTime.count(), initialization);

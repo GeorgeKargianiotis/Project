@@ -158,13 +158,14 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 			firstpoint = 0;
 		}
 	// After going through every point for a specific edge, apply the changes and update the optimal change	
-	local_search::ApplyChanges(greedypolygon, allchanges);
-	if (std::string(area).compare("max") == 0){
-		optimal = greedypolygon.area() - newpol.area();
-	}
-	else if (std::string(area).compare("min") == 0){
-		optimal = newpol.area() - greedypolygon.area();
-	}
+		local_search::ApplyChanges(greedypolygon, allchanges);
+		
+		if (std::string(area).compare("max") == 0){
+			optimal = greedypolygon.area() - newpol.area();
+		}
+		else if (std::string(area).compare("min") == 0){
+			optimal = newpol.area() - greedypolygon.area();
+		}
 	}
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
@@ -207,7 +208,7 @@ int local_search::InsertPointForLS(Polygon_2 &polygon, const Point_2 &begin, con
 	return 0;
 }
 
-void local_search::ApplyChanges(Polygon_2 &polygon, std::vector<Change> allchanges){
+void local_search::ApplyChanges(Polygon_2 polygon, std::vector<Change> allchanges){
 	std::cout <<"Made it to function"<< std::endl;
 	int first = 0, second = 0;
 	// For Every Change, delete/add point in reverse order

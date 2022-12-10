@@ -18,6 +18,14 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 	bool leftSegmentIsInPolygon = false;
 	bool rightSegmentIsInPolygon = false;
 
+	// this is only for the first sub-polygon
+	if(leftSegment.start() == Point_2(-1,-1))
+		leftSegmentIsInPolygon = true;
+
+	// this is only for the last sub-polygon
+	if(rightSegment.start() == Point_2(-1,-1))
+		rightSegmentIsInPolygon = true;
+
 	//order by x ascending
 	if(std::string(initialization).compare(SORT_BY_X_ASC) == 0)
 		std::sort(points.begin(), points.end(), utils::cmp1aPoint2);
@@ -137,17 +145,20 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 		int index = -1;
 
 		//choose visible edge to replace
-		if(newPoint != rightSegment.start() && newPoint != rightSegment.end()){
+		if(newPoint != rightSegment.end() && newPoint != leftSegment.end()){
 			while(1){
-					if(edgeSelection == RANDOM_EDGE_SELECTION)
-						index = randomSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
-					else if(edgeSelection == MIN_AREA_EDGE_SELECTION)
-						index = minAreaSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
-					else if(edgeSelection == MAX_AREA_EDGE_SELECTION)
-						index = maxAreaSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
+
+				if(edgeSelection == RANDOM_EDGE_SELECTION)
+					index = randomSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
+				else if(edgeSelection == MIN_AREA_EDGE_SELECTION)
+					index = minAreaSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
+				else if(edgeSelection == MAX_AREA_EDGE_SELECTION)
+					index = maxAreaSelectEdge(visibleEdges, points[lastPointExpandPolygonIndex]);
 
 				if(visibleEdges[index].end() == leftSegment.end() || visibleEdges[index].end() == rightSegment.end())
-					visibleEdges.erase[index];
+					visibleEdges.erase(visibleEdges.begin() + index);
+				else
+				 break;
 
 				if(visibleEdges.size() == 0){
 					std::cout << "No valid visibleEdges\n";
@@ -155,8 +166,6 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 				}
 				else
 					continue;
-				
-				break;
 			}
 		}
 		// place left segment end point after left-most point
@@ -164,6 +173,7 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 			for(int i = 0; i < visibleEdges.size(); i++){
 				if(visibleEdges[i].start() == leftSegment.start()){
 					index = i;
+					leftSegmentIsInPolygon = true;
 					break;
 				}
 			}
@@ -173,16 +183,16 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 			for(int i = 0; i < visibleEdges.size(); i++){
 				if(visibleEdges[i].start() == rightSegment.start()){
 					index = i;
+					rightSegmentIsInPolygon = true;
 					break;
 				}
 			}
 		}
 
 		if(index == -1){
-			std::cout << "No valid visibleEdges\n";
+			std::cout << "No valid visibleEdges " << newPoint <<  '\n';
 			exit(1);
 		}
-
 
 		Segment_2 edgeToBeReplaced = visibleEdges[index];
 
@@ -194,6 +204,13 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 
 	auto stop = std::chrono::high_resolution_clock::now();
 	auto executionTime = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+
+	if(!leftSegmentIsInPolygon || !rightSegmentIsInPolygon){
+		std::cerr << "Two segments haven's been inserted in polygon\n";
+		exit(1);
+	}
+
+	std::cout << "Segments inserted correct in polygon\n";
 
 	//write output
 	//utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, polygonArea, executionTime.count(), initialization);

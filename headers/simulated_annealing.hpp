@@ -16,7 +16,7 @@ void changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNe
 int triangleOrientation(Point_2 &a, Point_2 &b, Point_2 &c);
 
 void getConvexHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &convexHullPolygon);
-void getLowerHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &convexHullPolygon);
+//void getLowerHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &convexHullPolygon);
 
 int maxCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s);
 int maxCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s);

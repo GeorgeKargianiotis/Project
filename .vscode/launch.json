@@ -16,12 +16,14 @@
 				"-o", 
 				"output.txt",
 				"-algorithm",
-				"simulated_annealing",
+				"subdivision_annealing",
+				// "simulated_annealing",
 				"-L",
 				"10",
 				"-max",
 				"-annealing",
-				"local"
+				"subdivision"
+				// "local"
 			],
 			// "args": [
 			// 	"-i",

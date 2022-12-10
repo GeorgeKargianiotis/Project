@@ -14,8 +14,13 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 
 	//get the starting simple polygon
 	char initialization[2] = {'1', 'a'};
+	int edgeSelection; 
+	if(max)
+		edgeSelection = 3;
+	else
+		edgeSelection = 2;
 	Polygon_2 polygon, convexHullPolygon;
-	incremental::incrementalAlgorithm(points, initialization, 1, polygon);
+	incremental::incrementalAlgorithm(points, initialization, edgeSelection, polygon);
 	incremental::getConvexHullPolygonFromPoints(polygon.vertices(), convexHullPolygon);
 
 	std::cout << "Area before: " << polygon.area() << std::endl;
@@ -70,10 +75,126 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 	return nullptr;
 }
 
-Polygon_2* simulated_annealing::simulatedAnnealingWithSubdivision(std::vector<Point_2> &points, bool max){
-	
-	return nullptr;
+// Polygon_2* simulated_annealing::simulatedAnnealingWithSubdivision(std::vector<Point_2> &points, bool max){
+
+
+// 	int m, edgeSelection;
+// 	if(max)
+// 		edgeSelection = 3;
+// 	else
+// 		edgeSelection = 2;
+
+// 	// take input from the user
+// 	std::cout << "Enter number of points in sub-polygons (10 <= m <= 100): \n";
+// 	std::cin >> m;
+
+// 	//configuration for incremental algorithm
+// 	char initialization[2] = {'1', 'a'};
+
+// 	//order by x ascending
+// 	std::sort(points.begin(), points.end(), utils::cmp1aPoint2);
+
+// 	std::vector<int> indexOfLastPointInSubset;
+// 	int numOfSubPolygons = std::ceil( (points.size() - 1) / (m - 1) );
+
+// 	// initialize sub-polygons
+// 	std::vector<Polygon_2> subPolygons;
+// 	for(int i = 0; i < numOfSubPolygons; i++)
+// 		subPolygons.push_back(Polygon_2());
+
+
+// 	// initialize sub-sets, with m points
+// 	int indexOfLastPoint = 0;
+// 	for(int i = 0; i < numOfSubPolygons; i++){
+// 		indexOfLastPoint += m - 1;
+// 		indexOfLastPointInSubset.push_back(indexOfLastPoint);
+// 	}
+
+// 	// if there are remaining points, add them to the last sub-set 
+// 	if(indexOfLastPoint != points.size() - 1)
+// 		indexOfLastPointInSubset.at(numOfSubPolygons - 1) = points.size() - 1;
+
+// 	Polygon_2 leftConvexHull;	
+// 	Polygon_2 rightConvexHull;	
+// 	std::vector<Segment_2> leftLowerSegments; // for each sub-polygon, it holds the left segments that are stable
+// 	leftLowerSegments.push_back(Segment_2(Point_2(-1,-1), Point_2(-1,-1))); // left segment of first polygon set to -1
+// 	std::vector<Segment_2> rightLowerSegments; // for each sub-polygon, it holds the right segments that are stable
+
+// 	// find the convex hull of leftmost subset 
+// 	getConvexHullPolygonFromPoints(points, 0, indexOfLastPointInSubset[0], leftConvexHull);
+
+// 	// find segments of lower hull for every set of sub-sets  [left convexHull --- right convexHull]
+// 	for(int i = 1; i < numOfSubPolygons; i++){
+
+// 		// std::cout << "i - 1 point: " << *(points.begin() + indexOfLastPointInSubset[i-1]) << std::endl; 
+// 		// std::cout << "i point: " << *(points.begin() + indexOfLastPointInSubset[i]) << std::endl; 
+// 		getConvexHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1] - 1, indexOfLastPointInSubset[i], rightConvexHull);
+
+// 		// check if there are two segments meeting the requirements 
+// 		while(1){
+// 			Point_2 rightMostPoint = *(leftConvexHull.right_vertex());
+// 			Point_2 previousRightMostPoint = *(leftConvexHull.right_vertex() - 1);
+// 			Point_2 leftMostPoint = *(rightConvexHull.left_vertex());
+// 			Point_2 nextLeftMostPoint = *(rightConvexHull.left_vertex() + 1);
+
+// 			// if segments dont meet the requirements, we add 1 point to left sub-set and calculate new lower-hulls and repeat the progress 
+// 			if(rightMostPoint.y() < previousRightMostPoint.y() || leftMostPoint.y() < nextLeftMostPoint.y()){
+// 				indexOfLastPointInSubset[i-1] += 1;
+
+// 				leftConvexHull.clear();
+// 				if(i == 1)
+// 					getConvexHullPolygonFromPoints(points, 0, indexOfLastPointInSubset[0], leftConvexHull);
+// 				else
+// 					getConvexHullPolygonFromPoints(points, indexOfLastPointInSubset[i-2] - 1, indexOfLastPointInSubset[i-1], leftConvexHull);
+
+// 				rightConvexHull.clear();
+// 				getConvexHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1] - 1, indexOfLastPointInSubset[i], rightConvexHull);
+
+// 				std::cout << "rightConvex " << rightConvexHull.size() << std::endl;
+// 				continue;
+// 			}
+
+// 			leftLowerSegments.push_back(Segment_2(leftMostPoint, nextLeftMostPoint));
+// 			rightLowerSegments.push_back(Segment_2(previousRightMostPoint, rightMostPoint));
+
+// 			// create the left sub-polygon
+// 			incremental::incrementalAlgorithmForSubdivision(points, initialization, edgeSelection, leftLowerSegments[i - 1], rightLowerSegments[i - 1],  subPolygons[i - 1]);
+
+// 			// run global transition step for sub-polygon 
+
+// 			leftConvexHull = rightConvexHull;
+// 			break;
+// 		}
+
+// 		//utils::polygonToPythonArray(leftConvexHull);
+// 		//utils::polygonToPythonArray(rightConvexHull);
+// 	}
+
+// 	// set the last sub-polygon, set the lower segment -1
+// 	rightLowerSegments.push_back(Segment_2(Point_2(-1,-1), Point_2(-1,-1))); // right segment of last polygon set to -1
+
+// 	for(int i = 0; i < numOfSubPolygons; i++){
+// 		std::cout << leftLowerSegments[i] << " left " << i <<  std::endl;
+// 		std::cout << rightLowerSegments[i] << " right " << i << std::endl;
+// 	}
+
+// 	return nullptr;
+// }
+
+void getConvexHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &convexHullPolygon){
+	convexHullPolygon.clear();
+	std::vector<Point_2> p;
+	CGAL::convex_hull_2(points.begin() + begin, points.begin() + end, std::back_inserter(p));
+	for(auto it = p.begin(); it != p.end(); it++)
+		convexHullPolygon.push_back(*it);
 }
+
+// void getLowerHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &lowerHullPolygon){
+// 	std::vector<Point_2> p;
+// 	CGAL::lower_hull_points_2(points.begin() + begin, points.begin() + end, std::back_inserter(p));
+// 	for(auto it = p.begin(); it != p.end(); it++)
+// 		lowerHullPolygon.push_back(*it);
+// }
 
 void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfFirstPoint){
 	//create kd-Tree
@@ -183,10 +304,12 @@ void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &i
 
 		double areaRemoved, areaAdded;
 
-		//	calculate the area removed and area add because of swap
-		//	if triangle p, q, r has the same orientation as the polygon
-		// 	then the area of the triangle is inside the polygon
-		//	else it is outside.
+		/*
+			calculate the area removed and area add because of swap
+			if triangle p, q, r has the same orientation as the polygon
+		 	then the area of the triangle is inside the polygon
+			else it is outside.
+		*/
 		if(polygon.orientation() == triangleOrientation(p, q, r)){
 			areaRemoved = CGAL::area(p, q, r);
 			areaAdded = CGAL::area(q, r, s);
@@ -238,6 +361,12 @@ void globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &
 		Point_2 s = *(polygon.begin() + indexOfNewPosition - 1);	
 		Point_2 t = *(polygon.begin() + indexOfNewPosition);	
 
+		/*
+		 because we temporarily remove the point from polygon, before
+		 placing it to the new position, the size of polygon decrease
+		 by 1, so all indexes decrease by one. That holds only when
+		 the point to be move, is before the newPosition
+		*/
 		if(indexOfPoint < indexOfNewPosition)
 			indexOfNewPosition--;
 
@@ -246,6 +375,7 @@ void globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &
 
 		// if the change of position was not valid, we undo the change
 		if(!polygon.is_simple()){
+
 			changePositionOfPoint(polygon, indexOfNewPosition, indexOfPoint);
 			continue;
 		}
@@ -265,8 +395,6 @@ void globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &
 void swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint){
 
 	// Let p, q, r, s be four consecutive points in polygon. We remove point q and place it before s
-	// indexOfFirstPoint points to q
-
 	Polygon_2::Vertex_iterator vertex = polygon.begin() + indexOfFirstPoint; 
 	Point_2 q = Point_2(*vertex);
 
@@ -282,8 +410,6 @@ void swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint){
 void changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNewPosition){
 
 	// Let r, q, p be three consecutive points. We remove point q and place it in between points s and t
-	// indexOfPoint points to q and indexOfNewPosition points to point t
-
 	Point_2 q = Point_2(*(polygon.begin() + indexOfPoint));
 
 	//remove point q from polygon

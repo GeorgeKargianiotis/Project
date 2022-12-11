@@ -15,7 +15,7 @@ struct change{
 	Polygon_2::Edge_const_iterator edge;
 };
 
-void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold){
+void local_search::local_search_algorithm(Polygon_2 &greedypolygon, std::ofstream &outFile, int L, char* area, double threshhold){
 	
 	int firstpoint = 0, secondpoint = 0, found = 0; // Positions of points for each change we make
 	double optimal = DBL_MAX; // New area - Old area to calculate diffirence 
@@ -35,10 +35,10 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 
 		// For every edge, find paths of maximum L points and see if changing them is beneficial	
 		for(Polygon_2::Edge_const_iterator edge = greedypolygon.edges().begin(); edge != greedypolygon.edges().end(); edge++){
-			std::cout << "New Edge Iterated" << std::endl;
+			
 			// Check every consecutive point for potential chains
 			for(Polygon_2::Vertex_iterator vertex = greedypolygon.begin(); vertex != greedypolygon.end(); vertex++){
-				std::cout << *vertex << std::endl;
+				
 				// Add single point to chain, if we still have space
 				firstpoint++;
 				if (Points.size() < L){
@@ -57,12 +57,13 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 					// Store area before any change and attempt to remove point
 					before = greedypolygon.area();
 					std::cout << firstpoint << " " << secondpoint << std::endl;
+
 					local_search::changePositionOfPoint(newpol, firstpoint, secondpoint);
 					
 
 					// Visibility check, point must be able to "see" every edge
 					for(Polygon_2::Edge_const_iterator edge = newpol.edges().begin(); edge != newpol.edges().end(); edge++){
-						//std::cout << "Checked Visibility" << std::endl;
+						
 						if(!CGAL::do_intersect(Segment_2(edge->start(), *vertex), Segment_2(*vertex, edge->end()))){
 							std::cerr << "Visibility error" << std::endl;
 							error = true;
@@ -78,7 +79,7 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 						continue;
 					}
 
-					//std::cout << "Checking Simplicity" << std::endl;
+					
 					// New polygon must still be simple 
 					if(newpol.is_simple()){
 						std::cerr << "Simplicity error" << std::endl;
@@ -102,12 +103,10 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 						if (after - before > 0){
 							temp.edge = edge;
 							temp.Points.push_back(*vertex);
-							std::cout << "Point In" << std::endl;
 							apply = true;
 						}
 						else if (temp.Points.size() > 0){
 							Points.pop_back();
-							std::cout  << "Removed" << std::endl;
 							local_search::changePositionOfPoint(newpol, secondpoint, firstpoint);
 							if (temp.Points.size() > 0){
 								apply = true;
@@ -157,7 +156,8 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 			}	
 			firstpoint = 0;
 		}
-	// After going through every point for a specific edge, apply the changes and update the optimal change	
+		// After going through every point for a specific edge, apply the changes and update the optimal change	
+		newpol = greedypolygon;
 		local_search::ApplyChanges(greedypolygon, allchanges);
 		
 		if (std::string(area).compare("max") == 0){
@@ -175,50 +175,15 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 	std::cout << "Success" << std::endl;
 }	
 
-int local_search::InsertPointForLS(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint){
-
-	for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
-		if(*vertex == begin){
-			vertex++;
-			if(vertex == polygon.end()){
-				polygon.insert(polygon.begin(), newPoint);
-				return 1;
-			}
-			if(*vertex == end){
-				polygon.insert(vertex, newPoint);
-				return 1;
-			}
-			vertex--;
-		}
-		 else if(*vertex == end){
-			vertex++;
-			if(vertex == polygon.end()){
-				polygon.insert(polygon.begin(), newPoint);
-				return 1;
-			}
-			if(*vertex == begin){
-				polygon.insert(--vertex, newPoint);
-				return 1;
-			}
-			vertex--;
-		 }
-	}
-
-	std::cout << "Problem inserting point " << newPoint << std::endl;
-	return 0;
-}
-
-void local_search::ApplyChanges(Polygon_2 polygon, std::vector<Change> allchanges){
-	std::cout <<"Made it to function"<< std::endl;
+void local_search::ApplyChanges(Polygon_2 &polygon, std::vector<Change> allchanges){
 	int first = 0, second = 0;
 	// For Every Change, delete/add point in reverse order
-	for(auto iter = allchanges.begin(); iter != allchanges.end(); iter++){
+	for(auto iter = allchanges.end() - 1; iter != allchanges.begin(); iter--){
 		Change mychange = *iter;
 
 		// Position of point to insert
 		for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
 			first++;
-			std::cout << *vertex << " " << mychange.Points.back() << std::endl;
 			if (*vertex == mychange.Points.back()){
 				break;
 			}
@@ -241,37 +206,18 @@ void local_search::ApplyChanges(Polygon_2 polygon, std::vector<Change> allchange
 	}	
 }
 
-void local_search::swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint, int indexOfSecondPoint){
-
-	
-	// indexOfFirstPoint points to the current point we examine
-
-	Polygon_2::Vertex_iterator vertex = polygon.begin() + indexOfFirstPoint-1; 
-	Point_2 current = Point_2(*vertex);
-
-	
-	polygon.erase(vertex);
-
-	vertex = polygon.begin() + indexOfSecondPoint-1;
-
-	
-	polygon.insert(vertex, current);
-}
-
-void local_search::changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNewPosition){
-
+void local_search::changePositionOfPoint(Polygon_2 &polygon, int indexOfPoint, int indexOfNewPosition){
 	
 	// indexOfPoint points to the point we currently have and indexOfNewPosition points to the point at the new postiion of insertion
 
 	Point_2 newpoint = Point_2(*(polygon.begin() + indexOfPoint-1));
-	std::cout << newpoint << "  Is Removed And Then Inserted" << std::endl;
 
 	//remove point from polygon
 	polygon.erase(polygon.begin() + indexOfPoint-1);
 
 	//insert in new position
 	polygon.insert(polygon.begin() + indexOfNewPosition-1, newpoint);
-	std::cout << "Change Successful" << std::endl;
+	
 }
 
 

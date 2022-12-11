@@ -1,15 +1,19 @@
+#pragma once
+
 #ifndef SUBDIVISION_ANNEALING_HPP
 #define SUBDIVISION_ANNEALING_HPP 
 
 #include "../headers/cgalConfig.hpp"
 
 namespace subdivision_annealing{
-	Polygon_2* simulatedAnnealing(std::vector<Point_2> &points, char* annealing, bool max, int L);
-	Polygon_2* simulatedAnnealingWithSubdivision(std::vector<Point_2> &points, bool max);
+	Polygon_2* simulatedAnnealingWithSubdivision(std::vector<Point_2> &points, bool max, int L, double &initialArea, double &finalArea);
+	void simulatedAnnealing(Polygon_2 &polygon, Segment_2 &leftSegment, Segment_2 &rightSegment, char* annealing, bool max, int L);
 } 
 
-void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfFirstPoint);
-void globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfPoint, int &indexOfNewPlace);
+Polygon_2* mergeSubPolygons(std::vector<Polygon_2> &subPolygons);
+
+void localTransitionStep(Polygon_2 &polygon, Segment_2 &leftSegment, Segment_2 &rightSegment, double &changeOfPolygonArea, int &indexOfFirstPoint);
+void globalTransitionStep(Polygon_2 &polygon, Segment_2 &leftSegment, Segment_2 &rightSegment, double &changeOfPolygonArea, int &indexOfPoint, int &indexOfNewPlace);
 
 void swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint);
 void changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNewPosition);

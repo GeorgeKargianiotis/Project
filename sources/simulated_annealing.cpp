@@ -8,7 +8,7 @@
 #include "../headers/incremental.hpp"
 #include "../headers/utils.hpp"
 
-Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points, char* annealing, bool max, int L){
+Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points, char* annealing, bool max, int L, double &initialArea, double &finalArea){
 
 	srand(time(0));
 
@@ -23,7 +23,7 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 	incremental::incrementalAlgorithm(points, initialization, edgeSelection, polygon);
 	incremental::getConvexHullPolygonFromPoints(polygon.vertices(), convexHullPolygon);
 
-	std::cout << "Area before: " << polygon.area() << std::endl;
+	initialArea = polygon.area();
 
 	double energy = 0, temperature = 1, DE, R = rand() / (RAND_MAX);
 	double convexHullArea = convexHullPolygon.area();
@@ -38,7 +38,7 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 		int indexOfFirstPoint;	//the index of the point, that randomly choosen to be swapped with its next (for both steps)
 		int indexOfNewPosition; //point to be moved, will be inserted before point with this index (only for global step) 
 
-		// make a step
+		// take a step
 		if(strcmp(annealing, "local") == 0)
 			localTransitionStep(polygon, changeOfPolygonArea, indexOfFirstPoint);
 		else
@@ -68,120 +68,10 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 
 	}
 
-	std::cout << "Area after: " << polygon.area() << std::endl;
-
-	std::cout << "success\n";
-
-	return nullptr;
+	return (new Polygon_2(polygon));
 }
 
-// Polygon_2* simulated_annealing::simulatedAnnealingWithSubdivision(std::vector<Point_2> &points, bool max){
-
-
-// 	int m, edgeSelection;
-// 	if(max)
-// 		edgeSelection = 3;
-// 	else
-// 		edgeSelection = 2;
-
-// 	// take input from the user
-// 	std::cout << "Enter number of points in sub-polygons (10 <= m <= 100): \n";
-// 	std::cin >> m;
-
-// 	//configuration for incremental algorithm
-// 	char initialization[2] = {'1', 'a'};
-
-// 	//order by x ascending
-// 	std::sort(points.begin(), points.end(), utils::cmp1aPoint2);
-
-// 	std::vector<int> indexOfLastPointInSubset;
-// 	int numOfSubPolygons = std::ceil( (points.size() - 1) / (m - 1) );
-
-// 	// initialize sub-polygons
-// 	std::vector<Polygon_2> subPolygons;
-// 	for(int i = 0; i < numOfSubPolygons; i++)
-// 		subPolygons.push_back(Polygon_2());
-
-
-// 	// initialize sub-sets, with m points
-// 	int indexOfLastPoint = 0;
-// 	for(int i = 0; i < numOfSubPolygons; i++){
-// 		indexOfLastPoint += m - 1;
-// 		indexOfLastPointInSubset.push_back(indexOfLastPoint);
-// 	}
-
-// 	// if there are remaining points, add them to the last sub-set 
-// 	if(indexOfLastPoint != points.size() - 1)
-// 		indexOfLastPointInSubset.at(numOfSubPolygons - 1) = points.size() - 1;
-
-// 	Polygon_2 leftConvexHull;	
-// 	Polygon_2 rightConvexHull;	
-// 	std::vector<Segment_2> leftLowerSegments; // for each sub-polygon, it holds the left segments that are stable
-// 	leftLowerSegments.push_back(Segment_2(Point_2(-1,-1), Point_2(-1,-1))); // left segment of first polygon set to -1
-// 	std::vector<Segment_2> rightLowerSegments; // for each sub-polygon, it holds the right segments that are stable
-
-// 	// find the convex hull of leftmost subset 
-// 	getConvexHullPolygonFromPoints(points, 0, indexOfLastPointInSubset[0], leftConvexHull);
-
-// 	// find segments of lower hull for every set of sub-sets  [left convexHull --- right convexHull]
-// 	for(int i = 1; i < numOfSubPolygons; i++){
-
-// 		// std::cout << "i - 1 point: " << *(points.begin() + indexOfLastPointInSubset[i-1]) << std::endl; 
-// 		// std::cout << "i point: " << *(points.begin() + indexOfLastPointInSubset[i]) << std::endl; 
-// 		getConvexHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1] - 1, indexOfLastPointInSubset[i], rightConvexHull);
-
-// 		// check if there are two segments meeting the requirements 
-// 		while(1){
-// 			Point_2 rightMostPoint = *(leftConvexHull.right_vertex());
-// 			Point_2 previousRightMostPoint = *(leftConvexHull.right_vertex() - 1);
-// 			Point_2 leftMostPoint = *(rightConvexHull.left_vertex());
-// 			Point_2 nextLeftMostPoint = *(rightConvexHull.left_vertex() + 1);
-
-// 			// if segments dont meet the requirements, we add 1 point to left sub-set and calculate new lower-hulls and repeat the progress 
-// 			if(rightMostPoint.y() < previousRightMostPoint.y() || leftMostPoint.y() < nextLeftMostPoint.y()){
-// 				indexOfLastPointInSubset[i-1] += 1;
-
-// 				leftConvexHull.clear();
-// 				if(i == 1)
-// 					getConvexHullPolygonFromPoints(points, 0, indexOfLastPointInSubset[0], leftConvexHull);
-// 				else
-// 					getConvexHullPolygonFromPoints(points, indexOfLastPointInSubset[i-2] - 1, indexOfLastPointInSubset[i-1], leftConvexHull);
-
-// 				rightConvexHull.clear();
-// 				getConvexHullPolygonFromPoints(points, indexOfLastPointInSubset[i-1] - 1, indexOfLastPointInSubset[i], rightConvexHull);
-
-// 				std::cout << "rightConvex " << rightConvexHull.size() << std::endl;
-// 				continue;
-// 			}
-
-// 			leftLowerSegments.push_back(Segment_2(leftMostPoint, nextLeftMostPoint));
-// 			rightLowerSegments.push_back(Segment_2(previousRightMostPoint, rightMostPoint));
-
-// 			// create the left sub-polygon
-// 			incremental::incrementalAlgorithmForSubdivision(points, initialization, edgeSelection, leftLowerSegments[i - 1], rightLowerSegments[i - 1],  subPolygons[i - 1]);
-
-// 			// run global transition step for sub-polygon 
-
-// 			leftConvexHull = rightConvexHull;
-// 			break;
-// 		}
-
-// 		//utils::polygonToPythonArray(leftConvexHull);
-// 		//utils::polygonToPythonArray(rightConvexHull);
-// 	}
-
-// 	// set the last sub-polygon, set the lower segment -1
-// 	rightLowerSegments.push_back(Segment_2(Point_2(-1,-1), Point_2(-1,-1))); // right segment of last polygon set to -1
-
-// 	for(int i = 0; i < numOfSubPolygons; i++){
-// 		std::cout << leftLowerSegments[i] << " left " << i <<  std::endl;
-// 		std::cout << rightLowerSegments[i] << " right " << i << std::endl;
-// 	}
-
-// 	return nullptr;
-// }
-
-void getConvexHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &convexHullPolygon){
+void simulated_annealing::getConvexHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &convexHullPolygon){
 	convexHullPolygon.clear();
 	std::vector<Point_2> p;
 	CGAL::convex_hull_2(points.begin() + begin, points.begin() + end, std::back_inserter(p));
@@ -189,14 +79,7 @@ void getConvexHullPolygonFromPoints(const std::vector<Point_2> &points, int begi
 		convexHullPolygon.push_back(*it);
 }
 
-// void getLowerHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &lowerHullPolygon){
-// 	std::vector<Point_2> p;
-// 	CGAL::lower_hull_points_2(points.begin() + begin, points.begin() + end, std::back_inserter(p));
-// 	for(auto it = p.begin(); it != p.end(); it++)
-// 		lowerHullPolygon.push_back(*it);
-// }
-
-void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfFirstPoint){
+void simulated_annealing::localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfFirstPoint){
 	//create kd-Tree
 	Tree kdTree;
 	for(Point_2 vertex : polygon.vertices())
@@ -221,10 +104,6 @@ void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &i
 		int minX = minCoordinateX(p, q, r, s);
 		int maxY = maxCoordinateY(p, q, r, s);
 		int minY = minCoordinateY(p, q, r, s);
-
-		// std::cout << '[' << p.x() << ',' << p.y() << "]," << '[' << q.x() << ',' << q.y() << "]," << '[' << r.x() << ',' << r.y() << "]," << '[' << s.x() << ',' << s.y() << "]," << '[' << minX << ',' << minY << ']' << std::endl;
-		// std::cout << "box = [ " <<  '[' << minX << ',' << minY << "]," << '[' << maxX << ',' << minY << "]," << '[' << maxX << ',' << maxY << "]," << '[' << minX << ',' << maxY << "]," << '[' << minX << ',' << minY << "] ]" << std::endl;
-		// utils::polygonToPythonArray(polygon);
 
 		//find the points of polygon in the box
 		std::vector<Point_2> pointsInBox;
@@ -297,8 +176,6 @@ void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &i
 		if(!validPointSwap)
 			continue;
 
-		//utils::polygonToPythonArray(polygon);	
-
 		//swap points
 		swapTwoPoints(polygon, randomPointIndex);	
 
@@ -323,18 +200,11 @@ void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &i
 
 		indexOfFirstPoint = randomPointIndex;
 
-		//utils::printOutput2(polygon, pointsInBox, p, q, r, s);
-		// if(!polygon.is_simple()){
-		// 	std::cout << "Not ok " << randomPointIndex << "\n";
-		// 	exit(1);
-		// }
-		// else
-
 		break;
 	}
 }
 
-void globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfPoint, int &indexOfNewPosition){
+void simulated_annealing::globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfPoint, int &indexOfNewPosition){
 
 	/*
 		let q be the point to change position in the polygon
@@ -383,16 +253,11 @@ void globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &
 		// calculate the change of area
 		changeOfPolygonArea = CGAL::area(s, q, t) - CGAL::area(r, q, p); 
 		
-		// if(!polygon.is_simple()){
-		// 	std::cout << "not simple\n";
-		// 	exit(1);
-		// }
-
 		break;
 	}
 }
 
-void swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint){
+void simulated_annealing::swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint){
 
 	// Let p, q, r, s be four consecutive points in polygon. We remove point q and place it before s
 	Polygon_2::Vertex_iterator vertex = polygon.begin() + indexOfFirstPoint; 
@@ -407,7 +272,7 @@ void swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint){
 	polygon.insert(vertex, q);
 }
 
-void changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNewPosition){
+void simulated_annealing::changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNewPosition){
 
 	// Let r, q, p be three consecutive points. We remove point q and place it in between points s and t
 	Point_2 q = Point_2(*(polygon.begin() + indexOfPoint));
@@ -419,13 +284,13 @@ void changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNe
 	polygon.insert(polygon.begin() + indexOfNewPosition, q);
 }
 
-int triangleOrientation(Point_2 &a, Point_2 &b, Point_2 &c){
+int simulated_annealing::triangleOrientation(Point_2 &a, Point_2 &b, Point_2 &c){
 	int orientation = (b.y() - a.y()) * (c.x() - b.x()) - (b.x() - a.x()) * (c.y() - b.y());
 	if(orientation == 0) return 0;
 	return orientation < 0 ? 1 : -1;	// 1 for counter-clockwise, -1 for clockwise
 }
 
-int maxCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+int simulated_annealing::maxCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
 	int max = p.x();
 	if(q.x() > max)	
 		max = q.x();
@@ -436,7 +301,7 @@ int maxCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
 	return max;
 }
 
-int maxCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+int simulated_annealing::maxCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
 	int max = p.y();
 	if(q.y() > max)	
 		max = q.y();
@@ -447,7 +312,7 @@ int maxCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
 	return max;
 }
 
-int minCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+int simulated_annealing::minCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
 	int min = p.x();
 	if(q.x() < min)	
 		min = q.x();
@@ -458,7 +323,7 @@ int minCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
 	return min;
 }
 
-int minCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+int simulated_annealing::minCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
 	int min = p.y();
 	if(q.y() < min)	
 		min = q.y();

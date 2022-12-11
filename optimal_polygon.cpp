@@ -1,3 +1,4 @@
+#include <chrono>
 #include <iostream>
 #include <vector>
 #include <string>
@@ -8,6 +9,7 @@
 #include "headers/convex_hull.hpp"
 #include "headers/local_search.hpp"
 #include "headers/simulated_annealing.hpp"
+#include "../headers/subdivision_annealing.hpp"
 #include "headers/cgalConfig.hpp"
 
 void readArguments(int argc, char* argv[], bool &max, bool &min);
@@ -35,15 +37,31 @@ int main(int argc, char* argv[]){
 	inFile.close();
 
 	if(std::string(algorithm).compare("simulated_annealing") == 0){
+
+		Polygon_2 *polygon;
+		double initialArea = 0, finalArea = 0;
+
+		auto start = std::chrono::high_resolution_clock::now();
+
 		if(std::string(annealing).compare("subdivision") != 0)
-			simulated_annealing::simulatedAnnealing(points, annealing, max, std::stoi(L));
+			polygon = simulated_annealing::simulatedAnnealing(points, annealing, max, std::stoi(L), initialArea, finalArea);
 		else
-			simulated_annealing::simulatedAnnealingWithSubdivision(points, max);
+			polygon = subdivision_annealing::simulatedAnnealingWithSubdivision(points, max, std::stoi(L), initialArea, finalArea);
+
+		auto stop = std::chrono::high_resolution_clock::now();
+		auto executionTime = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
+
+		finalArea = polygon->area();
+
+		// print output in file
+		utils::writeToOutputFile(outFile, points, *polygon, algorithm, max, initialArea, finalArea, executionTime.count());
+
+		delete polygon;
 	}
 	else if(std::string(algorithm).compare("local_search") == 0){
 		//get the starting simple polygon
-		char initialization[2] = {'2', 'a'};
 		Polygon_2 polygon;
+		char initialization[2] = {'2', 'a'};
 		incremental::incrementalAlgorithm(points, initialization, 2, polygon);
 
 		if(max){

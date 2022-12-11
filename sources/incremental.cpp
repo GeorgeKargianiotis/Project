@@ -9,11 +9,9 @@
 #include "../headers/cgalConfig.hpp"
 #include "../headers/utils.hpp"
 
-void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &points, char *initialization, int edgeSelection, Segment_2 &leftSegment, Segment_2 &rightSegment, Polygon_2 &polygon){
+void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &points, int begin, int end, char *initialization, int edgeSelection, Segment_2 &leftSegment, Segment_2 &rightSegment, Polygon_2 &polygon){
 
 	srand(time(0));
-
-	auto start = std::chrono::high_resolution_clock::now();
 
 	bool leftSegmentIsInPolygon = false;
 	bool rightSegmentIsInPolygon = false;
@@ -46,15 +44,15 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 	double polygonArea;
 	
 	// initialize polygon with the 3 first sorted points
-	polygon.push_back(points[0]);
-	polygon.push_back(points[1]);
-	polygon.push_back(points[2]);
+	polygon.push_back(points[begin + 0]);
+	polygon.push_back(points[begin + 1]);
+	polygon.push_back(points[begin + 2]);
 
 	if(polygon[0] == leftSegment.start() && (polygon[1] == leftSegment.end() || polygon[2] == leftSegment.end()) )
 		leftSegmentIsInPolygon = true;
 
 	// add points until a triangle get shaped
-	int i = 0;
+	int i = begin;
 	while(CGAL::collinear(points[i], points[i+1], points[i+2])){
 		i++;
 		polygon.push_back(points[i+2]);
@@ -70,7 +68,7 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 	polygonArea = std::abs(CGAL::area(points[0], points[1], points[i+2]));
 	std::vector<Segment_2> visibleEdges;
 
-	while(lastPointExpandPolygonIndex != points.size() - 1){
+	while(lastPointExpandPolygonIndex != points.size() - 1 || lastPointExpandPolygonIndex == end){
 		lastPointExpandPolygonIndex++;
 
 		Point_2 newPoint = points[lastPointExpandPolygonIndex];
@@ -161,7 +159,8 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 				 break;
 
 				if(visibleEdges.size() == 0){
-					std::cout << "No valid visibleEdges\n";
+					utils::polygonToPythonArray(polygon, "polygonAfterStep");
+					std::cout << "No valid visibleEdges without breaking segments\n";
 					exit(1);
 				}
 				else
@@ -203,27 +202,21 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 		insertNewPointToPolygon(polygon, edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint);
 	}
 
-	auto stop = std::chrono::high_resolution_clock::now();
-	auto executionTime = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-
-	if(!leftSegmentIsInPolygon || !rightSegmentIsInPolygon){
-		std::cerr << "Two segments haven's been inserted in polygon\n";
+	if(!leftSegmentIsInPolygon){
+		std::cerr << "Left segment have not been inserted in polygon\n";
 		exit(1);
 	}
 
-	//std::cout << "Segments inserted correct in polygon\n";
-
-	//write output
-	//utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, polygonArea, executionTime.count(), initialization);
-	//std::cout << "Success" << std::endl;
+	if(!rightSegmentIsInPolygon){
+		std::cerr << "Right segment have not been inserted in polygon\n";
+		exit(1);
+	}
 }
 
 //void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile, Polygon_2 &polygon){
 void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, Polygon_2 &polygon){
 
 	srand(time(0));
-
-	auto start = std::chrono::high_resolution_clock::now();
 
 	//order by x ascending
 	if(std::string(initialization).compare(SORT_BY_X_ASC) == 0)
@@ -354,13 +347,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		//insert the new point to the right position in polygon
 		insertNewPointToPolygon(polygon, edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint);
 	}
-
-	auto stop = std::chrono::high_resolution_clock::now();
-	auto executionTime = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-
-	//write output
-	//utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, polygonArea, executionTime.count(), initialization);
-	//std::cout << "Success" << std::endl;
 }
 
 // int lastPointExpandPolygonIndex,

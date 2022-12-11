@@ -13,7 +13,7 @@
 #define MAX_AREA_EDGE_SELECTION 3
 
 namespace incremental {
-	void incrementalAlgorithmForSubdivision(std::vector<Point_2> &points, char *initialization, int edgeSelection, Segment_2 &leftSegment, Segment_2 &rightSegment, Polygon_2 &polygon);
+	void incrementalAlgorithmForSubdivision(std::vector<Point_2> &points, int begin, int end, char *initialization, int edgeSelection, Segment_2 &leftSegment, Segment_2 &rightSegment, Polygon_2 &polygon);
 	void incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, Polygon_2 &polygon);
 	void getConvexHullPolygonFromPoints(const Polygon_2::Vertices &vertices, Polygon_2 &convexHullPolygon);
 	//void incrementalAlgorithm(std::vector<Point_2> &Points, char *initialization, int edgeSelection, std::ofstream &outFile);

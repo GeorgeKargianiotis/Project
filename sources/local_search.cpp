@@ -122,8 +122,7 @@ void local_search::local_search_algorithm(Polygon_2 greedypolygon, std::ofstream
 	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
 	//write output
-	utils::writeToOutputFile(outFile, Points, old, greedypolygon, 0, std::abs(old.area()), executionTime.count(), "none");
-	std::cout << "Success" << std::endl;
+	//utils::writeToOutputFile(outFile, Points, old, greedypolygon, 0, std::abs(old.area()), executionTime.count(), "none");
 }	
 
 int local_search::InsertPointForLS(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint){

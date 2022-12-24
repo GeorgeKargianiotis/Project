@@ -8,17 +8,34 @@
 #include "../headers/incremental.hpp"
 #include "../headers/utils.hpp"
 
+<<<<<<< HEAD
 Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points, char* annealing, bool max, int L){
+=======
+Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points, char* annealing, bool max, int L, double &initialArea, double &finalArea){
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 
 	srand(time(0));
 
 	//get the starting simple polygon
 	char initialization[2] = {'1', 'a'};
+<<<<<<< HEAD
 	Polygon_2 polygon, convexHullPolygon;
 	incremental::incrementalAlgorithm(points, initialization, 1, polygon);
 	incremental::getConvexHullPolygonFromPoints(polygon.vertices(), convexHullPolygon);
 
 	std::cout << "Area before: " << polygon.area() << std::endl;
+=======
+	int edgeSelection; 
+	if(max)
+		edgeSelection = 3;
+	else
+		edgeSelection = 2;
+	Polygon_2 polygon, convexHullPolygon;
+	incremental::incrementalAlgorithm(points, initialization, edgeSelection, polygon);
+	incremental::getConvexHullPolygonFromPoints(polygon.vertices(), convexHullPolygon);
+
+	initialArea = polygon.area();
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 
 	double energy = 0, temperature = 1, DE, R = rand() / (RAND_MAX);
 	double convexHullArea = convexHullPolygon.area();
@@ -33,7 +50,11 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 		int indexOfFirstPoint;	//the index of the point, that randomly choosen to be swapped with its next (for both steps)
 		int indexOfNewPosition; //point to be moved, will be inserted before point with this index (only for global step) 
 
+<<<<<<< HEAD
 		// make a step
+=======
+		// take a step
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 		if(strcmp(annealing, "local") == 0)
 			localTransitionStep(polygon, changeOfPolygonArea, indexOfFirstPoint);
 		else
@@ -63,6 +84,7 @@ Polygon_2* simulated_annealing::simulatedAnnealing(std::vector<Point_2> &points,
 
 	}
 
+<<<<<<< HEAD
 	std::cout << "Area after: " << polygon.area() << std::endl;
 
 	std::cout << "success\n";
@@ -116,6 +138,20 @@ Polygon_2* simulated_annealing::simulatedAnnealingWithSubdivision(std::vector<Po
 }
 
 void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfFirstPoint){
+=======
+	return (new Polygon_2(polygon));
+}
+
+void simulated_annealing::getConvexHullPolygonFromPoints(const std::vector<Point_2> &points, int begin, int end, Polygon_2 &convexHullPolygon){
+	convexHullPolygon.clear();
+	std::vector<Point_2> p;
+	CGAL::convex_hull_2(points.begin() + begin, points.begin() + end, std::back_inserter(p));
+	for(auto it = p.begin(); it != p.end(); it++)
+		convexHullPolygon.push_back(*it);
+}
+
+void simulated_annealing::localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfFirstPoint){
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 	//create kd-Tree
 	Tree kdTree;
 	for(Point_2 vertex : polygon.vertices())
@@ -141,10 +177,13 @@ void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &i
 		int maxY = maxCoordinateY(p, q, r, s);
 		int minY = minCoordinateY(p, q, r, s);
 
+<<<<<<< HEAD
 		// std::cout << '[' << p.x() << ',' << p.y() << "]," << '[' << q.x() << ',' << q.y() << "]," << '[' << r.x() << ',' << r.y() << "]," << '[' << s.x() << ',' << s.y() << "]," << '[' << minX << ',' << minY << ']' << std::endl;
 		// std::cout << "box = [ " <<  '[' << minX << ',' << minY << "]," << '[' << maxX << ',' << minY << "]," << '[' << maxX << ',' << maxY << "]," << '[' << minX << ',' << maxY << "]," << '[' << minX << ',' << minY << "] ]" << std::endl;
 		// utils::polygonToPythonArray(polygon);
 
+=======
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 		//find the points of polygon in the box
 		std::vector<Point_2> pointsInBox;
 		Fuzzy_iso_box searchBox(Point_2(minX, minY), Point_2(maxX, maxY));
@@ -216,8 +255,11 @@ void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &i
 		if(!validPointSwap)
 			continue;
 
+<<<<<<< HEAD
 		//utils::polygonToPythonArray(polygon);	
 
+=======
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 		//swap points
 		swapTwoPoints(polygon, randomPointIndex);	
 
@@ -242,6 +284,7 @@ void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &i
 
 		indexOfFirstPoint = randomPointIndex;
 
+<<<<<<< HEAD
 		//utils::printOutput2(polygon, pointsInBox, p, q, r, s);
 		// if(!polygon.is_simple()){
 		// 	std::cout << "Not ok " << randomPointIndex << "\n";
@@ -249,11 +292,17 @@ void localTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &i
 		// }
 		// else
 
+=======
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 		break;
 	}
 }
 
+<<<<<<< HEAD
 void globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfPoint, int &indexOfNewPosition){
+=======
+void simulated_annealing::globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &indexOfPoint, int &indexOfNewPosition){
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 
 	/*
 		let q be the point to change position in the polygon
@@ -302,20 +351,29 @@ void globalTransitionStep(Polygon_2 &polygon, double &changeOfPolygonArea, int &
 		// calculate the change of area
 		changeOfPolygonArea = CGAL::area(s, q, t) - CGAL::area(r, q, p); 
 		
+<<<<<<< HEAD
 		// if(!polygon.is_simple()){
 		// 	std::cout << "not simple\n";
 		// 	exit(1);
 		// }
 
+=======
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 		break;
 	}
 }
 
+<<<<<<< HEAD
 void swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint){
 
 	// Let p, q, r, s be four consecutive points in polygon. We remove point q and place it before s
 	// indexOfFirstPoint points to q
 
+=======
+void simulated_annealing::swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint){
+
+	// Let p, q, r, s be four consecutive points in polygon. We remove point q and place it before s
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 	Polygon_2::Vertex_iterator vertex = polygon.begin() + indexOfFirstPoint; 
 	Point_2 q = Point_2(*vertex);
 
@@ -328,6 +386,7 @@ void swapTwoPoints(Polygon_2 &polygon, int indexOfFirstPoint){
 	polygon.insert(vertex, q);
 }
 
+<<<<<<< HEAD
 void changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNewPosition){
 
 	// Let r, q, p be three consecutive points. We remove point q and place it in between points s and t
@@ -336,6 +395,11 @@ void changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNe
 	// if(indexOfPoint < indexOfNewPosition)
 	// 	indexOfNewPosition--;
 
+=======
+void simulated_annealing::changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNewPosition){
+
+	// Let r, q, p be three consecutive points. We remove point q and place it in between points s and t
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 	Point_2 q = Point_2(*(polygon.begin() + indexOfPoint));
 
 	//remove point q from polygon
@@ -345,13 +409,21 @@ void changePositionOfPoint(Polygon_2 &polygon, int &indexOfPoint, int &indexOfNe
 	polygon.insert(polygon.begin() + indexOfNewPosition, q);
 }
 
+<<<<<<< HEAD
 int triangleOrientation(Point_2 &a, Point_2 &b, Point_2 &c){
+=======
+int simulated_annealing::triangleOrientation(Point_2 &a, Point_2 &b, Point_2 &c){
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 	int orientation = (b.y() - a.y()) * (c.x() - b.x()) - (b.x() - a.x()) * (c.y() - b.y());
 	if(orientation == 0) return 0;
 	return orientation < 0 ? 1 : -1;	// 1 for counter-clockwise, -1 for clockwise
 }
 
+<<<<<<< HEAD
 int maxCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+=======
+int simulated_annealing::maxCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 	int max = p.x();
 	if(q.x() > max)	
 		max = q.x();
@@ -362,7 +434,11 @@ int maxCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
 	return max;
 }
 
+<<<<<<< HEAD
 int maxCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+=======
+int simulated_annealing::maxCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 	int max = p.y();
 	if(q.y() > max)	
 		max = q.y();
@@ -373,7 +449,11 @@ int maxCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
 	return max;
 }
 
+<<<<<<< HEAD
 int minCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+=======
+int simulated_annealing::minCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 	int min = p.x();
 	if(q.x() < min)	
 		min = q.x();
@@ -384,7 +464,11 @@ int minCoordinateX(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
 	return min;
 }
 
+<<<<<<< HEAD
 int minCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+=======
+int simulated_annealing::minCoordinateY(Point_2 &p, Point_2 &q, Point_2 &r, Point_2 &s){
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 	int min = p.y();
 	if(q.y() < min)	
 		min = q.y();

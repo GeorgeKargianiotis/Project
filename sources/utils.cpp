@@ -4,6 +4,7 @@
 
 #include "../headers/utils.hpp"
 #include "../headers/cgalConfig.hpp"
+#include "../headers/incremental.hpp"
 
 std::vector<std::string> utils::splitString(std::string &str, char delimiter = ' '){
 	std::vector<std::string> split;
@@ -21,8 +22,7 @@ std::vector<std::string> utils::splitString(std::string &str, char delimiter = '
 	return split;
 }
 
-
-void utils::writeToOutputFile(std::ofstream &outFile, std::vector<Point_2> &points, Polygon_2 &polygon, Polygon_2 &convexHullPolygon, int edgeSelection, int polygonArea, const int64_t &executionTime, char* initialization){
+void utils::writeToOutputFile(std::ofstream &outFile, std::vector<Point_2> &points, Polygon_2 &polygon, char* algorithm, bool max, double initialArea, double finalArea, const int64_t &executionTime){
 	//wirite polygon's points
 	for(Point_2 point : points)
 		outFile << point.x() << " " << point.y() << "\n"; 
@@ -31,13 +31,26 @@ void utils::writeToOutputFile(std::ofstream &outFile, std::vector<Point_2> &poin
 	for(Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++)
 		outFile << edge->start() << " " << edge->end() << "\n";
 
+<<<<<<< HEAD
 	outFile << "Alogrithm: incremental edge_selection " << edgeSelection; 
 	if(initialization != nullptr)
 		outFile << " initilization " << initialization[0] << initialization[1];  
+=======
+	outFile << "Alogrithm: " << algorithm << "_";
+	if(max)
+		outFile << "max"; 
+	else
+		outFile << "min"; 
 
-	outFile << "\narea: " << polygonArea << "\n";
+	outFile << "\narea_initial: " << initialArea;
 
-	outFile << "ratio: " << polygonArea / convexHullPolygon.area() << "\n";
+	outFile << "\narea: " << finalArea << "\n";
+>>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
+
+	Polygon_2 convexHull; 
+	incremental::getConvexHullPolygonFromPoints(polygon.vertices(), convexHull);
+
+	outFile << "ratio: " << finalArea / convexHull.area() << "\n";
 
 	outFile << "construction time: " << executionTime << " ms\n";
 }

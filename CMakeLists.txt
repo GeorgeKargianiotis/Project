@@ -10,7 +10,7 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+#set(CMAKE_CXX_FLAGS "-Wall -Wextra")
 set(CMAKE__CXX_FLAGS_RELEASE "-O3")
 set(CMAKE_CXX_FLAGS_DEBUG "-g")
 
@@ -39,7 +39,7 @@ endif()
 # include for local directory
 add_subdirectory(sources)
 include_directories(headers)
-list(APPEND EXTRA_LIBS utils incremental convex_hull local_search simulated_annealing)
+list(APPEND EXTRA_LIBS utils incremental convex_hull local_search simulated_annealing subdivision_annealing)
 # include for local package
 
 # Creating entries for target: polygonization

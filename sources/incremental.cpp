@@ -9,10 +9,6 @@
 #include "../headers/cgalConfig.hpp"
 #include "../headers/utils.hpp"
 
-<<<<<<< HEAD
-//void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, std::ofstream &outFile, Polygon_2 &polygon){
-void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initialization, int edgeSelection, Polygon_2 &polygon){
-=======
 void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &points, int begin, int end, char *initialization, int edgeSelection, Segment_2 &leftSegment, Segment_2 &rightSegment, Polygon_2 &polygon){
 
 	srand(time(0));
@@ -102,7 +98,6 @@ void incremental::incrementalAlgorithmForSubdivision(std::vector<Point_2> &point
 
 				//find visible edges
 				for(Polygon_2::Vertex_iterator vertex = polygon.begin(); vertex != polygon.end(); vertex++){
->>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 
 					if(vertex == polygon.end())
 						break;

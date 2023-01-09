@@ -12,6 +12,13 @@
 #include "../headers/subdivision_annealing.hpp"
 #include "headers/cgalConfig.hpp"
 
+// Preprocess 
+// While 1, keep running each file
+// add parameters from 1 and 2 and compare
+// print results as requested
+
+
+
 void readArguments(int argc, char* argv[], bool &max, bool &min);
 
 char *inputFile, *outputFile, *algorithm, *L, *threshold, *annealing;

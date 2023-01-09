@@ -312,14 +312,9 @@ void convex_hull::convex_HullAlgorithm(std::vector<Point_2> &Points, int edge, s
 	auto executionTime = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
 
 	//write output
-<<<<<<< HEAD
-	utils::writeToOutputFile(outFile, Points, polygonchain, mypolygon, edge, std::abs(mypolygon.area()), executionTime.count(), "none");
+	utils::writeToOutputFile(outFile, Points, polygonchain, "convex_hull", edge, std::abs(mypolygon.area()), executionTime.count(), 0);
 	std::cout << "Success" << std::endl;
 	//utils::local_search_algorithm(polygonchain, outFile, 1, "max", 0.0);
-=======
-	//utils::writeToOutputFile(outFile, Points, polygonchain, mypolygon, edge, std::abs(mypolygon.area()), executionTime.count());
-	std::cout << "Success" << std::endl;
->>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 }	
 
 int insertNewPointToPolygonCH(Polygon_2 &polygon, const Point_2 &begin, const Point_2 &end, Point_2 newPoint){

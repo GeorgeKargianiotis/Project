@@ -1,4 +1,3 @@
-
 #include <vector>
 #include <string>
 
@@ -23,6 +22,9 @@ std::vector<std::string> utils::splitString(std::string &str, char delimiter = '
 }
 
 void utils::writeToOutputFile(std::ofstream &outFile, std::vector<Point_2> &points, Polygon_2 &polygon, char* algorithm, bool max, double initialArea, double finalArea, const int64_t &executionTime){
+
+	outFile << "Optimal Area Polygonization\n";
+
 	//wirite polygon's points
 	for(Point_2 point : points)
 		outFile << point.x() << " " << point.y() << "\n"; 
@@ -31,11 +33,6 @@ void utils::writeToOutputFile(std::ofstream &outFile, std::vector<Point_2> &poin
 	for(Polygon_2::Edge_const_iterator edge = polygon.edges().begin(); edge != polygon.edges().end(); edge++)
 		outFile << edge->start() << " " << edge->end() << "\n";
 
-<<<<<<< HEAD
-	outFile << "Alogrithm: incremental edge_selection " << edgeSelection; 
-	if(initialization != nullptr)
-		outFile << " initilization " << initialization[0] << initialization[1];  
-=======
 	outFile << "Alogrithm: " << algorithm << "_";
 	if(max)
 		outFile << "max"; 
@@ -45,7 +42,6 @@ void utils::writeToOutputFile(std::ofstream &outFile, std::vector<Point_2> &poin
 	outFile << "\narea_initial: " << initialArea;
 
 	outFile << "\narea: " << finalArea << "\n";
->>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 
 	Polygon_2 convexHull; 
 	incremental::getConvexHullPolygonFromPoints(polygon.vertices(), convexHull);

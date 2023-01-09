@@ -121,6 +121,13 @@ Polygon_2* subdivision_annealing::simulatedAnnealingWithSubdivision(std::vector<
 	// merge optimal subPolygons into one polygon
 	Polygon_2 *unifyPolygon = mergeSubPolygons(subPolygons);
 
+	// Dummy Segments
+	Segment_2 dummyLeft = Segment_2(Point_2(-1, -1), Point_2(-1, -1));
+	Segment_2 dummyRight = Segment_2(Point_2(-1, -1), Point_2(-1, -1));
+
+	// perform local step on the unify polygon
+	simulatedAnnealing(*unifyPolygon, dummyLeft, dummyRight, "local", max, L);
+
 	return unifyPolygon	;
 }
 

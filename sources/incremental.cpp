@@ -347,16 +347,6 @@ void incremental::incrementalAlgorithm(std::vector<Point_2> &points, char *initi
 		//insert the new point to the right position in polygon
 		insertNewPointToPolygon(polygon, edgeToBeReplaced.start(), edgeToBeReplaced.end(), newPoint);
 	}
-<<<<<<< HEAD
-
-	auto stop = std::chrono::high_resolution_clock::now();
-	auto executionTime = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-
-	//write output
-	//utils::writeToOutputFile(outFile, points, polygon, convexHullPolygon, edgeSelection, polygonArea, executionTime.count(), initialization);
-	//std::cout << "Success" << std::endl;
-=======
->>>>>>> 8a5ddaf3be06ee384c9d15cafb5df0f4d30a9f88
 }
 
 // int lastPointExpandPolygonIndex,

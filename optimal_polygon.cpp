@@ -9,15 +9,16 @@
 #include "headers/convex_hull.hpp"
 #include "headers/local_search.hpp"
 #include "headers/simulated_annealing.hpp"
-#include "../headers/subdivision_annealing.hpp"
+#include "headers/subdivision_annealing.hpp"
 #include "headers/cgalConfig.hpp"
 
 void readArguments(int argc, char* argv[], bool &max, bool &min);
 
-char *inputFile, *outputFile, *algorithm, *L, *threshold, *annealing;
+char *inputFile, *outputFile, *algorithm, *L, *threshold, *annealing, *initialization, *edgeSelection;
 
 int main(int argc, char* argv[]){
 
+	
 	bool max, min;
 	readArguments(argc, argv, max, min);
 	std::ifstream inFile(inputFile);

@@ -9,10 +9,11 @@
 			"type": "cppdbg",
 			"request": "launch",
 			//"program": "${workspaceFolder}/polygonization",
-			"program": "${workspaceFolder}/optimal_polygon",
+			//"program": "${workspaceFolder}/optimal_polygon",
+			"program": "${workspaceFolder}/evaluation",
 			"args": [
 				"-i",
-				"../images/euro-night-0000100.instance",
+				"euro-night-0000100.instance",
 				"-o", 
 				"output.txt",
 				"-algorithm",

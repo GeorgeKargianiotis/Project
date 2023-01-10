@@ -12,18 +12,25 @@
 #include "../headers/subdivision_annealing.hpp"
 #include "headers/cgalConfig.hpp"
 
-// Preprocess 
-// While 1, keep running each file
-// add parameters from 1 and 2 and compare
-// print results as requested
-
-
 
 void readArguments(int argc, char* argv[], bool &max, bool &min);
 
 char *inputFile, *outputFile, *algorithm, *L, *threshold, *annealing;
 
 int main(int argc, char* argv[]){
+
+	// Preprocess 
+	// While 1, keep running each file
+	// add parameters from 1 and 2 and compare
+	// print results as requested
+	std::string alg1 = "incremental", alg2 = "covex_hull", alg3 = "local_search", alg4 = "subdivision";
+
+	std::cout << "|| Algorithm 1: " << alg1 << " ||" << std::endl ;
+	std::cout << "Size: " << "10" << std::endl;
+	std::cout << "Min Score: " << " " << std::endl;
+	std::cout << "Max Score: " << " " << std::endl;
+	std::cout << "Min Bound: " << " " << std::endl;
+	std::cout << "Max Bound: " << " " << std::endl;
 
 	bool max, min;
 	readArguments(argc, argv, max, min);

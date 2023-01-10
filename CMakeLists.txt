@@ -4,7 +4,8 @@
 cmake_minimum_required(VERSION 3.1...3.23)
 
 #project( polygonization )
-project( optimal_polygon )
+#project( optimal_polygon )
+project(evaluate)
 
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
@@ -46,9 +47,9 @@ list(APPEND EXTRA_LIBS utils incremental convex_hull local_search simulated_anne
 # ############################
 
 #add_executable( polygonization polygonization.cpp )
-add_executable( optimal_polygon optimal_polygon.cpp )
+add_executable( evaluate evaluate.cpp)
 
-add_to_cached_list( CGAL_EXECUTABLE_TARGETS optimal_polygon )
+add_to_cached_list( CGAL_EXECUTABLE_TARGETS evaluate )
 
 # Link the executable to CGAL and third-party libraries
-target_link_libraries(optimal_polygon PRIVATE CGAL::CGAL ${EXTRA_LIBS})
+target_link_libraries(evaluate PRIVATE CGAL::CGAL ${EXTRA_LIBS})

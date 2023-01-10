@@ -32,7 +32,7 @@ int main(int argc, char* argv[]){
 	inFile.close();
 
 	if(std::string(algorithm).compare("incremental") == 0)
-		incremental::incrementalAlgorithm(Points2, initialization, std::stoi(edgeSelection), outFile, polygon);
+		//incremental::incrementalAlgorithm(Points2, initialization, std::stoi(edgeSelection), outFile, polygon);
 
 	// Need int for convex hull edges
 	if(std::string(algorithm).compare("convex_hull") == 0)

@@ -3,6 +3,10 @@
 #include <vector>
 #include <string>
 #include <fstream>
+#include <filesystem>
+#include <dirent.h>
+#include <sys/types.h>
+
 
 #include "headers/utils.hpp"
 #include "headers/incremental.hpp"
@@ -11,7 +15,7 @@
 #include "headers/simulated_annealing.hpp"
 #include "../headers/subdivision_annealing.hpp"
 #include "headers/cgalConfig.hpp"
-
+// -std = c++17;
 
 void readArguments(int argc, char* argv[], bool &max, bool &min);
 
@@ -31,6 +35,44 @@ int main(int argc, char* argv[]){
 	std::cout << "Max Score: " << " " << std::endl;
 	std::cout << "Min Bound: " << " " << std::endl;
 	std::cout << "Max Bound: " << " " << std::endl;
+
+	/*for (auto& file : std::filesystem::directory_iterator{ "." })  //loop through the current folder
+    {
+        std::ifstream fs{ file.path() };    //open the file
+        //or because directory_entry is implicit converted to a path, so you can do 
+        //std::ifstream fs{ file };
+        //... process the file
+    }*/
+
+	/*	vector<string> list_dir(const char *path) {
+	vector<string> AllFilesName;
+	struct dirent *entry;
+	DIR *dir = opendir(path);
+
+	if (dir == NULL) {
+	return;
+	}
+
+	//readdir return a pointer to the entry of a folder (could be any type not only .txt)
+
+	while ((entry = readdir(dir)) != NULL) {
+	AllFilesName.push_back(entry->d_name);
+	//push the name of every file
+	}
+	closedir(dir);
+	return AllFilesName; 
+	}
+	string readFile(string name){
+		ifstream inFile;
+		inFile.open("C:\\temp\\"+name);//concatenate the name with the directory path
+	//just replace your folder path with C:\\temp
+		while(inFile >> x) {
+			//x is the content of the file do whatever you want
+		}
+		//return the contetn of the text 
+	} */
+
+
 
 	bool max, min;
 	readArguments(argc, argv, max, min);

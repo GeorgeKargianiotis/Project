@@ -158,7 +158,7 @@ void local_search::local_search_algorithm(Polygon_2 &greedypolygon, std::ofstrea
 		}
 		// After going through every point for a specific edge, apply the changes and update the optimal change	
 		newpol = greedypolygon;
-		local_search::ApplyChanges(greedypolygon, allchanges);
+		// local_search::ApplyChanges(greedypolygon, allchanges);
 		
 		if (std::string(area).compare("max") == 0){
 			optimal = greedypolygon.area() - newpol.area();

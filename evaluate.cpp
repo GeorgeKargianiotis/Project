@@ -36,31 +36,26 @@ int main(int argc, char* argv[]){
 	std::cout << "Min Bound: " << " " << std::endl;
 	std::cout << "Max Bound: " << " " << std::endl;
 
-	/*for (auto& file : std::filesystem::directory_iterator{ "." })  //loop through the current folder
-    {
-        std::ifstream fs{ file.path() };    //open the file
-        //or because directory_entry is implicit converted to a path, so you can do 
-        //std::ifstream fs{ file };
-        //... process the file
-    }*/
+	// Reading through file, in case we need mulitple tests
 
-	/*	vector<string> list_dir(const char *path) {
-	vector<string> AllFilesName;
-	struct dirent *entry;
-	DIR *dir = opendir(path);
+	/*std::vector<std::string> list_dir(const char *path){
 
-	if (dir == NULL) {
-	return;
-	}
+		std::vector<std::string> AllFilesName;
+		struct dirent *entry;
+		DIR *dir = opendir(path);
 
-	//readdir return a pointer to the entry of a folder (could be any type not only .txt)
+		if (dir == NULL) {
+			return;
+		}
 
-	while ((entry = readdir(dir)) != NULL) {
-	AllFilesName.push_back(entry->d_name);
-	//push the name of every file
-	}
-	closedir(dir);
-	return AllFilesName; 
+		//readdir return a pointer to the entry of a folder (could be any type not only .txt)
+
+		while ((entry = readdir(dir)) != NULL) {
+			AllFilesName.push_back(entry->d_name);
+			//push the name of every file
+		}
+		closedir(dir);
+		return AllFilesName; 
 	}
 	string readFile(string name){
 		ifstream inFile;
@@ -70,12 +65,10 @@ int main(int argc, char* argv[]){
 			//x is the content of the file do whatever you want
 		}
 		//return the contetn of the text 
-	} */
+	}*/
 
-
-
-	bool max, min;
-	readArguments(argc, argv, max, min);
+	bool max, min, init; // 1 for incremental, 0 for convex_hull
+	readArguments(argc, argv, max, min, init);
 	std::ifstream inFile(inputFile);
 	std::ofstream outFile(outputFile);
 	std::string line;
@@ -118,7 +111,13 @@ int main(int argc, char* argv[]){
 		//get the starting simple polygon
 		Polygon_2 polygon;
 		char initialization[2] = {'2', 'a'};
-		incremental::incrementalAlgorithm(points, initialization, 2, polygon);
+
+		if (init == 1){
+			incremental::incrementalAlgorithm(points, initialization, 2, polygon);
+		}
+		else{
+			convex_hull::convex_HullAlgorithm(points, 1, outFile);
+		}	
 
 		if(max){
 			local_search::local_search_algorithm(polygon, outFile, std::stoi(L), "max", std::stoi(threshold));
@@ -133,8 +132,9 @@ int main(int argc, char* argv[]){
 	return 0;
 }
 
-void readArguments(int argc, char* argv[], bool &max, bool &min){
-	if(argc != 12){
+
+void readArguments(int argc, char* argv[], bool &max, bool &min, bool &init){
+	if(argc != 13){
 		std::cerr << "Λάθος αριθμός ορισμάτων." << std::endl;
 		std::cerr << "$./optima_polygon –i <point set input file> –ο <output file> –algorithm <local_search or simulated_annealing> -L [L parameter according to algorithm] –max [maximal area polygonization] –min [minimal area polygonization] –threshold <double> [in local search] –annealing <'local' or 'global' or 'subdivision' in simulated annealing>" << std::endl;
 		exit(EXIT_FAILURE);
@@ -152,6 +152,7 @@ void readArguments(int argc, char* argv[], bool &max, bool &min){
 				exit(1);
 			}
 			algorithm = argv[i+1];
+			init = argv[12];
 		}
 		else if(strcmp(argv[i], "-L") == 0)
 			L = argv[i+1];
@@ -173,7 +174,7 @@ void readArguments(int argc, char* argv[], bool &max, bool &min){
 			annealing = argv[i+1];
 		}
 		else{
-			std::cout << "Wrong argument " << argv[i] << std::endl;
+			std::cout << "Wrong argument given" << argv[i] << std::endl;
 			exit(EXIT_FAILURE);
 		}
 	}
@@ -188,7 +189,8 @@ void readArguments(int argc, char* argv[], bool &max, bool &min){
 	}
 
 	if(!max && !min){
-		std::cerr << "You set max or min argument\n";
+		std::cerr << "You must set max or min argument\n";
 		exit(1);
 	}
+
 }
